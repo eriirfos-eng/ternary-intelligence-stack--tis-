@@ -1,0 +1,275 @@
+(* ===================================================== *)
+(* Ternlang Grammar Specification v0.1                   *)
+(* Ternary Intelligence Stack                            *)
+(* ===================================================== *)
+
+program             = module_decl? import_decl* declaration* ;
+
+(* ----------------------------------------------------- *)
+(* Module and Imports                                    *)
+(* ----------------------------------------------------- *)
+
+module_decl         = "module" identifier ";" ;
+
+import_decl         = "use" namespace_path ";" ;
+
+namespace_path      = identifier ("::" identifier)* ;
+
+(* ----------------------------------------------------- *)
+(* Top-Level Declarations                                *)
+(* ----------------------------------------------------- *)
+
+declaration         = variable_decl
+                    | function_decl
+                    | struct_decl
+                    | enum_decl
+                    | agent_decl
+                    ;
+
+(* ----------------------------------------------------- *)
+(* Variable Declarations                                 *)
+(* ----------------------------------------------------- *)
+
+variable_decl       = ("let" | "const")
+                      "mut"?
+                      identifier
+                      ":"
+                      type
+                      ("=" expression)?
+                      ";"
+                      ;
+
+(* ----------------------------------------------------- *)
+(* Function Declarations                                 *)
+(* ----------------------------------------------------- *)
+
+function_decl       = "fn"
+                      identifier
+                      "(" parameter_list? ")"
+                      "->"
+                      type
+                      block
+                      ;
+
+parameter_list      = parameter ("," parameter)* ;
+
+parameter           = identifier ":" type ;
+
+(* ----------------------------------------------------- *)
+(* Agent / Actor Model                                   *)
+(* ----------------------------------------------------- *)
+
+agent_decl          = "agent"
+                      identifier
+                      block
+                      ;
+
+(* ----------------------------------------------------- *)
+(* Structs and Enums                                     *)
+(* ----------------------------------------------------- *)
+
+struct_decl         = "struct"
+                      identifier
+                      "{"
+                      field_decl*
+                      "}"
+                      ;
+
+field_decl          = identifier ":" type ";" ;
+
+enum_decl           = "enum"
+                      identifier
+                      "{"
+                      enum_variant ("," enum_variant)*
+                      "}"
+                      ;
+
+enum_variant        = identifier ;
+
+(* ----------------------------------------------------- *)
+(* Types                                                 *)
+(* ----------------------------------------------------- *)
+
+type                = primitive_type
+                    | tensor_type
+                    | identifier
+                    ;
+
+primitive_type      = "trit"
+                    | "int"
+                    | "float"
+                    | "bool"
+                    | "string"
+                    | "agentref"
+                    | "nodeid"
+                    ;
+
+tensor_type         = "trittensor"
+                      "<"
+                      dimension
+                      "x"
+                      dimension
+                      ">"
+                      ;
+
+dimension           = integer ;
+
+(* ----------------------------------------------------- *)
+(* Statements                                            *)
+(* ----------------------------------------------------- *)
+
+statement           = variable_decl
+                    | assignment_stmt
+                    | return_stmt
+                    | expression_stmt
+                    | match_stmt
+                    | loop_stmt
+                    | send_stmt
+                    ;
+
+assignment_stmt     = identifier "=" expression ";" ;
+
+return_stmt         = "return" expression ";" ;
+
+expression_stmt     = expression ";" ;
+
+send_stmt           = "send"
+                      "("
+                      expression
+                      ","
+                      expression
+                      ")"
+                      ";"
+                      ;
+
+(* ----------------------------------------------------- *)
+(* Match / Ternary Branching                             *)
+(* ----------------------------------------------------- *)
+
+match_stmt          = "match"
+                      expression
+                      "{"
+                      match_arm+
+                      "}"
+                      ;
+
+match_arm           = trit_literal
+                      "=>"
+                      block
+                      ;
+
+trit_literal        = "-1"
+                    | "0"
+                    | "1"
+                    | "conflict"
+                    | "hold"
+                    | "truth"
+                    ;
+
+(* ----------------------------------------------------- *)
+(* Loops                                                 *)
+(* ----------------------------------------------------- *)
+
+loop_stmt           = while_loop
+                    | for_loop
+                    ;
+
+while_loop          = "while"
+                      expression
+                      block
+                      ;
+
+for_loop            = "for"
+                      identifier
+                      "in"
+                      expression
+                      block
+                      ;
+
+(* ----------------------------------------------------- *)
+(* Expressions                                           *)
+(* ----------------------------------------------------- *)
+
+expression          = logical_expr ;
+
+logical_expr        = equality_expr
+                      (("&&" | "||") equality_expr)*
+                      ;
+
+equality_expr       = additive_expr
+                      (("==" | "!=") additive_expr)*
+                      ;
+
+additive_expr       = multiplicative_expr
+                      (("+" | "-") multiplicative_expr)*
+                      ;
+
+multiplicative_expr = unary_expr
+                      (("*" | "/") unary_expr)*
+                      ;
+
+unary_expr          = ("-" | "!") unary_expr
+                    | primary_expr
+                    ;
+
+primary_expr        = literal
+                    | identifier
+                    | function_call
+                    | tensor_access
+                    | "(" expression ")"
+                    ;
+
+function_call       = identifier
+                      "("
+                      argument_list?
+                      ")"
+                      ;
+
+argument_list       = expression
+                      ("," expression)*
+                      ;
+
+tensor_access       = identifier
+                      "["
+                      expression
+                      "]"
+                      ;
+
+(* ----------------------------------------------------- *)
+(* Literals                                              *)
+(* ----------------------------------------------------- *)
+
+literal             = trit_literal
+                    | integer
+                    | float
+                    | string
+                    ;
+
+(* ----------------------------------------------------- *)
+(* Lexical Tokens                                        *)
+(* ----------------------------------------------------- *)
+
+identifier          = letter (letter | digit | "_")* ;
+
+integer             = digit+ ;
+
+float               = digit+ "." digit+ ;
+
+string              = "\"" character* "\"" ;
+
+letter              = "a" | "b" | "c" | "d" | "e" | "f" | "g"
+                    | "h" | "i" | "j" | "k" | "l" | "m" | "n"
+                    | "o" | "p" | "q" | "r" | "s" | "t" | "u"
+                    | "v" | "w" | "x" | "y" | "z"
+                    | "A" | "B" | "C" | "D" | "E" | "F" | "G"
+                    | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+                    | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+                    | "V" | "W" | "X" | "Y" | "Z"
+                    | "_"
+                    ;
+
+digit               = "0" | "1" | "2" | "3" | "4"
+                    | "5" | "6" | "7" | "8" | "9"
+                    ;
+
+character           = ? any valid UTF-8 character except quote ? ;
