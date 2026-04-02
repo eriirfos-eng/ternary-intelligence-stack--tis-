@@ -86,6 +86,23 @@ This is our philosopher's stone. Full resource commitment.
 
 ---
 
+## 🔌 Phase 3.5: MCP Integration — COMPLETE ✅
+**Any binary AI agent connected to this MCP server becomes a ternary decision engine.**
+
+- [x] `ternlang-mcp` crate — JSON-RPC 2.0 over stdio, MCP protocol 2024-11-05
+- [x] `trit_decide` — flagship tool: float evidence → ternary decision (+1/0/-1) with confidence, interpretation, sparsity
+- [x] `trit_consensus` — consensus(a, b) with carry
+- [x] `trit_eval` — evaluate ternlang expressions on live BET VM
+- [x] `ternlang_run` — compile + run full .tern programs via MCP
+- [x] `quantize_weights` — f32 → ternary with BitNet thresholding
+- [x] `sparse_benchmark` — sparse vs dense matmul stats
+- [x] `mcp-config.json` — drop-in config for Claude Desktop and any MCP client
+- [x] Release binary: `target/release/ternlang-mcp`
+
+**Next for MCP:** publish to MCP registry, write integration guide
+
+---
+
 ## 🤖 Phase 5: Actor Model & Distributed Agents
 **Keywords exist in spec but NOT in lexer/parser/AST yet.**
 - [ ] **Lexer/Parser/AST**: `agent`, `spawn`, `send`, `await`, `remote`, `nodeid`, `agentref`
@@ -125,3 +142,4 @@ This is our philosopher's stone. Full resource commitment.
 | 2026-04-02 | Fixed DimSeparator/Ident collision in lexer. Fixed betbc test import. 11/11 tests passing. Next: TCALL/TRET function dispatch + tensor VM opcodes. |
 | 2026-04-02 | TCALL/TRET implemented. Tensor opcodes DONE: TMATMUL, TSPARSE_MATMUL, TIDX, TSET, TSHAPE, TSPARSITY. 14/14 tests passing. Next: @sparseskip codegen wiring + ternlang-ml kernels. |
 | 2026-04-02 | @sparseskip → TSPARSE_MATMUL wired in codegen. ternlang-ml filled: quantize, bitnet_threshold, dense_matmul, sparse_matmul, linear, benchmark. First benchmark: 56% sparsity → 2.3x fewer multiply ops. 23/23 tests passing. |
+| 2026-04-02 | ternlang-mcp LIVE — MCP server (JSON-RPC 2.0, stdio). 6 tools: trit_decide, trit_consensus, trit_eval, ternlang_run, quantize_weights, sparse_benchmark. Any binary agent connecting to this becomes a ternary decision engine. Hidden easter egg: ternlang enlighten. |
