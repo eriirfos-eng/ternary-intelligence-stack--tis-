@@ -145,6 +145,9 @@ pub enum Token {
     #[token("->")]
     Arrow,
 
+    #[token(".")]
+    Dot,
+
     // Literals
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string(), priority = 1)]
     Ident(String),

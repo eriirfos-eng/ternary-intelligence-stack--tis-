@@ -8,6 +8,8 @@ pub struct BytecodeEmitter {
     func_addrs: std::collections::HashMap<String, u16>,
     break_patches: Vec<usize>, // addresses to patch when a loop ends
     next_reg: u8,
+    /// Struct layouts: struct_name → ordered field names
+    struct_layouts: std::collections::HashMap<String, Vec<String>>,
 }
 
 impl BytecodeEmitter {
@@ -18,10 +20,16 @@ impl BytecodeEmitter {
             func_addrs: std::collections::HashMap::new(),
             break_patches: Vec::new(),
             next_reg: 0,
+            struct_layouts: std::collections::HashMap::new(),
         }
     }
 
     pub fn emit_program(&mut self, program: &Program) {
+        // Register struct layouts so field-access codegen knows field order.
+        for s in &program.structs {
+            let field_names: Vec<String> = s.fields.iter().map(|(n, _)| n.clone()).collect();
+            self.struct_layouts.insert(s.name.clone(), field_names);
+        }
         // Two-pass: first emit a TJMP over all function bodies so execution
         // starts at the entry point (last function, or a designated main).
         // Pass 1: record which functions exist, emit a jump placeholder.
@@ -60,18 +68,59 @@ impl BytecodeEmitter {
                         let size: usize = dims.iter().product();
                         self.code.push(0x0f); // TALLOC
                         self.code.extend_from_slice(&(size as u16).to_le_bytes());
+                        let reg = self.next_reg;
+                        self.symbols.insert(name.clone(), reg);
+                        self.next_reg += 1;
+                        self.code.push(0x08); // TSTORE
+                        self.code.push(reg);
+                    }
+                    Type::Named(struct_name) => {
+                        // Allocate one register per field, zero-initialised.
+                        // Fields stored as "<instance>.<field>" in the symbol table.
+                        let fields = self.struct_layouts.get(struct_name)
+                            .cloned()
+                            .unwrap_or_default();
+                        // Record base register under the instance name too (not strictly needed).
+                        let base_reg = self.next_reg;
+                        self.symbols.insert(name.clone(), base_reg);
+                        for field in &fields {
+                            let reg = self.next_reg;
+                            self.next_reg += 1;
+                            self.symbols.insert(format!("{}.{}", name, field), reg);
+                            // Zero-initialise each field
+                            self.code.push(0x01); // TPUSH hold
+                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Zero]));
+                            self.code.push(0x08); // TSTORE
+                            self.code.push(reg);
+                        }
+                        // If no fields, still emit the base placeholder
+                        if fields.is_empty() {
+                            self.next_reg += 1;
+                            self.code.push(0x01);
+                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Zero]));
+                            self.code.push(0x08);
+                            self.code.push(base_reg);
+                        }
                     }
                     _ => {
                         self.emit_expr(value);
+                        let reg = self.next_reg;
+                        self.symbols.insert(name.clone(), reg);
+                        self.next_reg += 1;
+                        self.code.push(0x08); // TSTORE
+                        self.code.push(reg);
                     }
                 }
-                
-                let reg = self.next_reg;
-                self.symbols.insert(name.clone(), reg);
-                self.next_reg += 1;
-                
-                self.code.push(0x08); // TSTORE
-                self.code.push(reg);
+            }
+            Stmt::FieldSet { object, field, value } => {
+                // Resolve the mangled register name for this field.
+                let key = format!("{}.{}", object, field);
+                self.emit_expr(value);
+                if let Some(&reg) = self.symbols.get(&key) {
+                    self.code.push(0x08); // TSTORE
+                    self.code.push(reg);
+                }
+                // Unknown field — emit nothing (will be a runtime no-op).
             }
             Stmt::IfTernary { condition, on_pos, on_zero, on_neg } => {
                 self.emit_expr(condition);
@@ -416,6 +465,26 @@ impl BytecodeEmitter {
                         }
                     }
                 }
+            }
+            Expr::FieldAccess { object, field } => {
+                // Resolve to mangled register: "<object_name>.<field>"
+                // Only handles single-level ident.field — nested access falls back to hold.
+                if let Expr::Ident(obj_name) = object.as_ref() {
+                    let key = format!("{}.{}", obj_name, field);
+                    if let Some(&reg) = self.symbols.get(&key) {
+                        self.code.push(0x09); // TLOAD
+                        self.code.push(reg);
+                        return;
+                    }
+                }
+                // Fallback: push hold
+                self.code.push(0x01);
+                self.code.extend(pack_trits(&[Trit::Zero]));
+            }
+            Expr::Cast { expr, .. } => {
+                // cast() is a no-op at the BET level — trits are already in canonical form.
+                // Emit the inner expression; the type annotation guides the type checker only.
+                self.emit_expr(expr);
             }
             _ => {}
         }

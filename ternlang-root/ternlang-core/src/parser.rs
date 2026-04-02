@@ -20,11 +20,37 @@ impl<'a> Parser<'a> {
     }
 
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
+        let mut structs = Vec::new();
         let mut functions = Vec::new();
         while self.peek_token().is_ok() {
-            functions.push(self.parse_function()?);
+            match self.peek_token()? {
+                Token::Struct => structs.push(self.parse_struct_def()?),
+                _             => functions.push(self.parse_function()?),
+            }
         }
-        Ok(Program { functions })
+        Ok(Program { structs, functions })
+    }
+
+    fn parse_struct_def(&mut self) -> Result<StructDef, ParseError> {
+        self.expect(Token::Struct)?;
+        let name = match self.next_token()? {
+            Token::Ident(n) => n,
+            t => return Err(ParseError::ExpectedToken("struct name".into(), format!("{:?}", t))),
+        };
+        self.expect(Token::LBrace)?;
+        let mut fields = Vec::new();
+        while self.peek_token()? != Token::RBrace {
+            let field_name = match self.next_token()? {
+                Token::Ident(n) => n,
+                t => return Err(ParseError::ExpectedToken("field name".into(), format!("{:?}", t))),
+            };
+            self.expect(Token::Colon)?;
+            let field_type = self.parse_type()?;
+            fields.push((field_name, field_type));
+            if let Ok(Token::Comma) = self.peek_token() { self.next_token()?; }
+        }
+        self.expect(Token::RBrace)?;
+        Ok(StructDef { name, fields })
     }
 
     pub fn parse_function(&mut self) -> Result<Function, ParseError> {
@@ -78,7 +104,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_binary_expr(&mut self, min_prec: i8) -> Result<Expr, ParseError> {
-        let mut lhs = self.parse_primary_expr()?;
+        let mut lhs = self.parse_unary_expr()?;
         loop {
             let Ok(op_token) = self.peek_token() else { break };
             let prec = self.get_precedence(&op_token);
@@ -118,11 +144,30 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Parse unary prefix expressions, then wrap with postfix (field access).
+    fn parse_unary_expr(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.parse_primary_expr()?;
+        // Postfix: `.field` chains
+        loop {
+            if let Ok(Token::Dot) = self.peek_token() {
+                self.next_token()?; // consume `.`
+                let field = match self.next_token()? {
+                    Token::Ident(n) => n,
+                    t => return Err(ParseError::ExpectedToken("field name".into(), format!("{:?}", t))),
+                };
+                expr = Expr::FieldAccess { object: Box::new(expr), field };
+            } else {
+                break;
+            }
+        }
+        Ok(expr)
+    }
+
     fn parse_primary_expr(&mut self) -> Result<Expr, ParseError> {
         let token = self.next_token()?;
         match token {
             Token::Minus => {
-                let expr = self.parse_primary_expr()?;
+                let expr = self.parse_unary_expr()?;
                 Ok(Expr::UnaryOp { op: UnOp::Neg, expr: Box::new(expr) })
             }
             Token::TritLiteral => {
@@ -133,7 +178,20 @@ impl<'a> Parser<'a> {
             }
             Token::Int(val) => Ok(Expr::IntLiteral(val)),
             Token::Ident(name) => {
+                // cast(expr) built-in: returns Cast node
+                if name == "cast" {
+                    if let Ok(Token::LParen) = self.peek_token() {
+                        self.next_token()?;
+                        let inner = self.parse_expr()?;
+                        self.expect(Token::RParen)?;
+                        // Type is resolved by context (the let binding ty)
+                        // Emit with placeholder Trit — semantic pass refines this
+                        return Ok(Expr::Cast { expr: Box::new(inner), ty: Type::Trit });
+                    }
+                }
+
                 if let Ok(Token::LParen) = self.peek_token() {
+                    // Function call
                     self.next_token()?;
                     let mut args = Vec::new();
                     if self.peek_token()? != Token::RParen {
@@ -181,8 +239,8 @@ impl<'a> Parser<'a> {
                 loop {
                     // Accept both identifiers and reserved type keywords as path segments
                     let segment = match self.next_token()? {
-                        Token::Ident(n)  => n,
-                        Token::TritType  => "trit".to_string(),
+                        Token::Ident(n)   => n,
+                        Token::TritType   => "trit".to_string(),
                         Token::TritTensor => "trittensor".to_string(),
                         t => return Err(ParseError::ExpectedToken("module path segment".into(), format!("{:?}", t))),
                     };
@@ -324,7 +382,22 @@ impl<'a> Parser<'a> {
             Token::LBrace => self.parse_block(),
 
             _ => {
+                // Could be: expr; OR field assignment: ident.field = value;
                 let expr = self.parse_expr()?;
+
+                // Check for field assignment: expr was `ident.field`, next is `=`
+                if let Ok(Token::Assign) = self.peek_token() {
+                    if let Expr::FieldAccess { object, field } = expr {
+                        if let Expr::Ident(obj_name) = *object {
+                            self.next_token()?; // consume `=`
+                            let value = self.parse_expr()?;
+                            self.expect(Token::Semicolon)?;
+                            return Ok(Stmt::FieldSet { object: obj_name, field, value });
+                        }
+                    }
+                    return Err(ParseError::UnexpectedToken("invalid assignment target".into()));
+                }
+
                 self.expect(Token::Semicolon)?;
                 Ok(Stmt::Expr(expr))
             }
@@ -368,7 +441,8 @@ impl<'a> Parser<'a> {
                 "float"  => Ok(Type::Float),
                 "bool"   => Ok(Type::Bool),
                 "string" => Ok(Type::String),
-                _ => Err(ParseError::UnexpectedToken(format!("unknown type: {}", name))),
+                // Named struct type
+                _        => Ok(Type::Named(name.clone())),
             },
             _ => Err(ParseError::UnexpectedToken(format!("{:?}", token))),
         }
@@ -457,5 +531,60 @@ mod tests {
         let mut parser = Parser::new(input);
         let stmt = parser.parse_stmt().unwrap();
         assert!(matches!(stmt, Stmt::Let { .. }));
+    }
+
+    #[test]
+    fn test_parse_struct_def() {
+        let input = "struct Signal { value: trit, weight: trit }";
+        let mut parser = Parser::new(input);
+        let s = parser.parse_struct_def().unwrap();
+        assert_eq!(s.name, "Signal");
+        assert_eq!(s.fields.len(), 2);
+        assert_eq!(s.fields[0], ("value".to_string(), Type::Trit));
+        assert_eq!(s.fields[1], ("weight".to_string(), Type::Trit));
+    }
+
+    #[test]
+    fn test_parse_field_access() {
+        let input = "let v: trit = sig.value;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { value: Expr::FieldAccess { field, .. }, .. } = stmt {
+            assert_eq!(field, "value");
+        } else {
+            panic!("Expected FieldAccess in let binding");
+        }
+    }
+
+    #[test]
+    fn test_parse_field_set() {
+        let input = "sig.value = 1;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        assert!(matches!(stmt, Stmt::FieldSet { .. }));
+    }
+
+    #[test]
+    fn test_parse_cast() {
+        let input = "let t: trit = cast(flag);";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { value: Expr::Cast { .. }, .. } = stmt {
+            // ok
+        } else {
+            panic!("Expected Cast in let binding");
+        }
+    }
+
+    #[test]
+    fn test_parse_named_type() {
+        let input = "let s: Signal;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { ty: Type::Named(name), .. } = stmt {
+            assert_eq!(name, "Signal");
+        } else {
+            panic!("Expected Named type");
+        }
     }
 }

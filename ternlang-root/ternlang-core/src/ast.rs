@@ -16,6 +16,16 @@ pub enum Expr {
         callee: String,
         args: Vec<Expr>,
     },
+    /// field access: `object.field`
+    FieldAccess {
+        object: Box<Expr>,
+        field: String,
+    },
+    /// cast(expr) — type coercion built-in
+    Cast {
+        expr: Box<Expr>,
+        ty: Type,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -81,6 +91,12 @@ pub enum Stmt {
     Use {
         path: Vec<String>,
     },
+    /// instance.field = value;
+    FieldSet {
+        object: String,
+        field: String,
+        value: Expr,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -91,6 +107,8 @@ pub enum Type {
     Bool,
     Float,
     String,
+    /// User-defined struct type
+    Named(String),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -101,7 +119,15 @@ pub struct Function {
     pub body: Vec<Stmt>,
 }
 
+/// Top-level struct definition: `struct Name { field: type, ... }`
+#[derive(Debug, Clone, PartialEq)]
+pub struct StructDef {
+    pub name: String,
+    pub fields: Vec<(String, Type)>,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Program {
+    pub structs: Vec<StructDef>,
     pub functions: Vec<Function>,
 }
