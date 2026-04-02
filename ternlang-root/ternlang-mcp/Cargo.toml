@@ -1,0 +1,16 @@
+[package]
+name = "ternlang-mcp"
+version = "0.1.0"
+edition = "2024"
+description = "MCP server — turns any binary AI agent into a ternary decision engine"
+authors = ["RFI-IRFOS"]
+
+[[bin]]
+name = "ternlang-mcp"
+path = "src/main.rs"
+
+[dependencies]
+ternlang-core = { path = "../ternlang-core" }
+ternlang-ml   = { path = "../ternlang-ml" }
+serde         = { version = "1", features = ["derive"] }
+serde_json    = "1"
