@@ -167,8 +167,39 @@ impl BytecodeEmitter {
                     self.emit_stmt(stmt);
                 }
             }
-            Stmt::Decorated { stmt, .. } => {
-                // TODO: Apply directive to following statement
+            Stmt::Decorated { directive, stmt } => {
+                if directive == "sparseskip" {
+                    // Case 1: @sparseskip on a bare expression: matmul(a, b);
+                    if let Stmt::Expr(inner_expr) = stmt.as_ref() {
+                        if let Expr::Call { callee, args } = inner_expr {
+                            if callee == "matmul" && args.len() == 2 {
+                                self.emit_expr(&args[0]);
+                                self.emit_expr(&args[1]);
+                                self.code.push(0x21); // TSPARSE_MATMUL
+                                return;
+                            }
+                        }
+                    }
+                    // Case 2: @sparseskip on a let binding: let c: trittensor = matmul(a, b);
+                    if let Stmt::Let { name, value, .. } = stmt.as_ref() {
+                        if let Expr::Call { callee, args } = value {
+                            if callee == "matmul" && args.len() == 2 {
+                                self.emit_expr(&args[0]);
+                                self.emit_expr(&args[1]);
+                                self.code.push(0x21); // TSPARSE_MATMUL
+                                // TSPARSE_MATMUL pushes TensorRef then Int(skipped_count)
+                                self.code.push(0x0c); // TPOP — discard skipped_count
+                                let reg = self.next_reg;
+                                self.symbols.insert(name.clone(), reg);
+                                self.next_reg += 1;
+                                self.code.push(0x08); // TSTORE tensor ref into register
+                                self.code.push(reg);
+                                return;
+                            }
+                        }
+                    }
+                }
+                // Fallthrough: emit the inner statement unchanged
                 self.emit_stmt(stmt);
             }
             _ => {}
@@ -230,6 +261,21 @@ impl BytecodeEmitter {
                         self.code.push(0x01); // TPUSH
                         self.code.extend(pack_trits(&[Trit::NegOne]));
                     }
+                    "matmul" => {
+                        if args.len() == 2 {
+                            self.code.push(0x20); // TMATMUL (dense)
+                        }
+                    }
+                    "sparsity" => {
+                        if args.len() == 1 {
+                            self.code.push(0x25); // TSPARSITY
+                        }
+                    }
+                    "shape" => {
+                        if args.len() == 1 {
+                            self.code.push(0x24); // TSHAPE
+                        }
+                    }
                     _ => {
                         // User-defined function call — emit TCALL if address known
                         if let Some(&addr) = self.func_addrs.get(callee) {
@@ -283,6 +329,30 @@ mod tests {
         
         // Final 'y' should be in register 1
         assert_eq!(vm.get_register(1), Value::Trit(Trit::NegOne));
+    }
+
+    #[test]
+    fn test_sparseskip_emits_tsparse_matmul() {
+        // @sparseskip on a let binding with matmul rhs should emit TSPARSE_MATMUL (0x21)
+        // and the result tensor ref should be stored in a register
+        let input = "let a: trittensor<2 x 2>; let b: trittensor<2 x 2>; @sparseskip let c: trittensor<2 x 2> = matmul(a, b);";
+        let mut parser = Parser::new(input);
+        let mut emitter = BytecodeEmitter::new();
+
+        while let Ok(stmt) = parser.parse_stmt() {
+            emitter.emit_stmt(&stmt);
+        }
+
+        let code = emitter.finalize();
+        // Verify TSPARSE_MATMUL (0x21) appears in the bytecode
+        assert!(code.contains(&0x21), "Expected TSPARSE_MATMUL (0x21) in bytecode");
+        // Verify dense TMATMUL (0x20) does NOT appear (we used sparseskip)
+        assert!(!code.contains(&0x20), "Expected no dense TMATMUL (0x20) when @sparseskip used");
+
+        // Run it — both tensors are zero-initialized, result should be TensorRef in reg2
+        let mut vm = BetVm::new(code);
+        vm.run().unwrap();
+        assert!(matches!(vm.get_register(2), Value::TensorRef(_)));
     }
 
     #[test]

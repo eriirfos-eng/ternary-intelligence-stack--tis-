@@ -254,6 +254,9 @@ dependencies = [
 [[package]]
 name = "ternlang-ml"
 version = "0.1.0"
+dependencies = [
+ "ternlang-core",
+]
 
 [[package]]
 name = "ternlang-test"

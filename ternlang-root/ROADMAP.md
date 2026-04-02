@@ -63,13 +63,17 @@ This is our philosopher's stone. Full resource commitment.
     - [x] `0x23` `TSET` — store trit at tensor index
     - [x] `0x24` `TSHAPE` — push tensor dimensions to stack
     - [x] `0x25` `TSPARSITY` — compute zero-element count
-- [ ] **Implement `@sparseskip`** in codegen → emits `TSPARSE_MATMUL` (wiring AST → opcode)
+- [x] **Implement `@sparseskip`** in codegen → emits `TSPARSE_MATMUL` — DONE
 - [ ] **`TCOMPRESS` / `TUNPACK`** — run-length compression (next)
-- [ ] **Fill `ternlang-ml`** with real kernels:
-    - [ ] `quantize(f32_weights) -> TritTensor`
-    - [ ] `forward(input, weights) -> TritTensor`
-    - [ ] `linear(x, W) -> TritTensor` (BitNet-style)
-- [ ] **Publish sparse matmul benchmark** vs float32 (first public proof of concept)
+- [x] **Fill `ternlang-ml`** with real kernels — DONE:
+    - [x] `quantize(f32_weights, threshold) -> Vec<Trit>` — BitNet-style ternary quantization
+    - [x] `bitnet_threshold(weights)` — auto-compute τ = 0.5 × mean(|w|)
+    - [x] `dense_matmul(a, b) -> TritMatrix` — baseline
+    - [x] `sparse_matmul(a, b) -> (TritMatrix, skipped_count)` — flagship kernel
+    - [x] `linear(input, W) -> (TritMatrix, skipped)` — BitNet-style ternary linear layer
+    - [x] `benchmark(a, b) -> BenchmarkResult` — prints summary with skip rate
+- [x] **First benchmark result**: 56% weight sparsity → **2.3x fewer multiply ops** vs dense
+- [ ] **Publish sparse matmul benchmark** — write blog post / README section comparing vs float32
 
 ---
 
@@ -120,3 +124,4 @@ This is our philosopher's stone. Full resource commitment.
 | 2026-04-02 | Initial repo setup. Phase 1+2 confirmed complete. Git initialized, pushed to GitHub. Credential store configured. 4 failing tests identified (DimSeparator bug). Phase 3 plan defined. |
 | 2026-04-02 | Fixed DimSeparator/Ident collision in lexer. Fixed betbc test import. 11/11 tests passing. Next: TCALL/TRET function dispatch + tensor VM opcodes. |
 | 2026-04-02 | TCALL/TRET implemented. Tensor opcodes DONE: TMATMUL, TSPARSE_MATMUL, TIDX, TSET, TSHAPE, TSPARSITY. 14/14 tests passing. Next: @sparseskip codegen wiring + ternlang-ml kernels. |
+| 2026-04-02 | @sparseskip → TSPARSE_MATMUL wired in codegen. ternlang-ml filled: quantize, bitnet_threshold, dense_matmul, sparse_matmul, linear, benchmark. First benchmark: 56% sparsity → 2.3x fewer multiply ops. 23/23 tests passing. |

@@ -1,2 +1,4 @@
+// TritTensor allocation test
+// NOTE: dimension separator 'x' must be space-separated: <256 x 256> not <256x256>
 let weights: trittensor<256 x 256>;
 return weights;
