@@ -5,29 +5,49 @@ use crate::trit::Trit;
 pub struct BytecodeEmitter {
     code: Vec<u8>,
     symbols: std::collections::HashMap<String, u8>,
+    func_addrs: std::collections::HashMap<String, u16>, // function name → bytecode address
     next_reg: u8,
 }
 
 impl BytecodeEmitter {
     pub fn new() -> Self {
-        Self { 
+        Self {
             code: Vec::new(),
             symbols: std::collections::HashMap::new(),
+            func_addrs: std::collections::HashMap::new(),
             next_reg: 0,
         }
     }
 
     pub fn emit_program(&mut self, program: &Program) {
+        // Two-pass: first emit a TJMP over all function bodies so execution
+        // starts at the entry point (last function, or a designated main).
+        // Pass 1: record which functions exist, emit a jump placeholder.
+        let entry_jmp_patch = self.code.len() + 1;
+        self.code.push(0x0b); // TJMP — skip over function bodies
+        self.code.extend_from_slice(&[0u8, 0u8]);
+
+        // Pass 2: emit each function body, recording its address.
         for func in &program.functions {
             self.emit_function(func);
         }
+
+        // Patch the entry jump to land after all function bodies.
+        // (Programs that call functions explicitly will use TCALL.)
+        let after_funcs = self.code.len() as u16;
+        self.patch_u16(entry_jmp_patch, after_funcs);
     }
 
     pub fn emit_function(&mut self, func: &Function) {
-        // Simple entry for functions
+        // Record address of this function's first instruction.
+        let func_addr = self.code.len() as u16;
+        self.func_addrs.insert(func.name.clone(), func_addr);
+
         for stmt in &func.body {
             self.emit_stmt(stmt);
         }
+        // Emit TRET at end of every function body.
+        self.code.push(0x11); // TRET
     }
 
     pub fn emit_stmt(&mut self, stmt: &Stmt) {
@@ -211,9 +231,16 @@ impl BytecodeEmitter {
                         self.code.extend(pack_trits(&[Trit::NegOne]));
                     }
                     _ => {
-                        // Default mock: return 0
-                        self.code.push(0x01); // TPUSH
-                        self.code.extend(pack_trits(&[Trit::Zero]));
+                        // User-defined function call — emit TCALL if address known
+                        if let Some(&addr) = self.func_addrs.get(callee) {
+                            self.code.push(0x10); // TCALL
+                            self.code.extend_from_slice(&addr.to_le_bytes());
+                        } else {
+                            // Forward reference: emit TCALL with placeholder, needs second pass
+                            // For now emit hold as safe default
+                            self.code.push(0x01); // TPUSH hold
+                            self.code.extend(pack_trits(&[Trit::Zero]));
+                        }
                     }
                 }
             }

@@ -47,6 +47,8 @@ pub enum Opcode {
     TloadCarry = 0x0d,
     Tcons = 0x0e,
     Talloc(u16) = 0x0f,
+    Tcall(u16) = 0x10,  // Call function at address, push return addr to call stack
+    Tret = 0x11,         // Return: pop call stack, jump back
     Thalt = 0x00,
 }
 
@@ -67,6 +69,7 @@ pub struct BetVm {
     registers: [Value; 27],
     carry_reg: Trit,
     stack: Vec<Value>,
+    call_stack: Vec<usize>,  // Return addresses for TCALL/TRET
     tensors: Vec<Vec<Trit>>, // Simple heap for now
     pc: usize,
     code: Vec<u8>,
@@ -78,6 +81,7 @@ impl BetVm {
             registers: [Value::default(); 27],
             carry_reg: Trit::Zero,
             stack: Vec::new(),
+            call_stack: Vec::new(),
             tensors: Vec::new(),
             pc: 0,
             code,
@@ -209,6 +213,19 @@ impl BetVm {
                     let idx = self.tensors.len();
                     self.tensors.push(vec![Trit::Zero; size]);
                     self.stack.push(Value::TensorRef(idx));
+                }
+                0x10 => { // Tcall
+                    if self.pc + 1 >= self.code.len() { return Err(VmError::PcOutOfBounds(self.pc)); }
+                    let addr = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]) as usize;
+                    self.pc += 2;
+                    self.call_stack.push(self.pc); // push return address
+                    self.pc = addr;
+                }
+                0x11 => { // Tret
+                    match self.call_stack.pop() {
+                        Some(return_addr) => self.pc = return_addr,
+                        None => return Ok(()), // top-level return = halt
+                    }
                 }
                 0x00 => return Ok(()), // Thalt
                 _ => return Err(VmError::InvalidOpcode(opcode)),
