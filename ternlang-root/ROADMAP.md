@@ -84,10 +84,10 @@ This is our philosopher's stone. Full resource commitment.
 - [x] **Match exhaustiveness enforcement** in parser — `NonExhaustiveMatch` error if any of -1/0/+1 missing
 - [x] **Codegen**: `ForIn`, `Loop`+`Break`, `WhileTernary`, `Use` (no-op), `Continue` (no-op), `BinOp` operators
 - [x] **Semantic checker**: all new nodes handled
-- [ ] **Standard Library** source files: `std::trit`, `std::tensor`, `std::math`, `std::io`
+- [x] **Standard Library** source files: `std::trit`, `std::tensor`, `std::math`, `std::io`, `ml::quantize`, `ml::inference`
 - [ ] **Real function call type resolution** in semantic checker (replace mock)
-- [ ] `cast()` expression for bool→trit coercion
-- [ ] `struct` definitions and field access
+- [x] `cast()` expression for bool→trit coercion — transparent BET pass-through, type-system level only
+- [x] `struct` definitions and field access — `struct Name {}`, `s.field`, `s.field = v;`, `Type::Named`
 
 ---
 
@@ -109,7 +109,7 @@ This is our philosopher's stone. Full resource commitment.
 ---
 
 ## 🤖 Phase 5: Actor Model & Distributed Agents
-**Keywords exist in spec but NOT in lexer/parser/AST yet.**
+**Next session starts here.**
 - [ ] **Lexer/Parser/AST**: `agent`, `spawn`, `send`, `await`, `remote`, `nodeid`, `agentref`
 - [ ] **Local Actor Runtime**: actor registry, `TSPAWN`/`TSEND`/`TAWAIT` opcodes, green threads
 - [ ] **Distributed Runtime**: serialize agentref as (nodeid, local_id), TCP transport, later libp2p
@@ -149,3 +149,4 @@ This is our philosopher's stone. Full resource commitment.
 | 2026-04-02 | @sparseskip → TSPARSE_MATMUL wired in codegen. ternlang-ml filled: quantize, bitnet_threshold, dense_matmul, sparse_matmul, linear, benchmark. First benchmark: 56% sparsity → 2.3x fewer multiply ops. 23/23 tests passing. |
 | 2026-04-02 | ternlang-mcp LIVE — MCP server (JSON-RPC 2.0, stdio). 6 tools: trit_decide, trit_consensus, trit_eval, ternlang_run, quantize_weights, sparse_benchmark. Any binary agent connecting to this becomes a ternary decision engine. Hidden easter egg: ternlang enlighten. |
 | 2026-04-02 | Phase 4 language completeness: for/while/loop/break/continue/mut/use/::. Match exhaustiveness enforced at parser. 20 core tests + 6 ML tests + 1 codegen tests = 28 total passing. |
+| 2026-04-02 | stdlib source files: std::trit, std::math, std::tensor, std::io, ml::quantize, ml::inference. Struct defs + field access (s.field) + field assignment (s.field=v) + cast() + Type::Named. Dot token in lexer. 25/25 tests passing. Phase 5 (actor model) is next. |
