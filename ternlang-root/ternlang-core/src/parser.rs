@@ -273,7 +273,7 @@ impl<'a> Parser<'a> {
                         t => return Err(ParseError::ExpectedToken("dimension".to_string(), format!("{:?}", t))),
                     };
                     dims.push(d);
-                    if self.peek_token()? == Token::DimSeparator {
+                    if self.peek_token()? == Token::Ident("x".to_string()) {
                         self.next_token()?;
                     } else {
                         break;

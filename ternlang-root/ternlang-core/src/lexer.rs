@@ -85,9 +85,6 @@ pub enum Token {
     #[token(">", priority = 3)]
     RAngle,
 
-    #[token("x", priority = 4)]
-    DimSeparator,
-
     #[token(",", priority = 3)]
     Comma,
 

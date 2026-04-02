@@ -42,7 +42,7 @@ This is our philosopher's stone. Full resource commitment.
 ---
 
 ## 🔴 Known Bugs (Fix Before Phase 3 Progress)
-- [ ] **`DimSeparator` vs `Ident` collision**: `x` tokenized as `DimSeparator` (priority 4) instead of `Ident` everywhere — breaks 3 tests (`test_lexer`, `test_parse_match`, `test_compile_and_run_simple`, `test_compile_match`)
+- [x] **`DimSeparator` vs `Ident` collision**: FIXED — removed dedicated token, `x` now correctly tokenizes as `Ident` everywhere
 - [ ] **No function call dispatch**: Functions emit inline — no `TCALL`/`TRET` opcodes, no call stack
 - [ ] **`@sparseskip` is a stub**: Parsed correctly but codegen ignores it (TODO comment in `betbc.rs`)
 - [ ] **Semantic checker mocks all `Call` return types as `Trit`** — needs real function table lookup
@@ -53,7 +53,7 @@ This is our philosopher's stone. Full resource commitment.
 ## 🛠 Phase 3: TritTensors & Sparse Inference — IN PROGRESS
 **This is the commercial differentiator. The AI inference story.**
 
-- [ ] **Fix `DimSeparator` bug** in lexer (remove dedicated token, handle as `Ident("x")` in type parser)
+- [x] **Fix `DimSeparator` bug** in lexer (remove dedicated token, handle as `Ident("x")` in type parser) — 11/11 tests passing
 - [ ] **TCALL/TRET opcodes**: Real function call dispatch with call stack in VM + codegen
 - [ ] **TritTensor VM Operations**:
     - [ ] `0x10` `TMATMUL` — multiply two tensor refs
@@ -118,3 +118,4 @@ This is our philosopher's stone. Full resource commitment.
 | Date | What was done |
 |------|---------------|
 | 2026-04-02 | Initial repo setup. Phase 1+2 confirmed complete. Git initialized, pushed to GitHub. Credential store configured. 4 failing tests identified (DimSeparator bug). Phase 3 plan defined. |
+| 2026-04-02 | Fixed DimSeparator/Ident collision in lexer. Fixed betbc test import. 11/11 tests passing. Next: TCALL/TRET function dispatch + tensor VM opcodes. |
