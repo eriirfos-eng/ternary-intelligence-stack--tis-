@@ -41,6 +41,39 @@ pub enum Token {
     #[token("match", priority = 3)]
     Match,
 
+    #[token("for", priority = 3)]
+    For,
+
+    #[token("in", priority = 3)]
+    In,
+
+    #[token("while", priority = 3)]
+    While,
+
+    #[token("loop", priority = 3)]
+    Loop,
+
+    #[token("break", priority = 3)]
+    Break,
+
+    #[token("continue", priority = 3)]
+    Continue,
+
+    #[token("mut", priority = 3)]
+    Mut,
+
+    #[token("use", priority = 3)]
+    Use,
+
+    #[token("module", priority = 3)]
+    Module,
+
+    #[token("pub", priority = 3)]
+    Pub,
+
+    #[token("struct", priority = 3)]
+    Struct,
+
     // Operators
     #[token("+")]
     Plus,
@@ -59,6 +92,18 @@ pub enum Token {
 
     #[token("=>")]
     FatArrow,
+
+    #[token("!=")]
+    NotEqual,
+
+    #[token("::")]
+    DoubleColon,
+
+    #[token("&&")]
+    And,
+
+    #[token("||")]
+    Or,
 
     // Delimiters
     #[token("(", priority = 3)]

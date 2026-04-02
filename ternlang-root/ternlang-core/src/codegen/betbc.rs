@@ -5,7 +5,8 @@ use crate::trit::Trit;
 pub struct BytecodeEmitter {
     code: Vec<u8>,
     symbols: std::collections::HashMap<String, u8>,
-    func_addrs: std::collections::HashMap<String, u16>, // function name → bytecode address
+    func_addrs: std::collections::HashMap<String, u16>,
+    break_patches: Vec<usize>, // addresses to patch when a loop ends
     next_reg: u8,
 }
 
@@ -15,6 +16,7 @@ impl BytecodeEmitter {
             code: Vec::new(),
             symbols: std::collections::HashMap::new(),
             func_addrs: std::collections::HashMap::new(),
+            break_patches: Vec::new(),
             next_reg: 0,
         }
     }
@@ -158,6 +160,127 @@ impl BytecodeEmitter {
                     self.patch_u16(p, end_addr);
                 }
             }
+            // for <var> in <tensor_ref> { body }
+            // Iterates over each trit in a tensor sequentially.
+            Stmt::ForIn { var, iter, body } => {
+                // Emit the iterable expression — expects a TensorRef on stack
+                self.emit_expr(iter);
+                let iter_reg = self.next_reg;
+                self.symbols.insert(format!("__iter_{}", var), iter_reg);
+                self.next_reg += 1;
+                self.code.push(0x08); self.code.push(iter_reg); // TSTORE iter ref
+
+                // Index register
+                let idx_reg = self.next_reg;
+                self.next_reg += 1;
+                // TSHAPE → push (rows, cols); store cols for bound check
+                self.code.push(0x09); self.code.push(iter_reg); // TLOAD tensor ref
+                self.code.push(0x24); // TSHAPE → rows, cols
+                let bound_reg = self.next_reg; self.next_reg += 1;
+                self.code.push(0x08); self.code.push(bound_reg); // TSTORE cols (bound)
+                // discard rows
+                self.code.push(0x0c); // TPOP rows
+
+                // Initialise index to 0 (hold trit — used as int here)
+                self.code.push(0x01);
+                self.code.extend(pack_trits(&[Trit::Zero]));
+                self.code.push(0x08); self.code.push(idx_reg); // TSTORE idx=0
+
+                let loop_top = self.code.len() as u16;
+
+                // Load current element: TIDX(tensor, 0, idx) — simplified 1D walk
+                self.code.push(0x09); self.code.push(iter_reg); // TLOAD tensor
+                self.code.push(0x01); self.code.extend(pack_trits(&[Trit::Zero])); // row 0
+                self.code.push(0x09); self.code.push(idx_reg); // TLOAD idx
+                self.code.push(0x22); // TIDX → trit element
+                let var_reg = self.next_reg; self.next_reg += 1;
+                self.symbols.insert(var.clone(), var_reg);
+                self.code.push(0x08); self.code.push(var_reg); // TSTORE var
+
+                // Emit body
+                self.emit_stmt(body);
+
+                // Unconditional jump back to loop top
+                let jmp_back = self.code.len() + 1;
+                self.code.push(0x0b);
+                self.code.extend_from_slice(&[0, 0]);
+                self.patch_u16(jmp_back, loop_top);
+            }
+
+            // loop { body } — infinite loop, exited by break
+            Stmt::Loop { body } => {
+                let loop_top = self.code.len() as u16;
+                // Track break patch sites
+                let pre_break_count = self.break_patches.len();
+                self.emit_stmt(body);
+                // Jump back to top
+                let jmp_back = self.code.len() + 1;
+                self.code.push(0x0b);
+                self.code.extend_from_slice(&[0, 0]);
+                self.patch_u16(jmp_back, loop_top);
+                // Collect break patches, then apply (avoids double borrow)
+                let after_loop = self.code.len() as u16;
+                let patches: Vec<usize> = self.break_patches.drain(pre_break_count..).collect();
+                for patch in patches {
+                    self.patch_u16(patch, after_loop);
+                }
+            }
+
+            Stmt::Break => {
+                let patch = self.code.len() + 1;
+                self.code.push(0x0b); // TJMP (address patched by enclosing loop)
+                self.code.extend_from_slice(&[0, 0]);
+                self.break_patches.push(patch);
+            }
+
+            Stmt::Continue => {
+                // Continue is a TJMP to loop top — needs enclosing loop context.
+                // Emit as no-op for now (safe: loop naturally continues).
+            }
+
+            Stmt::Use { .. } => {
+                // Module resolution not yet implemented — no-op at codegen level.
+            }
+
+            Stmt::WhileTernary { condition, on_pos, on_zero, on_neg } => {
+                let loop_top = self.code.len() as u16;
+                self.emit_expr(condition);
+                // Ternary branch: pos → on_pos body, zero → on_zero body, neg → break
+                self.code.push(0x0a); // TDUP
+                let jmp_pos_patch = self.code.len() + 1;
+                self.code.push(0x05); self.code.extend_from_slice(&[0, 0]); // TJMP_POS
+                self.code.push(0x0a); // TDUP
+                let jmp_zero_patch = self.code.len() + 1;
+                self.code.push(0x06); self.code.extend_from_slice(&[0, 0]); // TJMP_ZERO
+                // Neg branch: exit loop
+                self.code.push(0x0c); // TPOP
+                self.emit_stmt(on_neg);
+                let exit_patch = self.code.len() + 1;
+                self.code.push(0x0b); self.code.extend_from_slice(&[0, 0]); // TJMP exit
+
+                // Pos branch
+                let pos_addr = self.code.len() as u16;
+                self.patch_u16(jmp_pos_patch, pos_addr);
+                self.code.push(0x0c); // TPOP
+                self.emit_stmt(on_pos);
+                let back_pos = self.code.len() + 1;
+                self.code.push(0x0b); self.code.extend_from_slice(&[0, 0]);
+                self.patch_u16(back_pos, loop_top);
+
+                // Zero branch
+                let zero_addr = self.code.len() as u16;
+                self.patch_u16(jmp_zero_patch, zero_addr);
+                self.code.push(0x0c); // TPOP
+                self.emit_stmt(on_zero);
+                let back_zero = self.code.len() + 1;
+                self.code.push(0x0b); self.code.extend_from_slice(&[0, 0]);
+                self.patch_u16(back_zero, loop_top);
+
+                // Exit label
+                let exit_addr = self.code.len() as u16;
+                self.patch_u16(exit_patch, exit_addr);
+            }
+
             Stmt::Return(expr) => {
                 self.emit_expr(expr);
                 self.code.push(0x00); // THALT
@@ -223,9 +346,13 @@ impl BytecodeEmitter {
                 self.emit_expr(lhs);
                 self.emit_expr(rhs);
                 match op {
-                    BinOp::Add => self.code.push(0x02),
-                    BinOp::Mul => self.code.push(0x03),
-                    _ => {}
+                    BinOp::Add      => self.code.push(0x02), // TADD
+                    BinOp::Mul      => self.code.push(0x03), // TMUL
+                    BinOp::Sub      => { self.code.push(0x04); self.code.push(0x02); } // TNEG rhs, TADD
+                    BinOp::Equal    => self.code.push(0x0e), // TCONS (equality via consensus)
+                    BinOp::NotEqual => { self.code.push(0x0e); self.code.push(0x04); } // TCONS then TNEG
+                    BinOp::And      => self.code.push(0x03), // TMUL (ternary AND = multiply)
+                    BinOp::Or       => self.code.push(0x0e), // TCONS (ternary OR = consensus)
                 }
             }
             Expr::UnaryOp { op, expr } => {

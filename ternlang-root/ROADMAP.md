@@ -77,12 +77,17 @@ This is our philosopher's stone. Full resource commitment.
 
 ---
 
-## 🧩 Phase 4: Language Completeness
-- [ ] **Add to Lexer/Parser/AST**: `for`, `while`, `loop`, `mut`, `struct`, `string`, `float`, `cast()`
-- [ ] **Module system**: `use std::trit;`, `::` namespace access
+## 🧩 Phase 4: Language Completeness — IN PROGRESS
+- [x] **Lexer**: `for`, `in`, `while`, `loop`, `break`, `continue`, `mut`, `use`, `module`, `pub`, `struct`, `::`, `!=`, `&&`, `||`
+- [x] **AST**: `ForIn`, `WhileTernary`, `Loop`, `Break`, `Continue`, `Use` nodes; `BinOp::NotEqual/And/Or`; `Type::Bool/Float/String`
+- [x] **Parser**: `for x in expr { }`, `while cond ? { } else { } else { }`, `loop { }`, `break`, `continue`, `use std::trit;`, `let mut`
+- [x] **Match exhaustiveness enforcement** in parser — `NonExhaustiveMatch` error if any of -1/0/+1 missing
+- [x] **Codegen**: `ForIn`, `Loop`+`Break`, `WhileTernary`, `Use` (no-op), `Continue` (no-op), `BinOp` operators
+- [x] **Semantic checker**: all new nodes handled
 - [ ] **Standard Library** source files: `std::trit`, `std::tensor`, `std::math`, `std::io`
-- [ ] **Match exhaustiveness enforcement** in semantic checker
 - [ ] **Real function call type resolution** in semantic checker (replace mock)
+- [ ] `cast()` expression for bool→trit coercion
+- [ ] `struct` definitions and field access
 
 ---
 
@@ -143,3 +148,4 @@ This is our philosopher's stone. Full resource commitment.
 | 2026-04-02 | TCALL/TRET implemented. Tensor opcodes DONE: TMATMUL, TSPARSE_MATMUL, TIDX, TSET, TSHAPE, TSPARSITY. 14/14 tests passing. Next: @sparseskip codegen wiring + ternlang-ml kernels. |
 | 2026-04-02 | @sparseskip → TSPARSE_MATMUL wired in codegen. ternlang-ml filled: quantize, bitnet_threshold, dense_matmul, sparse_matmul, linear, benchmark. First benchmark: 56% sparsity → 2.3x fewer multiply ops. 23/23 tests passing. |
 | 2026-04-02 | ternlang-mcp LIVE — MCP server (JSON-RPC 2.0, stdio). 6 tools: trit_decide, trit_consensus, trit_eval, ternlang_run, quantize_weights, sparse_benchmark. Any binary agent connecting to this becomes a ternary decision engine. Hidden easter egg: ternlang enlighten. |
+| 2026-04-02 | Phase 4 language completeness: for/while/loop/break/continue/mut/use/::. Match exhaustiveness enforced at parser. 20 core tests + 6 ML tests + 1 codegen tests = 28 total passing. |

@@ -67,6 +67,28 @@ impl SemanticAnalyzer {
                 self.infer_expr_type(expr)?;
                 Ok(())
             }
+            Stmt::ForIn { var, iter, body } => {
+                self.infer_expr_type(iter)?;
+                self.scopes.push(std::collections::HashMap::new());
+                // bind loop variable as Trit (tensors yield trits)
+                self.scopes.last_mut().unwrap().insert(var.clone(), Type::Trit);
+                self.check_stmt(body)?;
+                self.scopes.pop();
+                Ok(())
+            }
+            Stmt::WhileTernary { condition, on_pos, on_zero, on_neg } => {
+                let cond_ty = self.infer_expr_type(condition)?;
+                if cond_ty != Type::Trit {
+                    return Err(SemanticError::TypeMismatch { expected: Type::Trit, found: cond_ty });
+                }
+                self.check_stmt(on_pos)?;
+                self.check_stmt(on_zero)?;
+                self.check_stmt(on_neg)?;
+                Ok(())
+            }
+            Stmt::Loop { body } => self.check_stmt(body),
+            Stmt::Break | Stmt::Continue => Ok(()),
+            Stmt::Use { .. } => Ok(()), // module resolution is a future pass
         }
     }
 
