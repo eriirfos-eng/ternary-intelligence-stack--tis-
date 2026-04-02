@@ -21,14 +21,31 @@ impl<'a> Parser<'a> {
 
     pub fn parse_program(&mut self) -> Result<Program, ParseError> {
         let mut structs = Vec::new();
+        let mut agents = Vec::new();
         let mut functions = Vec::new();
         while self.peek_token().is_ok() {
             match self.peek_token()? {
                 Token::Struct => structs.push(self.parse_struct_def()?),
+                Token::Agent  => agents.push(self.parse_agent_def()?),
                 _             => functions.push(self.parse_function()?),
             }
         }
-        Ok(Program { structs, functions })
+        Ok(Program { structs, agents, functions })
+    }
+
+    fn parse_agent_def(&mut self) -> Result<AgentDef, ParseError> {
+        self.expect(Token::Agent)?;
+        let name = match self.next_token()? {
+            Token::Ident(n) => n,
+            t => return Err(ParseError::ExpectedToken("agent name".into(), format!("{:?}", t))),
+        };
+        self.expect(Token::LBrace)?;
+        let mut methods = Vec::new();
+        while self.peek_token()? != Token::RBrace {
+            methods.push(self.parse_function()?);
+        }
+        self.expect(Token::RBrace)?;
+        Ok(AgentDef { name, methods })
     }
 
     fn parse_struct_def(&mut self) -> Result<StructDef, ParseError> {
@@ -166,6 +183,19 @@ impl<'a> Parser<'a> {
     fn parse_primary_expr(&mut self) -> Result<Expr, ParseError> {
         let token = self.next_token()?;
         match token {
+            // spawn AgentName — creates a new agent instance
+            Token::Spawn => {
+                let agent_name = match self.next_token()? {
+                    Token::Ident(n) => n,
+                    t => return Err(ParseError::ExpectedToken("agent name".into(), format!("{:?}", t))),
+                };
+                Ok(Expr::Spawn { agent_name })
+            }
+            // await <agentref_expr> — receive from agent mailbox
+            Token::Await => {
+                let target = self.parse_unary_expr()?;
+                Ok(Expr::Await { target: Box::new(target) })
+            }
             Token::Minus => {
                 let expr = self.parse_unary_expr()?;
                 Ok(Expr::UnaryOp { op: UnOp::Neg, expr: Box::new(expr) })
@@ -360,6 +390,15 @@ impl<'a> Parser<'a> {
                 Ok(Stmt::Loop { body })
             }
 
+            // send <target_expr> <message_expr>;
+            Token::Send => {
+                self.next_token()?;
+                let target = self.parse_expr()?;
+                let message = self.parse_expr()?;
+                self.expect(Token::Semicolon)?;
+                Ok(Stmt::Send { target, message })
+            }
+
             Token::Break => {
                 self.next_token()?;
                 self.expect(Token::Semicolon)?;
@@ -418,6 +457,7 @@ impl<'a> Parser<'a> {
         let token = self.next_token()?;
         match token {
             Token::TritType   => Ok(Type::Trit),
+            Token::AgentRef   => Ok(Type::AgentRef),
             Token::TritTensor => {
                 self.expect(Token::LAngle)?;
                 let mut dims = Vec::new();
@@ -585,6 +625,58 @@ mod tests {
             assert_eq!(name, "Signal");
         } else {
             panic!("Expected Named type");
+        }
+    }
+
+    #[test]
+    fn test_parse_agent_def() {
+        let input = r#"
+            agent Voter {
+                fn handle(msg: trit) -> trit {
+                    match msg {
+                         1 => { return  1; }
+                         0 => { return  0; }
+                        -1 => { return -1; }
+                    }
+                }
+            }
+        "#;
+        let mut parser = Parser::new(input);
+        let agent = parser.parse_agent_def().unwrap();
+        assert_eq!(agent.name, "Voter");
+        assert_eq!(agent.methods.len(), 1);
+        assert_eq!(agent.methods[0].name, "handle");
+    }
+
+    #[test]
+    fn test_parse_spawn() {
+        let input = "let v: agentref = spawn Voter;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { ty: Type::AgentRef, value: Expr::Spawn { agent_name }, .. } = stmt {
+            assert_eq!(agent_name, "Voter");
+        } else {
+            panic!("Expected spawn in let binding");
+        }
+    }
+
+    #[test]
+    fn test_parse_send() {
+        let input = "send v 1;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        assert!(matches!(stmt, Stmt::Send { .. }));
+    }
+
+    #[test]
+    fn test_parse_await() {
+        let input = "let reply: trit = await v;";
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { value: Expr::Await { .. }, .. } = stmt {
+            // ok
+        } else {
+            panic!("Expected await in let binding");
         }
     }
 }

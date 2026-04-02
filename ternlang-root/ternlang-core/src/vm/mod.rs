@@ -57,6 +57,7 @@ pub enum Value {
     Trit(Trit),
     Int(i64),
     TensorRef(usize),
+    AgentRef(usize),
 }
 
 impl Default for Value {
@@ -65,12 +66,22 @@ impl Default for Value {
     }
 }
 
+/// A running agent instance.
+/// v0.1: synchronous local actors — handler_addr is the bytecode address of the `handle` fn.
+struct AgentInstance {
+    handler_addr: usize,
+    mailbox: std::collections::VecDeque<Value>,
+}
+
 pub struct BetVm {
     registers: [Value; 27],
     carry_reg: Trit,
     stack: Vec<Value>,
     call_stack: Vec<usize>,  // Return addresses for TCALL/TRET
     tensors: Vec<Vec<Trit>>, // Simple heap for now
+    agents: Vec<AgentInstance>,
+    /// agent_types[type_id] = handler_addr — registered at spawn time via TSPAWN
+    agent_types: std::collections::HashMap<u16, usize>,
     pc: usize,
     code: Vec<u8>,
 }
@@ -83,9 +94,17 @@ impl BetVm {
             stack: Vec::new(),
             call_stack: Vec::new(),
             tensors: Vec::new(),
+            agents: Vec::new(),
+            agent_types: std::collections::HashMap::new(),
             pc: 0,
             code,
         }
+    }
+
+    /// Register an agent type (handler_addr) under a type_id.
+    /// Called by the codegen runtime before spawning instances.
+    pub fn register_agent_type(&mut self, type_id: u16, handler_addr: usize) {
+        self.agent_types.insert(type_id, handler_addr);
     }
 
     pub fn run(&mut self) -> Result<(), VmError> {
@@ -348,6 +367,47 @@ impl BetVm {
                         None => return Ok(()), // top-level return = halt
                     }
                 }
+                // ── Actor opcodes ────────────────────────────────────────────────
+                0x30 => { // TSPAWN type_id:u16 — create agent instance, push AgentRef
+                    if self.pc + 1 >= self.code.len() { return Err(VmError::PcOutOfBounds(self.pc)); }
+                    let type_id = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]);
+                    self.pc += 2;
+                    let handler_addr = *self.agent_types.get(&type_id)
+                        .ok_or(VmError::InvalidOpcode(0x30))?;
+                    let instance_id = self.agents.len();
+                    self.agents.push(AgentInstance {
+                        handler_addr,
+                        mailbox: std::collections::VecDeque::new(),
+                    });
+                    self.stack.push(Value::AgentRef(instance_id));
+                }
+                0x31 => { // TSEND — (AgentRef, message) → push to mailbox
+                    let message = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    let agent_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    match agent_val {
+                        Value::AgentRef(id) => {
+                            self.agents[id].mailbox.push_back(message);
+                        }
+                        _ => return Err(VmError::TypeMismatch),
+                    }
+                }
+                0x32 => { // TAWAIT — AgentRef → pop mailbox, call handler, push result
+                    let agent_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    match agent_val {
+                        Value::AgentRef(id) => {
+                            let message = self.agents[id].mailbox.pop_front()
+                                .unwrap_or(Value::Trit(Trit::Zero)); // empty mailbox → hold
+                            let handler_addr = self.agents[id].handler_addr;
+                            // Push message as argument, then TCALL the handler.
+                            self.stack.push(message);
+                            self.call_stack.push(self.pc); // return to after TAWAIT
+                            self.pc = handler_addr;
+                        }
+                        _ => return Err(VmError::TypeMismatch),
+                    }
+                }
+                // ─────────────────────────────────────────────────────────────────
+
                 0x00 => return Ok(()), // Thalt
                 _ => return Err(VmError::InvalidOpcode(opcode)),
             }
@@ -445,6 +505,71 @@ mod tensor_tests {
             _ => panic!("expected TensorRef"),
         };
         assert_eq!(vm.get_tensor(result_ref).unwrap()[0], Trit::Zero);
+    }
+}
+
+#[cfg(test)]
+mod actor_tests {
+    use super::*;
+    use crate::vm::bet::pack_trits;
+
+    /// Integration test: spawn an agent, send a trit message, await the reply.
+    /// The handler is an identity function: handle(msg: trit) → msg.
+    ///
+    /// Bytecode layout:
+    ///   [0x00] TJMP → entry_point          (skip over handler body)
+    ///   [handler_addr]: TPUSH msg (arg) already on stack when called via TAWAIT
+    ///                   TRET
+    ///   [entry_point]: TSPAWN type_id=0    → AgentRef(0)
+    ///                  TSTORE reg0
+    ///                  TLOAD  reg0         → AgentRef(0)
+    ///                  TPUSH PosOne        → message
+    ///                  TSEND               → sends +1 to agent's mailbox
+    ///                  TLOAD  reg0         → AgentRef(0)
+    ///                  TAWAIT              → pops mailbox, calls handler, pushes result
+    ///                  TSTORE reg1         → result (+1) in reg1
+    ///                  THALT
+    #[test]
+    fn test_actor_spawn_send_await() {
+        let mut code = Vec::new();
+
+        // [0] TJMP over handler (3 bytes total, patch after)
+        let jmp_patch = code.len() + 1;
+        code.push(0x0b); // TJMP
+        code.extend_from_slice(&[0u8, 0u8]);
+
+        // [3] Handler: identity — the message is already on the stack when TAWAIT calls us.
+        //     Just TRET — leaves the message as the return value on the stack.
+        let handler_addr = code.len();
+        code.push(0x11); // TRET
+
+        // Patch the TJMP to land here
+        let entry = code.len() as u16;
+        let bytes = entry.to_le_bytes();
+        code[jmp_patch] = bytes[0];
+        code[jmp_patch + 1] = bytes[1];
+
+        // [entry] TSPAWN type_id=0 → AgentRef(0) on stack
+        code.push(0x30); code.extend_from_slice(&0u16.to_le_bytes());
+        code.push(0x08); code.push(0x00); // TSTORE reg0
+
+        // TLOAD reg0 → AgentRef, TPUSH PosOne → message, TSEND
+        code.push(0x09); code.push(0x00); // TLOAD reg0
+        code.push(0x01); code.extend(pack_trits(&[Trit::PosOne])); // TPUSH +1
+        code.push(0x31); // TSEND
+
+        // TLOAD reg0 → AgentRef, TAWAIT
+        code.push(0x09); code.push(0x00); // TLOAD reg0
+        code.push(0x32); // TAWAIT → calls handler with message on stack
+        code.push(0x08); code.push(0x01); // TSTORE reg1
+        code.push(0x00); // THALT
+
+        let mut vm = BetVm::new(code);
+        vm.register_agent_type(0, handler_addr);
+        vm.run().unwrap();
+
+        // The agent echoed +1 back → reg1 = PosOne
+        assert_eq!(vm.get_register(1), Value::Trit(Trit::PosOne));
     }
 }
 

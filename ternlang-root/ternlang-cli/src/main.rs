@@ -81,6 +81,7 @@ fn main() {
                             Value::Trit(t) => println!("Reg {}: trit({})", i, t),
                             Value::Int(v) => println!("Reg {}: int({})", i, v),
                             Value::TensorRef(r) => println!("Reg {}: tensor_ref({})", i, r),
+                            Value::AgentRef(a)  => println!("Reg {}: agent_ref({})", i, a),
                         }
                     }
                 }

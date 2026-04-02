@@ -26,6 +26,14 @@ pub enum Expr {
         expr: Box<Expr>,
         ty: Type,
     },
+    /// spawn AgentName — creates an agent instance, evaluates to AgentRef
+    Spawn {
+        agent_name: String,
+    },
+    /// await <agentref_expr> — receive result from agent mailbox
+    Await {
+        target: Box<Expr>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -91,6 +99,11 @@ pub enum Stmt {
     Use {
         path: Vec<String>,
     },
+    /// send <agentref_expr> <message_expr>;
+    Send {
+        target: Expr,
+        message: Expr,
+    },
     /// instance.field = value;
     FieldSet {
         object: String,
@@ -109,6 +122,8 @@ pub enum Type {
     String,
     /// User-defined struct type
     Named(String),
+    /// Handle to a running agent instance
+    AgentRef,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -126,8 +141,17 @@ pub struct StructDef {
     pub fields: Vec<(String, Type)>,
 }
 
+/// Top-level agent definition: `agent Name { fn handle(msg: trit) -> trit { ... } }`
+/// v0.1: agents have a single `handle` method that processes each incoming message.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AgentDef {
+    pub name: String,
+    pub methods: Vec<Function>,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Program {
     pub structs: Vec<StructDef>,
+    pub agents: Vec<AgentDef>,
     pub functions: Vec<Function>,
 }

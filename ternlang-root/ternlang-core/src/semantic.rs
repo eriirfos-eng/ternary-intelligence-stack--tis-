@@ -31,6 +31,12 @@ impl SemanticAnalyzer {
 
     pub fn check_program(&mut self, program: &Program) -> Result<(), SemanticError> {
         self.register_structs(&program.structs);
+        // Register agent method signatures so calls inside agents are resolved.
+        for agent in &program.agents {
+            for method in &agent.methods {
+                self.check_function(method)?;
+            }
+        }
         for func in &program.functions {
             self.check_function(func)?;
         }
@@ -123,6 +129,11 @@ impl SemanticAnalyzer {
             Stmt::Loop { body } => self.check_stmt(body),
             Stmt::Break | Stmt::Continue => Ok(()),
             Stmt::Use { .. } => Ok(()),
+            Stmt::Send { target, message } => {
+                self.infer_expr_type(target)?;
+                self.infer_expr_type(message)?;
+                Ok(())
+            }
             Stmt::FieldSet { object, field, value } => {
                 // Look up object type in scope, verify field exists, check value type
                 let obj_ty = self.lookup_var(object)?;
@@ -178,7 +189,9 @@ impl SemanticAnalyzer {
             }
             Expr::UnaryOp { expr, .. } => self.infer_expr_type(expr),
             Expr::Call { .. }          => Ok(Type::Trit), // mocked — full resolution is Phase 4 todo
-            Expr::Cast { ty, .. }      => Ok(ty.clone()),  // cast always returns its declared type
+            Expr::Cast { ty, .. }      => Ok(ty.clone()),
+            Expr::Spawn { .. }         => Ok(Type::AgentRef),
+            Expr::Await { .. }         => Ok(Type::Trit),  // agents communicate in trits v0.1
             Expr::FieldAccess { object, field } => {
                 let obj_ty = self.infer_expr_type(object)?;
                 if let Type::Named(struct_name) = obj_ty {

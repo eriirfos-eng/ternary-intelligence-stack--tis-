@@ -10,6 +10,10 @@ pub struct BytecodeEmitter {
     next_reg: u8,
     /// Struct layouts: struct_name → ordered field names
     struct_layouts: std::collections::HashMap<String, Vec<String>>,
+    /// Agent type IDs: agent_name → type_id (u16 index)
+    agent_type_ids: std::collections::HashMap<String, u16>,
+    /// Agent handler addresses emitted during emit_program (type_id → addr)
+    agent_handlers: Vec<(u16, u16)>,
 }
 
 impl BytecodeEmitter {
@@ -21,6 +25,15 @@ impl BytecodeEmitter {
             break_patches: Vec::new(),
             next_reg: 0,
             struct_layouts: std::collections::HashMap::new(),
+            agent_type_ids: std::collections::HashMap::new(),
+            agent_handlers: Vec::new(),
+        }
+    }
+
+    /// After emit_program, call this to wire agent handler addresses into a VM.
+    pub fn register_agents(&self, vm: &mut crate::vm::BetVm) {
+        for &(type_id, addr) in &self.agent_handlers {
+            vm.register_agent_type(type_id, addr as usize);
         }
     }
 
@@ -30,20 +43,43 @@ impl BytecodeEmitter {
             let field_names: Vec<String> = s.fields.iter().map(|(n, _)| n.clone()).collect();
             self.struct_layouts.insert(s.name.clone(), field_names);
         }
-        // Two-pass: first emit a TJMP over all function bodies so execution
-        // starts at the entry point (last function, or a designated main).
-        // Pass 1: record which functions exist, emit a jump placeholder.
+        // Register agent type IDs before emitting bodies.
+        for (idx, agent) in program.agents.iter().enumerate() {
+            self.agent_type_ids.insert(agent.name.clone(), idx as u16);
+        }
+
+        // Two-pass: first emit a TJMP over all function/agent bodies.
         let entry_jmp_patch = self.code.len() + 1;
         self.code.push(0x0b); // TJMP — skip over function bodies
         self.code.extend_from_slice(&[0u8, 0u8]);
 
-        // Pass 2: emit each function body, recording its address.
+        // Emit agent handler methods (the `handle` fn of each agent).
+        for agent in &program.agents {
+            let type_id = self.agent_type_ids[&agent.name];
+            // The first method named "handle" is the entry point.
+            // All methods are emitted; the first one becomes the handler addr.
+            let mut handler_addr: Option<u16> = None;
+            for method in &agent.methods {
+                let addr = self.code.len() as u16;
+                if handler_addr.is_none() {
+                    handler_addr = Some(addr);
+                }
+                self.emit_function(method);
+                // Also register under the fully-qualified name "AgentName::method"
+                let fq = format!("{}::{}", agent.name, method.name);
+                self.func_addrs.insert(fq, addr);
+            }
+            if let Some(addr) = handler_addr {
+                self.agent_handlers.push((type_id, addr));
+            }
+        }
+
+        // Emit regular function bodies.
         for func in &program.functions {
             self.emit_function(func);
         }
 
-        // Patch the entry jump to land after all function bodies.
-        // (Programs that call functions explicitly will use TCALL.)
+        // Patch entry jump to land after all bodies.
         let after_funcs = self.code.len() as u16;
         self.patch_u16(entry_jmp_patch, after_funcs);
     }
@@ -290,6 +326,12 @@ impl BytecodeEmitter {
             Stmt::Use { .. } => {
                 // Module resolution not yet implemented — no-op at codegen level.
             }
+            Stmt::Send { target, message } => {
+                // Push AgentRef, then message, then emit TSEND (0x31).
+                self.emit_expr(target);
+                self.emit_expr(message);
+                self.code.push(0x31); // TSEND
+            }
 
             Stmt::WhileTernary { condition, on_pos, on_zero, on_neg } => {
                 let loop_top = self.code.len() as u16;
@@ -485,6 +527,23 @@ impl BytecodeEmitter {
                 // cast() is a no-op at the BET level — trits are already in canonical form.
                 // Emit the inner expression; the type annotation guides the type checker only.
                 self.emit_expr(expr);
+            }
+            Expr::Spawn { agent_name } => {
+                // TSPAWN type_id:u16 — creates instance, pushes AgentRef.
+                if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
+                    self.code.push(0x30); // TSPAWN
+                    self.code.extend_from_slice(&type_id.to_le_bytes());
+                } else {
+                    // Unknown agent — push hold as fallback
+                    self.code.push(0x01);
+                    self.code.extend(pack_trits(&[Trit::Zero]));
+                }
+            }
+            Expr::Await { target } => {
+                // Emit the AgentRef expression, then TAWAIT (0x32).
+                // TAWAIT pops the AgentRef, pops its mailbox front, calls handler, pushes result.
+                self.emit_expr(target);
+                self.code.push(0x32); // TAWAIT
             }
             _ => {}
         }

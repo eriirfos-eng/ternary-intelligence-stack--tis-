@@ -74,6 +74,22 @@ pub enum Token {
     #[token("struct", priority = 3)]
     Struct,
 
+    // Actor model keywords
+    #[token("agent", priority = 3)]
+    Agent,
+
+    #[token("spawn", priority = 3)]
+    Spawn,
+
+    #[token("send", priority = 3)]
+    Send,
+
+    #[token("await", priority = 3)]
+    Await,
+
+    #[token("agentref", priority = 3)]
+    AgentRef,
+
     // Operators
     #[token("+")]
     Plus,
