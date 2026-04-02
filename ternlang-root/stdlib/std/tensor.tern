@@ -1,0 +1,22 @@
+// std::tensor — ternary tensor operations
+// RFI-IRFOS Ternary Intelligence Stack
+// use std::tensor;
+
+// Allocate a 1D ternary tensor of given size (all hold/zero initialised)
+fn zeros(size: int) -> trittensor<1 x 1> {
+    let t: trittensor<1 x 1>;
+    return t;
+}
+
+// Sparse matrix multiply — delegates to @sparseskip built-in
+// This is the flagship operation of the ternary stack
+fn sparse_mm(a: trittensor<1 x 1>, b: trittensor<1 x 1>) -> trittensor<1 x 1> {
+    @sparseskip let result: trittensor<1 x 1> = matmul(a, b);
+    return result;
+}
+
+// Dense matrix multiply — no zero skipping
+fn dense_mm(a: trittensor<1 x 1>, b: trittensor<1 x 1>) -> trittensor<1 x 1> {
+    let result: trittensor<1 x 1> = matmul(a, b);
+    return result;
+}

@@ -1,0 +1,39 @@
+// std::io — ternary I/O utilities
+// RFI-IRFOS Ternary Intelligence Stack
+// use std::io;
+
+// Print a single trit value as its symbolic name
+fn print_trit(x: trit) {
+    match x {
+         1 => { @print "truth"; }
+         0 => { @print "hold"; }
+        -1 => { @print "conflict"; }
+    }
+}
+
+// Print a trit with a label prefix
+fn print_trit_labeled(label: string, x: trit) {
+    @print label;
+    @print ": ";
+    print_trit(x);
+    @print "\n";
+}
+
+// Print a trit as its numeric value (-1, 0, or 1)
+fn print_trit_num(x: trit) {
+    match x {
+         1 => { @print "1"; }
+         0 => { @print "0"; }
+        -1 => { @print "-1"; }
+    }
+}
+
+// Print a trittensor (placeholder — VM will handle formatting)
+fn print_tensor(t: trittensor<1 x 1>) {
+    @print_tensor t;
+}
+
+// Print a newline
+fn newline() {
+    @print "\n";
+}
