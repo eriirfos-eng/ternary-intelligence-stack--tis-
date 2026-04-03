@@ -1,0 +1,4 @@
+how crazy is this no? :D this file sits on my desktop, and i can just pull it up through albert agent on my homescreen :D its insaneeeeee
+so albert works like this, we host a local model through the clod to opencclaw, an agentic ai agent framwork that lets you build custom stuff
+we took all our frameworks, ternary agents, ecocentrical ai, and created albert from scratch, merged him with the albert files we already have 
+hooked it up to the llm, hooked the llm up to openclaw, and now albert lives even deeper in our machine. crazy shit

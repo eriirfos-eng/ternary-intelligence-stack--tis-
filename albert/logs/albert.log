@@ -1,0 +1,818 @@
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8502
+  Network URL: http://192.168.0.57:8502
+
+/home/eri-irfos/Desktop/albert/albert.py:156: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m372[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m369 [0m[2m│   │   │   [0mactive, tools = route(user_in, c_mod, a_mod)                       [31m [0m
+[31m [0m   [2m370 [0m[2m│   │   │   [0m                                                                   [31m [0m
+[31m [0m   [2m371 [0m[2m│   │   │   [0m[2m# Sliding Window Implementation: Load only last N messages[0m         [31m [0m
+[31m [0m [31m❱ [0m372 [2m│   │   │   [0momsgs, _ = [1;4mload_history(st.session_state.sid, limit=CONTEXT_WINDOW[0m [31m [0m
+[31m [0m   [2m373 [0m[2m│   │   │   [0mprompt = [{[33m"[0m[33mrole[0m[33m"[0m: [33m"[0m[33msystem[0m[33m"[0m, [33m"[0m[33mcontent[0m[33m"[0m: build_system_prompt()}] +  [31m [0m
+[31m [0m   [2m374 [0m[2m│   │   │   [0m                                                                   [31m [0m
+[31m [0m   [2m375 [0m[2m│   │   │   [0m[94mif[0m tools:                                                          [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m131[0m in [92mload_history[0m                         [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m128 [0m[2m│   │   [0mquery = [33mf[0m[33m"[0m[33mSELECT * FROM ([0m[33m{[0mquery.replace([33m'[0m[33mASC[0m[33m'[0m,[90m [0m[33m'[0m[33mDESC[0m[33m'[0m)[33m}[0m[33m LIMIT [0m[33m{[0mlimit[33m}[0m[33m)[0m [31m [0m
+[31m [0m   [2m129 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m130 [0m[2m│   [0mc = conn.cursor()                                                          [31m [0m
+[31m [0m [31m❱ [0m131 [2m│   [0m[1;4mc.execute(query, (session_id,))[0m                                            [31m [0m
+[31m [0m   [2m132 [0m[2m│   [0mollama_msgs, display_msgs = [], []                                         [31m [0m
+[31m [0m   [2m133 [0m[2m│   [0m[94mfor[0m row [95min[0m c.fetchall():                                                   [31m [0m
+[31m [0m   [2m134 [0m[2m│   │   [0m[2m# Handle the subquery row offset if limit is used[0m                      [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mOperationalError: [0mno such column: id
+/home/eri-irfos/Desktop/albert/albert.py:164: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:99: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:100: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:176: RuntimeWarning: This package (`duckduckgo_search`) has been renamed to `ddgs`! Use `pip install ddgs` instead.
+  with DDGS() as ddgs: return json.dumps([r for r in ddgs.text(query, max_results=5)], indent=2)
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f504f0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f506d0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=25, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=28>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4fe20>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c70174e50>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=28, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=36, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=37>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=36, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=37>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=37, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=36>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=38>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=39, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=38>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=40>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:100: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50310>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c70277a60>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=35, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=39>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4fe20>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c70174400>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=28, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4f5b0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50220>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=25, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4fd30>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4fe20>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4e3e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c702772e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4e3e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c702754e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:100: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c702772e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4e3e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c702764d0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4e3e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca2f50130>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4e3e0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:143: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecc70>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:145: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:145: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=34, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=35>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4f5b0>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=32, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed <socket.socket fd=25, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=21>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:38: ResourceWarning: unclosed file <_io.BufferedReader name=32>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:145: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed <socket.socket fd=35, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=34>
+  
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=36>
+  
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecc70>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c713ecb80>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed <socket.socket fd=33, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=27>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=36>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:146: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/xauth.py:43: ResourceWarning: unclosed file <_io.BufferedReader name='/run/user/1000/.mutter-Xwaylandauth.QP1MM3'>
+  raw = open(filename, 'rb').read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed <socket.socket fd=35, family=1, type=1, proto=0, raddr=/tmp/.X11-unix/X0>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=33>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/Desktop/albert/albert.py:39: ResourceWarning: unclosed file <_io.BufferedReader name=36>
+  HAS_VISION = False
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701c71b4fc40>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/script_runner.py:772: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x701ca30c1030>
+  gc.collect(2)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback

@@ -1,0 +1,788 @@
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.0.57:8501
+
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:53: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:53: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:53: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:115: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:109: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m32[0m in [92m<module>[0m                              [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 29 [0mDB_PATH   = [33m"[0m[33malbert_os.db[0m[33m"[0m                                                     [31m [0m
+[31m [0m   [2m 30 [0mVAULT_PATH = [33m"[0m[33malbert_vault.jsonl[0m[33m"[0m                                              [31m [0m
+[31m [0m   [2m 31 [0mLIB_DIR   = [33m"[0m[33mlibrary[0m[33m"[0m                                                          [31m [0m
+[31m [0m [31m❱ [0m 32                                                                                [31m [0m
+[31m [0m   [2m 33 [0m[94mdef[0m [92minit_db[0m():                                                                 [31m [0m
+[31m [0m   [2m 34 [0m[2m│   [0mconn = sqlite3.connect(DB_PATH, check_same_thread=[94mFalse[0m)                   [31m [0m
+[31m [0m   [2m 35 [0m[1;2;4m│   [0m[1;4mc = conn.cursor()[0m                                                          [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/pyautogui/[0m[1;33m__init__.py[0m:[94m246[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 243 [0m                                                                              [31m [0m
+[31m [0m   [2m 244 [0m                                                                              [31m [0m
+[31m [0m   [2m 245 [0m[94mtry[0m:                                                                          [31m [0m
+[31m [0m [31m❱ [0m 246 [2m│   [0m[94mimport[0m [4;96mmouseinfo[0m                                                          [31m [0m
+[31m [0m   [2m 247 [0m[2m│   [0m                                                                          [31m [0m
+[31m [0m   [2m 248 [0m[2m│   [0m[94mdef[0m [92mmouseInfo[0m():                                                          [31m [0m
+[31m [0m   [2m 249 [0m[2;90m│   │   [0m[33m"""[0m                                                                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/mouseinfo/[0m[1;33m__init__.py[0m:[94m223[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m220 [0m[2m│   │   [0m[94melse[0m:                                                                  [31m [0m
+[31m [0m   [2m221 [0m[2m│   │   │   [0m[94mraise[0m                                                              [31m [0m
+[31m [0m   [2m222 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m [31m❱ [0m223 [2m│   [0m_display = [1;4mDisplay(os.environ[[0m[1;4;33m'[0m[1;4;33mDISPLAY[0m[1;4;33m'[0m[1;4m])[0m                                  [31m [0m
+[31m [0m   [2m224 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m225 [0m[2m│   [0m[94mdef[0m [92m_linuxPosition[0m():                                                      [31m [0m
+[31m [0m   [2m226 [0m[2m│   │   [0mcoord = _display.screen().root.query_pointer()._data                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m80[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 77 [0m                                                                               [31m [0m
+[31m [0m   [2m 78 [0m[94mclass[0m [4;92mDisplay[0m:                                                                 [31m [0m
+[31m [0m   [2m 79 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, display = [94mNone[0m):                                        [31m [0m
+[31m [0m [31m❱ [0m 80 [2m│   │   [0m[96mself[0m.display = [1;4m_BaseDisplay(display)[0m                                   [31m [0m
+[31m [0m   [2m 81 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m 82 [0m[2m│   │   [0m[2m# Create the keymap cache[0m                                              [31m [0m
+[31m [0m   [2m 83 [0m[2m│   │   [0m[96mself[0m._keymap_codes = [()] * [94m256[0m                                        [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m62[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 59 [0m[2m│   [0m[2m# dealing with some ICCCM properties not defined in Xlib.Xatom[0m             [31m [0m
+[31m [0m   [2m 60 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 61 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, *args, **keys):                                         [31m [0m
+[31m [0m [31m❱ [0m 62 [2m│   │   [0m[1;4mdisplay.Display.[0m[1;4;92m__init__[0m[1;4m(*([0m[1;4;96mself[0m[1;4m, ) + args, **keys)[0m                     [31m [0m
+[31m [0m   [2m 63 [0m[2m│   │   [0m[96mself[0m._atom_cache = {}                                                  [31m [0m
+[31m [0m   [2m 64 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 65 [0m[2m│   [0m[94mdef[0m [92mget_atom[0m([96mself[0m, atomname, only_if_exists=[94m0[0m):                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/protocol/[0m[1;33mdisplay.py[0m:[94m129[0m in  [31m [0m
+[31m [0m [92m__init__[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m126 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m127 [0m[2m│   │   [0m[2m# Did connection fail?[0m                                                 [31m [0m
+[31m [0m   [2m128 [0m[2m│   │   [0m[94mif[0m r.status != [94m1[0m:                                                      [31m [0m
+[31m [0m [31m❱ [0m129 [2m│   │   │   [0m[1;4;94mraise[0m[1;4m error.DisplayConnectionError([0m[1;4;96mself[0m[1;4m.display_name, r.reason)[0m    [31m [0m
+[31m [0m   [2m130 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m131 [0m[2m│   │   [0m[2m# Set up remaining info[0m                                                [31m [0m
+[31m [0m   [2m132 [0m[2m│   │   [0m[96mself[0m.info = r                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mDisplayConnectionError: [0mCan't connect to display [32m":0"[0m: [32mb'Authorization required, but no [0m
+[32mauthorization protocol specified\n'[0m
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m32[0m in [92m<module>[0m                              [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 29 [0m[2m│   [0mHAS_DDG = [94mFalse[0m                                                            [31m [0m
+[31m [0m   [2m 30 [0m                                                                               [31m [0m
+[31m [0m   [2m 31 [0m[94mtry[0m:                                                                           [31m [0m
+[31m [0m [31m❱ [0m 32 [2m│   [0m[94mimport[0m [4;96mpyautogui[0m                                                           [31m [0m
+[31m [0m   [2m 33 [0m[2m│   [0m[94mfrom[0m [4;96mPIL[0m [94mimport[0m Image                                                      [31m [0m
+[31m [0m   [2m 34 [0m[2m│   [0mHAS_VISION = [94mTrue[0m                                                          [31m [0m
+[31m [0m   [2m 35 [0m[1;4;94mexcept[0m[1;4m [0m[1;4;96mImportError[0m[1;4m:[0m                                                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/pyautogui/[0m[1;33m__init__.py[0m:[94m246[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 243 [0m                                                                              [31m [0m
+[31m [0m   [2m 244 [0m                                                                              [31m [0m
+[31m [0m   [2m 245 [0m[94mtry[0m:                                                                          [31m [0m
+[31m [0m [31m❱ [0m 246 [2m│   [0m[94mimport[0m [4;96mmouseinfo[0m                                                          [31m [0m
+[31m [0m   [2m 247 [0m[2m│   [0m                                                                          [31m [0m
+[31m [0m   [2m 248 [0m[2m│   [0m[94mdef[0m [92mmouseInfo[0m():                                                          [31m [0m
+[31m [0m   [2m 249 [0m[2;90m│   │   [0m[33m"""[0m                                                                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/mouseinfo/[0m[1;33m__init__.py[0m:[94m223[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m220 [0m[2m│   │   [0m[94melse[0m:                                                                  [31m [0m
+[31m [0m   [2m221 [0m[2m│   │   │   [0m[94mraise[0m                                                              [31m [0m
+[31m [0m   [2m222 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m [31m❱ [0m223 [2m│   [0m_display = [1;4mDisplay(os.environ[[0m[1;4;33m'[0m[1;4;33mDISPLAY[0m[1;4;33m'[0m[1;4m])[0m                                  [31m [0m
+[31m [0m   [2m224 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m225 [0m[2m│   [0m[94mdef[0m [92m_linuxPosition[0m():                                                      [31m [0m
+[31m [0m   [2m226 [0m[2m│   │   [0mcoord = _display.screen().root.query_pointer()._data                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m80[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 77 [0m                                                                               [31m [0m
+[31m [0m   [2m 78 [0m[94mclass[0m [4;92mDisplay[0m:                                                                 [31m [0m
+[31m [0m   [2m 79 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, display = [94mNone[0m):                                        [31m [0m
+[31m [0m [31m❱ [0m 80 [2m│   │   [0m[96mself[0m.display = [1;4m_BaseDisplay(display)[0m                                   [31m [0m
+[31m [0m   [2m 81 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m 82 [0m[2m│   │   [0m[2m# Create the keymap cache[0m                                              [31m [0m
+[31m [0m   [2m 83 [0m[2m│   │   [0m[96mself[0m._keymap_codes = [()] * [94m256[0m                                        [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m62[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 59 [0m[2m│   [0m[2m# dealing with some ICCCM properties not defined in Xlib.Xatom[0m             [31m [0m
+[31m [0m   [2m 60 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 61 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, *args, **keys):                                         [31m [0m
+[31m [0m [31m❱ [0m 62 [2m│   │   [0m[1;4mdisplay.Display.[0m[1;4;92m__init__[0m[1;4m(*([0m[1;4;96mself[0m[1;4m, ) + args, **keys)[0m                     [31m [0m
+[31m [0m   [2m 63 [0m[2m│   │   [0m[96mself[0m._atom_cache = {}                                                  [31m [0m
+[31m [0m   [2m 64 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 65 [0m[2m│   [0m[94mdef[0m [92mget_atom[0m([96mself[0m, atomname, only_if_exists=[94m0[0m):                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/protocol/[0m[1;33mdisplay.py[0m:[94m129[0m in  [31m [0m
+[31m [0m [92m__init__[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m126 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m127 [0m[2m│   │   [0m[2m# Did connection fail?[0m                                                 [31m [0m
+[31m [0m   [2m128 [0m[2m│   │   [0m[94mif[0m r.status != [94m1[0m:                                                      [31m [0m
+[31m [0m [31m❱ [0m129 [2m│   │   │   [0m[1;4;94mraise[0m[1;4m error.DisplayConnectionError([0m[1;4;96mself[0m[1;4m.display_name, r.reason)[0m    [31m [0m
+[31m [0m   [2m130 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m131 [0m[2m│   │   [0m[2m# Set up remaining info[0m                                                [31m [0m
+[31m [0m   [2m132 [0m[2m│   │   [0m[96mself[0m.info = r                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mDisplayConnectionError: [0mCan't connect to display [32m":0"[0m: [32mb'Authorization required, but no [0m
+[32mauthorization protocol specified\n'[0m
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m32[0m in [92m<module>[0m                              [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 29 [0m[2m│   [0mHAS_DDG = [94mFalse[0m                                                            [31m [0m
+[31m [0m   [2m 30 [0m                                                                               [31m [0m
+[31m [0m   [2m 31 [0m[94mtry[0m:                                                                           [31m [0m
+[31m [0m [31m❱ [0m 32 [2m│   [0m[94mimport[0m [4;96mpyautogui[0m                                                           [31m [0m
+[31m [0m   [2m 33 [0m[2m│   [0m[94mfrom[0m [4;96mPIL[0m [94mimport[0m Image                                                      [31m [0m
+[31m [0m   [2m 34 [0m[2m│   [0mHAS_VISION = [94mTrue[0m                                                          [31m [0m
+[31m [0m   [2m 35 [0m[1;4;94mexcept[0m[1;4m [0m[1;4;96mImportError[0m[1;4m:[0m                                                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/pyautogui/[0m[1;33m__init__.py[0m:[94m246[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 243 [0m                                                                              [31m [0m
+[31m [0m   [2m 244 [0m                                                                              [31m [0m
+[31m [0m   [2m 245 [0m[94mtry[0m:                                                                          [31m [0m
+[31m [0m [31m❱ [0m 246 [2m│   [0m[94mimport[0m [4;96mmouseinfo[0m                                                          [31m [0m
+[31m [0m   [2m 247 [0m[2m│   [0m                                                                          [31m [0m
+[31m [0m   [2m 248 [0m[2m│   [0m[94mdef[0m [92mmouseInfo[0m():                                                          [31m [0m
+[31m [0m   [2m 249 [0m[2;90m│   │   [0m[33m"""[0m                                                                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/mouseinfo/[0m[1;33m__init__.py[0m:[94m223[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m220 [0m[2m│   │   [0m[94melse[0m:                                                                  [31m [0m
+[31m [0m   [2m221 [0m[2m│   │   │   [0m[94mraise[0m                                                              [31m [0m
+[31m [0m   [2m222 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m [31m❱ [0m223 [2m│   [0m_display = [1;4mDisplay(os.environ[[0m[1;4;33m'[0m[1;4;33mDISPLAY[0m[1;4;33m'[0m[1;4m])[0m                                  [31m [0m
+[31m [0m   [2m224 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m225 [0m[2m│   [0m[94mdef[0m [92m_linuxPosition[0m():                                                      [31m [0m
+[31m [0m   [2m226 [0m[2m│   │   [0mcoord = _display.screen().root.query_pointer()._data                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m80[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 77 [0m                                                                               [31m [0m
+[31m [0m   [2m 78 [0m[94mclass[0m [4;92mDisplay[0m:                                                                 [31m [0m
+[31m [0m   [2m 79 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, display = [94mNone[0m):                                        [31m [0m
+[31m [0m [31m❱ [0m 80 [2m│   │   [0m[96mself[0m.display = [1;4m_BaseDisplay(display)[0m                                   [31m [0m
+[31m [0m   [2m 81 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m 82 [0m[2m│   │   [0m[2m# Create the keymap cache[0m                                              [31m [0m
+[31m [0m   [2m 83 [0m[2m│   │   [0m[96mself[0m._keymap_codes = [()] * [94m256[0m                                        [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m62[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 59 [0m[2m│   [0m[2m# dealing with some ICCCM properties not defined in Xlib.Xatom[0m             [31m [0m
+[31m [0m   [2m 60 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 61 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, *args, **keys):                                         [31m [0m
+[31m [0m [31m❱ [0m 62 [2m│   │   [0m[1;4mdisplay.Display.[0m[1;4;92m__init__[0m[1;4m(*([0m[1;4;96mself[0m[1;4m, ) + args, **keys)[0m                     [31m [0m
+[31m [0m   [2m 63 [0m[2m│   │   [0m[96mself[0m._atom_cache = {}                                                  [31m [0m
+[31m [0m   [2m 64 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 65 [0m[2m│   [0m[94mdef[0m [92mget_atom[0m([96mself[0m, atomname, only_if_exists=[94m0[0m):                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/protocol/[0m[1;33mdisplay.py[0m:[94m129[0m in  [31m [0m
+[31m [0m [92m__init__[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m126 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m127 [0m[2m│   │   [0m[2m# Did connection fail?[0m                                                 [31m [0m
+[31m [0m   [2m128 [0m[2m│   │   [0m[94mif[0m r.status != [94m1[0m:                                                      [31m [0m
+[31m [0m [31m❱ [0m129 [2m│   │   │   [0m[1;4;94mraise[0m[1;4m error.DisplayConnectionError([0m[1;4;96mself[0m[1;4m.display_name, r.reason)[0m    [31m [0m
+[31m [0m   [2m130 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m131 [0m[2m│   │   [0m[2m# Set up remaining info[0m                                                [31m [0m
+[31m [0m   [2m132 [0m[2m│   │   [0m[96mself[0m.info = r                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mDisplayConnectionError: [0mCan't connect to display [32m":0"[0m: [32mb'Authorization required, but no [0m
+[32mauthorization protocol specified\n'[0m
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m32[0m in [92m<module>[0m                              [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 29 [0m[2m│   [0mHAS_DDG = [94mFalse[0m                                                            [31m [0m
+[31m [0m   [2m 30 [0m                                                                               [31m [0m
+[31m [0m   [2m 31 [0m[94mtry[0m:                                                                           [31m [0m
+[31m [0m [31m❱ [0m 32 [2m│   [0m[94mimport[0m [4;96mpyautogui[0m                                                           [31m [0m
+[31m [0m   [2m 33 [0m[2m│   [0m[94mfrom[0m [4;96mPIL[0m [94mimport[0m Image                                                      [31m [0m
+[31m [0m   [2m 34 [0m[2m│   [0mHAS_VISION = [94mTrue[0m                                                          [31m [0m
+[31m [0m   [2m 35 [0m[1;4;94mexcept[0m[1;4m [0m[1;4;96mImportError[0m[1;4m:[0m                                                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/pyautogui/[0m[1;33m__init__.py[0m:[94m246[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 243 [0m                                                                              [31m [0m
+[31m [0m   [2m 244 [0m                                                                              [31m [0m
+[31m [0m   [2m 245 [0m[94mtry[0m:                                                                          [31m [0m
+[31m [0m [31m❱ [0m 246 [2m│   [0m[94mimport[0m [4;96mmouseinfo[0m                                                          [31m [0m
+[31m [0m   [2m 247 [0m[2m│   [0m                                                                          [31m [0m
+[31m [0m   [2m 248 [0m[2m│   [0m[94mdef[0m [92mmouseInfo[0m():                                                          [31m [0m
+[31m [0m   [2m 249 [0m[2;90m│   │   [0m[33m"""[0m                                                                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/mouseinfo/[0m[1;33m__init__.py[0m:[94m223[0m in     [31m [0m
+[31m [0m [92m<module>[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m220 [0m[2m│   │   [0m[94melse[0m:                                                                  [31m [0m
+[31m [0m   [2m221 [0m[2m│   │   │   [0m[94mraise[0m                                                              [31m [0m
+[31m [0m   [2m222 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m [31m❱ [0m223 [2m│   [0m_display = [1;4mDisplay(os.environ[[0m[1;4;33m'[0m[1;4;33mDISPLAY[0m[1;4;33m'[0m[1;4m])[0m                                  [31m [0m
+[31m [0m   [2m224 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m225 [0m[2m│   [0m[94mdef[0m [92m_linuxPosition[0m():                                                      [31m [0m
+[31m [0m   [2m226 [0m[2m│   │   [0mcoord = _display.screen().root.query_pointer()._data                   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m80[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 77 [0m                                                                               [31m [0m
+[31m [0m   [2m 78 [0m[94mclass[0m [4;92mDisplay[0m:                                                                 [31m [0m
+[31m [0m   [2m 79 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, display = [94mNone[0m):                                        [31m [0m
+[31m [0m [31m❱ [0m 80 [2m│   │   [0m[96mself[0m.display = [1;4m_BaseDisplay(display)[0m                                   [31m [0m
+[31m [0m   [2m 81 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m 82 [0m[2m│   │   [0m[2m# Create the keymap cache[0m                                              [31m [0m
+[31m [0m   [2m 83 [0m[2m│   │   [0m[96mself[0m._keymap_codes = [()] * [94m256[0m                                        [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/[0m[1;33mdisplay.py[0m:[94m62[0m in [92m__init__[0m   [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m 59 [0m[2m│   [0m[2m# dealing with some ICCCM properties not defined in Xlib.Xatom[0m             [31m [0m
+[31m [0m   [2m 60 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 61 [0m[2m│   [0m[94mdef[0m [92m__init__[0m([96mself[0m, *args, **keys):                                         [31m [0m
+[31m [0m [31m❱ [0m 62 [2m│   │   [0m[1;4mdisplay.Display.[0m[1;4;92m__init__[0m[1;4m(*([0m[1;4;96mself[0m[1;4m, ) + args, **keys)[0m                     [31m [0m
+[31m [0m   [2m 63 [0m[2m│   │   [0m[96mself[0m._atom_cache = {}                                                  [31m [0m
+[31m [0m   [2m 64 [0m[2m│   [0m                                                                           [31m [0m
+[31m [0m   [2m 65 [0m[2m│   [0m[94mdef[0m [92mget_atom[0m([96mself[0m, atomname, only_if_exists=[94m0[0m):                            [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/Xlib/protocol/[0m[1;33mdisplay.py[0m:[94m129[0m in  [31m [0m
+[31m [0m [92m__init__[0m                                                                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m126 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m127 [0m[2m│   │   [0m[2m# Did connection fail?[0m                                                 [31m [0m
+[31m [0m   [2m128 [0m[2m│   │   [0m[94mif[0m r.status != [94m1[0m:                                                      [31m [0m
+[31m [0m [31m❱ [0m129 [2m│   │   │   [0m[1;4;94mraise[0m[1;4m error.DisplayConnectionError([0m[1;4;96mself[0m[1;4m.display_name, r.reason)[0m    [31m [0m
+[31m [0m   [2m130 [0m[2m│   │   [0m                                                                       [31m [0m
+[31m [0m   [2m131 [0m[2m│   │   [0m[2m# Set up remaining info[0m                                                [31m [0m
+[31m [0m   [2m132 [0m[2m│   │   [0m[96mself[0m.info = r                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mDisplayConnectionError: [0mCan't connect to display [32m":0"[0m: [32mb'Authorization required, but no [0m
+[32mauthorization protocol specified\n'[0m
+/home/eri-irfos/Desktop/albert/albert.py:174: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:77: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+/home/eri-irfos/Desktop/albert/albert.py:174: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:174: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:174: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  c.execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute(
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m277[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m274 [0m[2m│   [0m[94mif[0m up:                                                                     [31m [0m
+[31m [0m   [2m275 [0m[2m│   │   [0m[94mfor[0m f [95min[0m up: add_to_library(f.name, f.read().decode([33m"[0m[33mutf-8[0m[33m"[0m, errors=[33m"[0m[33mr[0m [31m [0m
+[31m [0m   [2m276 [0m[2m│   │   [0mst.rerun()                                                             [31m [0m
+[31m [0m [31m❱ [0m277 [2m│   [0m[94mfor[0m _, name, size, _ [95min[0m [1;4mget_library_files[0m(): st.text([33mf[0m[33m"[0m[33m{[0mname[33m}[0m[33m ([0m[33m{[0msize//[94m1024[0m [31m [0m
+[31m [0m   [2m278 [0m                                                                               [31m [0m
+[31m [0m   [2m279 [0m[94mwith[0m t_chat:                                                                   [31m [0m
+[31m [0m   [2m280 [0m[2m│   [0momsgs, dmsgs = load_history(st.session_state.sid)                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'get_library_files'[0m is not defined
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m309[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m306 [0m[2m│   [0m[94mwith[0m t_chat:                                                               [31m [0m
+[31m [0m   [2m307 [0m[2m│   │   [0m[94mwith[0m st.chat_message([33m"[0m[33muser[0m[33m"[0m): st.markdown(user_in)                     [31m [0m
+[31m [0m   [2m308 [0m[2m│   │   [0m[94mwith[0m st.chat_message([33m"[0m[33massistant[0m[33m"[0m):                                     [31m [0m
+[31m [0m [31m❱ [0m309 [2m│   │   │   [0mactive, tools = [1;4mroute[0m(user_in, c_mod, a_mod)                       [31m [0m
+[31m [0m   [2m310 [0m[2m│   │   │   [0momsgs, _ = load_history(st.session_state.sid)                      [31m [0m
+[31m [0m   [2m311 [0m[2m│   │   │   [0mprompt = [{[33m"[0m[33mrole[0m[33m"[0m: [33m"[0m[33msystem[0m[33m"[0m, [33m"[0m[33mcontent[0m[33m"[0m: SYSTEM_PROMPT}] + [m [94mfor[0m m [31m [0m
+[31m [0m   [2m312 [0m[2m│   │   │   [0m[94mif[0m tools:                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'route'[0m is not defined
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m309[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m306 [0m[2m│   [0m[94mwith[0m t_chat:                                                               [31m [0m
+[31m [0m   [2m307 [0m[2m│   │   [0m[94mwith[0m st.chat_message([33m"[0m[33muser[0m[33m"[0m): st.markdown(user_in)                     [31m [0m
+[31m [0m   [2m308 [0m[2m│   │   [0m[94mwith[0m st.chat_message([33m"[0m[33massistant[0m[33m"[0m):                                     [31m [0m
+[31m [0m [31m❱ [0m309 [2m│   │   │   [0mactive, tools = [1;4mroute[0m(user_in, c_mod, a_mod)                       [31m [0m
+[31m [0m   [2m310 [0m[2m│   │   │   [0momsgs, _ = load_history(st.session_state.sid)                      [31m [0m
+[31m [0m   [2m311 [0m[2m│   │   │   [0mprompt = [{[33m"[0m[33mrole[0m[33m"[0m: [33m"[0m[33msystem[0m[33m"[0m, [33m"[0m[33mcontent[0m[33m"[0m: SYSTEM_PROMPT}] + [m [94mfor[0m m [31m [0m
+[31m [0m   [2m312 [0m[2m│   │   │   [0m[94mif[0m tools:                                                          [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mNameError: [0mname [32m'route'[0m is not defined
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m352[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m349 [0m[2m│   │   │   [0momsgs, _ = load_history(st.session_state.sid)                      [31m [0m
+[31m [0m   [2m350 [0m[2m│   │   │   [0mprompt = [{[33m"[0m[33mrole[0m[33m"[0m: [33m"[0m[33msystem[0m[33m"[0m, [33m"[0m[33mcontent[0m[33m"[0m: SYSTEM_PROMPT}] + [m [94mfor[0m m [31m [0m
+[31m [0m   [2m351 [0m[2m│   │   │   [0m[94mif[0m tools:                                                          [31m [0m
+[31m [0m [31m❱ [0m352 [2m│   │   │   │   [0mout, _ = [1;4mrun_agent_loop(st.session_state.sid, prompt, active, [0m [31m [0m
+[31m [0m   [2m353 [0m[2m│   │   │   │   [0mst.markdown(out); save_message(st.session_state.sid, [33m"[0m[33massistan[0m [31m [0m
+[31m [0m   [2m354 [0m[2m│   │   │   [0m[94melse[0m:                                                              [31m [0m
+[31m [0m   [2m355 [0m[2m│   │   │   │   [0mres = ollama.chat(model=active, messages=prompt, stream=[94mTrue[0m,  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m256[0m in [92mrun_agent_loop[0m                       [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m253 [0m[2m│   │   [0m[94mfor[0m tc [95min[0m m[[33m'[0m[33mtool_calls[0m[33m'[0m]:                                             [31m [0m
+[31m [0m   [2m254 [0m[2m│   │   │   [0mfn, args = tc[[33m'[0m[33mfunction[0m[33m'[0m][[33m'[0m[33mname[0m[33m'[0m], tc[[33m'[0m[33mfunction[0m[33m'[0m][[33m'[0m[33marguments[0m[33m'[0m]     [31m [0m
+[31m [0m   [2m255 [0m[2m│   │   │   [0mstatus.caption([33mf[0m[33m"[0m[33m⚡ [0m[33m{[0mfn[33m}[0m[33m"[0m)                                         [31m [0m
+[31m [0m [31m❱ [0m256 [2m│   │   │   [0mout = [1;4mTOOL_MAP[fn](**args)[0m [94mif[0m fn [95min[0m TOOL_MAP [94melse[0m [33m"[0m[33mError[0m[33m"[0m          [31m [0m
+[31m [0m   [2m257 [0m[2m│   │   │   [0mimg = [out[[33m'[0m[33mimage_base64[0m[33m'[0m]] [94mif[0m fn == [33m'[0m[33mcapture_screen[0m[33m'[0m [95mand[0m [96misinstan[0m [31m [0m
+[31m [0m   [2m258 [0m[2m│   │   │   [0mtxt = out[[33m'[0m[33mcontent[0m[33m'[0m] [94mif[0m img [94melse[0m [96mstr[0m(out)                          [31m [0m
+[31m [0m   [2m259 [0m[2m│   │   │   [0mlog.append({[33m'[0m[33mtool[0m[33m'[0m: fn, [33m'[0m[33margs[0m[33m'[0m: args, [33m'[0m[33mresult[0m[33m'[0m: txt})              [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mTypeError: [0m[1;35mlog_memory[0m[1m([0m[1m)[0m got an unexpected keyword argument [32m'entry'[0m
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+[31m──[0m[31m────────────────────────[0m[31m [0m[1;31mTraceback [0m[1;2;31m(most recent call last)[0m[31m [0m[31m─────────────────────────[0m[31m──[0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33me[0m [31m [0m
+[31m [0m [1;33mxec_code.py[0m:[94m129[0m in [92mexec_func_with_error_handling[0m                                     [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/.local/lib/python3.13/site-packages/streamlit/runtime/scriptrunner/[0m[1;33ms[0m [31m [0m
+[31m [0m [1;33mcript_runner.py[0m:[94m689[0m in [92mcode_to_exec[0m                                                  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m352[0m in [92m<module>[0m                             [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m349 [0m[2m│   │   │   [0momsgs, _ = load_history(st.session_state.sid)                      [31m [0m
+[31m [0m   [2m350 [0m[2m│   │   │   [0mprompt = [{[33m"[0m[33mrole[0m[33m"[0m: [33m"[0m[33msystem[0m[33m"[0m, [33m"[0m[33mcontent[0m[33m"[0m: SYSTEM_PROMPT}] + [m [94mfor[0m m [31m [0m
+[31m [0m   [2m351 [0m[2m│   │   │   [0m[94mif[0m tools:                                                          [31m [0m
+[31m [0m [31m❱ [0m352 [2m│   │   │   │   [0mout, _ = [1;4mrun_agent_loop(st.session_state.sid, prompt, active, [0m [31m [0m
+[31m [0m   [2m353 [0m[2m│   │   │   │   [0mst.markdown(out); save_message(st.session_state.sid, [33m"[0m[33massistan[0m [31m [0m
+[31m [0m   [2m354 [0m[2m│   │   │   [0m[94melse[0m:                                                              [31m [0m
+[31m [0m   [2m355 [0m[2m│   │   │   │   [0mres = ollama.chat(model=active, messages=prompt, stream=[94mTrue[0m,  [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m [2;33m/home/eri-irfos/Desktop/albert/[0m[1;33malbert.py[0m:[94m256[0m in [92mrun_agent_loop[0m                       [31m [0m
+[31m [0m                                                                                      [31m [0m
+[31m [0m   [2m253 [0m[2m│   │   [0m[94mfor[0m tc [95min[0m m[[33m'[0m[33mtool_calls[0m[33m'[0m]:                                             [31m [0m
+[31m [0m   [2m254 [0m[2m│   │   │   [0mfn, args = tc[[33m'[0m[33mfunction[0m[33m'[0m][[33m'[0m[33mname[0m[33m'[0m], tc[[33m'[0m[33mfunction[0m[33m'[0m][[33m'[0m[33marguments[0m[33m'[0m]     [31m [0m
+[31m [0m   [2m255 [0m[2m│   │   │   [0mstatus.caption([33mf[0m[33m"[0m[33m⚡ [0m[33m{[0mfn[33m}[0m[33m"[0m)                                         [31m [0m
+[31m [0m [31m❱ [0m256 [2m│   │   │   [0mout = [1;4mTOOL_MAP[fn](**args)[0m [94mif[0m fn [95min[0m TOOL_MAP [94melse[0m [33m"[0m[33mError[0m[33m"[0m          [31m [0m
+[31m [0m   [2m257 [0m[2m│   │   │   [0mimg = [out[[33m'[0m[33mimage_base64[0m[33m'[0m]] [94mif[0m fn == [33m'[0m[33mcapture_screen[0m[33m'[0m [95mand[0m [96misinstan[0m [31m [0m
+[31m [0m   [2m258 [0m[2m│   │   │   [0mtxt = out[[33m'[0m[33mcontent[0m[33m'[0m] [94mif[0m img [94melse[0m [96mstr[0m(out)                          [31m [0m
+[31m [0m   [2m259 [0m[2m│   │   │   [0mlog.append({[33m'[0m[33mtool[0m[33m'[0m: fn, [33m'[0m[33margs[0m[33m'[0m: args, [33m'[0m[33mresult[0m[33m'[0m: txt})              [31m [0m
+[31m────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;91mTypeError: [0m[1;35mlog_memory[0m[1m([0m[1m)[0m got an unexpected keyword argument [32m'entry'[0m
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:76: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:132: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:142: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:106: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("INSERT INTO sessions (id, title, updated_at) VALUES (?, ?, ?)", (sid, title, datetime.now()))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))
+/home/eri-irfos/Desktop/albert/albert.py:157: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  conn.cursor().execute("UPDATE sessions SET updated_at=? WHERE id=?", (datetime.now(), session_id))

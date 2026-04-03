@@ -1,0 +1,7 @@
+__pycache__/
+archive/
+.omx/
+.clawd-agents/
+# Albert Code local artifacts
+.albert/settings.local.json
+.albert/sessions/

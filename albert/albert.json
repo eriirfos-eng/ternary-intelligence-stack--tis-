@@ -1,0 +1,8 @@
+{
+  "model_path": "models/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+  "kiwix_url": "http://localhost:8080/search",
+  "max_tokens": 256,
+  "context_chars": 2000,
+  "log_file": "albert_log.jsonl"
+}
+
