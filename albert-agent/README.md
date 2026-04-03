@@ -75,7 +75,7 @@ python3 -m src.main chat
 
 ## Backstory
 
-At 4 AM on March 31, 2026, the developer community was shaken by the exposure of major agentic harness structures. Simeon (RFI-IRFOS) and the team sat down to port the core architectural patterns to a clean-room Python implementation that fits the **Albert** philosophy.
+Simeon (RFI-IRFOS) and the team sat down to port the core architectural patterns to a clean-room Python implementation that fits the **Albert** philosophy.
 
 The result is **Albert-Code**: a bridge between the sophisticated agentic workflows of the future and the fast, local, offline-first reality of today.
 
