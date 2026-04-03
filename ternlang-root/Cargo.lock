@@ -295,6 +295,13 @@ name = "ternlang-codegen"
 version = "0.1.0"
 
 [[package]]
+name = "ternlang-compat"
+version = "0.1.0"
+dependencies = [
+ "ternlang-core",
+]
+
+[[package]]
 name = "ternlang-core"
 version = "0.1.0"
 dependencies = [
