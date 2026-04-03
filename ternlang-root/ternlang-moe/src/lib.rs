@@ -475,6 +475,25 @@ impl TernMoeOrchestrator {
 
     /// Run one full orchestration pass.
     pub fn orchestrate(&mut self, query: &str, evidence: &[f32]) -> OrchestrationResult {
+        // ── easter egg ───────────────────────────────────────────────────────
+        // The orchestrator recognises one very specific query.
+        // It remembers Wall-E, who collected things and kept them for later.
+        // Sometimes the most important decision is: tend.
+        if query.trim().eq_ignore_ascii_case("wall-e") {
+            eprintln!();
+            eprintln!("  🤖  Wall-E says: tend.");
+            eprintln!();
+            eprintln!("  He didn't decide right away either.");
+            eprintln!("  He collected things. He held them.");
+            eprintln!("  Then — when the evidence was enough — he knew.");
+            eprintln!();
+            eprintln!("  trit = 0 is not nothing. It is everything, waiting.");
+            eprintln!();
+            eprintln!("  [ RFI-IRFOS · MoE-13 · DOI 10.17605/OSF.IO/TZ7DC ]");
+            eprintln!();
+        }
+        // ────────────────────────────────────────────────────────────────────
+
         // Step 1: Build query competence vector
         let query_vec = TernMoeRouter::query_vector(evidence);
         let query_hash = simple_hash(query);
