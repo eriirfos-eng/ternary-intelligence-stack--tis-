@@ -7,7 +7,7 @@ use ternlang_core::codegen::betbc::BytecodeEmitter;
 use ternlang_core::vm::{BetVm, Value};
 use ternlang_core::StdlibLoader;
 use ternlang_ml::{TritMatrix, bitnet_threshold, benchmark};
-use ternlang_hdl::BetSimEmitter;
+use ternlang_hdl::{BetSimEmitter, BetRtlProcessor};
 use ternlang_runtime::TernNode;
 
 #[derive(ClapParser)]
@@ -49,7 +49,7 @@ enum Commands {
         #[arg(short, long)]
         write: bool,
     },
-    /// Generate an Icarus Verilog FPGA testbench for a .tern file
+    /// Generate an Icarus Verilog FPGA testbench or run RTL simulation
     Sim {
         /// Path to the .tern file
         file: PathBuf,
@@ -59,6 +59,12 @@ enum Commands {
         /// Run simulation with iverilog+vvp if available
         #[arg(short, long)]
         run: bool,
+        /// Run cycle-accurate RTL simulation in pure Rust (no external tools needed)
+        #[arg(long)]
+        rtl: bool,
+        /// Max clock cycles for RTL simulation (default: 10000)
+        #[arg(long, default_value = "10000")]
+        max_cycles: u64,
     },
     /// Emit BET processor Verilog and run Yosys synthesis (Phase 6.1)
     HdlSynth {
@@ -152,8 +158,12 @@ fn main() {
         Commands::Fmt { file, write } => {
             run_fmt(file, *write);
         }
-        Commands::Sim { file, output, run } => {
-            run_sim(file, output.as_deref(), *run);
+        Commands::Sim { file, output, run, rtl, max_cycles } => {
+            if *rtl {
+                run_rtl_sim(file, *max_cycles);
+            } else {
+                run_sim(file, output.as_deref(), *run);
+            }
         }
         Commands::HdlSynth { output, synth } => {
             run_hdl_synth(output.as_deref(), *synth);
@@ -189,6 +199,62 @@ fn main() {
             fs::write(out_path, code).expect("Failed to write bytecode");
             println!("Compiled to {:?}", file);
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RTL Sim — Phase 6.1 cycle-accurate BET processor simulation (no external tools)
+// ─────────────────────────────────────────────────────────────────────────────
+fn run_rtl_sim(file: &std::path::PathBuf, max_cycles: u64) {
+    let input = fs::read_to_string(file).expect("Failed to read file");
+    let mut parser = Parser::new(&input);
+    let mut emitter = BytecodeEmitter::new();
+
+    match parser.parse_program() {
+        Ok(mut prog) => { StdlibLoader::resolve(&mut prog); emitter.emit_program(&prog); }
+        Err(_) => {
+            let mut parser = Parser::new(&input);
+            while let Ok(stmt) = parser.parse_stmt() { emitter.emit_stmt(&stmt); }
+        }
+    }
+
+    let code = emitter.finalize();
+    println!("BET RTL Simulator — Phase 6.1");
+    println!("Bytecode: {} bytes | Max cycles: {}", code.len(), max_cycles);
+    println!("{}", "─".repeat(52));
+
+    let mut proc = BetRtlProcessor::new(code);
+    let trace = proc.run(max_cycles);
+
+    println!("  Cycles elapsed : {}", trace.cycles);
+    println!("  Halted cleanly : {}", trace.halted);
+    println!("{}", "─".repeat(52));
+
+    // Print final register state (first 10)
+    println!("  Final registers (0–9):");
+    for (i, &v) in trace.final_regs.iter().take(10).enumerate() {
+        let label = match v { 1 => "+1 (truth)", -1 => "-1 (conflict)", _ => " 0 (hold)" };
+        println!("    r{:02}: {}", i, label);
+    }
+
+    if !trace.final_stack.is_empty() {
+        println!("  Final stack (top→bottom): {:?}", trace.final_stack.iter().rev().collect::<Vec<_>>());
+    } else {
+        println!("  Final stack: empty");
+    }
+
+    // Print last 5 cycle snapshots for traceability
+    if trace.cycles_state.len() > 1 {
+        println!("{}", "─".repeat(52));
+        println!("  Last {} cycles:", trace.cycles_state.len().min(5));
+        for snap in trace.cycles_state.iter().rev().take(5).rev() {
+            println!("    [cy {:>4}] pc={:04x} op=0x{:02x} stack={:?}",
+                snap.cycle, snap.pc, snap.opcode, snap.stack);
+        }
+    }
+
+    if !trace.halted {
+        eprintln!("  WARNING: max_cycles ({}) reached without THALT", max_cycles);
     }
 }
 

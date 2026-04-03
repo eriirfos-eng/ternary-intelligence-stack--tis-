@@ -132,14 +132,14 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
 
 ---
 
-## 📡 Phase 6: Hardware & HDL Backends — PHASE 6.0 COMPLETE ✅
+## 📡 Phase 6: Hardware & HDL Backends — PHASE 6.1 COMPLETE ✅
 - [x] **Verilog/VHDL Codegen**: `ternlang-hdl` crate, map trit → 2-bit wire pairs
   - Primitives: trit_neg, trit_cons, trit_mul, trit_add, trit_reg, bet_alu
   - Sparse matmul array: parameterised N×N with per-cell zero-skip enable
   - ISA control: bet_regfile (27 reg), bet_pc (16-bit), bet_control (all opcodes), bet_processor (top-level)
   - 11 HDL tests passing
 - [x] **BET ISA Spec Document**: `BET-ISA-SPEC.md` — formal ISA spec with encoding tables, stack-effect notation, hardware mapping
-- [ ] **FPGA Simulation** (Phase 6.1): Verilator/Icarus Verilog wrapper for BET bytecode — **NEXT**
+- [x] **FPGA Simulation** (Phase 6.1): Cycle-accurate RTL simulator in pure Rust (`BetRtlProcessor`) — mirrors `bet_processor.v` exactly; same 2-bit encoding, clocked regfile, PC, ALU; 12 RTL unit tests; `ternlang sim --rtl` CLI flag (no external tools needed); iverilog path still supported via `ternlang sim --run`
 
 ---
 
@@ -195,3 +195,4 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
 | 2026-04-03 | StdlibLoader: `use std::trit;` works end-to-end. Comment skip in lexer. 3-layer CSC sparse matmul (flat i8 + offset table + Rayon): 86× at 60% sparsity, 122× at 99% sparsity (512² release). Goldilocks sweep confirms 40–60% as optimal zone for medium matrices. Whitepaper updated with full sweep table. 120+ tests passing. |
 | 2026-04-03 | Multi-tenant API key management in ternlang-api: KeyStore (JSON-backed, async RwLock), key generation (tern_<tier>_<uuid24>), revocation, usage counters, admin routes POST/GET/DELETE /admin/keys. `TERNLANG_ADMIN_KEY` + `KEYS_FILE` env vars. Albert-agent integrated as primary TIS agent. 5 VM compile errors fixed (Value::Clone, AgentRef 2-tuple). Build clean across full workspace. |
 | 2026-04-03 | Phase 5.1 COMPLETE: RemoteTransport trait in ternlang-core (no circular dep), TernNode impl in ternlang-runtime; TSEND/TAWAIT route over TCP for remote AgentRefs with auto-connect; `ternlang run --node-addr --peer` CLI flags wire TernNode into VM at startup; 4 runtime tests passing. |
+| 2026-04-03 | Phase 6.1 COMPLETE: BetRtlProcessor — cycle-accurate RTL simulator in pure Rust. Mirrors bet_processor.v exactly: TritWire 2-bit encoding, trit_neg/cons/mul/add combinational primitives, BetRegfile (27 regs), BetPc (16-bit), BetAlu, bet_decode control unit. `ternlang sim --rtl [--max-cycles N]` CLI. 12 RTL unit tests + 2 doctests. 93 tests total across core/hdl/runtime. |

@@ -25,7 +25,9 @@
 pub mod verilog;
 pub mod isa;
 pub mod sim;
+pub mod rtl_sim;
 
 pub use verilog::{VerilogEmitter, VerilogModule};
 pub use isa::BetIsaEmitter;
 pub use sim::BetSimEmitter;
+pub use rtl_sim::{BetRtlProcessor, RtlTrace, TritWire};
