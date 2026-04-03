@@ -4,6 +4,6 @@ members = [
     "ternlang-codegen",
     "ternlang-ml",
     "ternlang-cli",
-    "ternlang-test", "ternlang-mcp", "ternlang-runtime", "ternlang-hdl",
+    "ternlang-test", "ternlang-mcp", "ternlang-runtime", "ternlang-hdl", "ternlang-lsp",
 ]
 resolver = "2"
