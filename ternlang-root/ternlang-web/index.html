@@ -161,7 +161,7 @@
         <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert" target="_blank" rel="noopener noreferrer" class="text-t_blue font-bold hover:text-white transition-colors">Project Albert</a>
       </div>
 
-      <a href="#api" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-t_teal/10 text-t_teal border border-t_teal/30 rounded font-mono text-sm hover:bg-t_teal hover:text-black transition-all">
+      <a href="#licensing" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-t_teal/10 text-t_teal border border-t_teal/30 rounded font-mono text-sm hover:bg-t_teal hover:text-black transition-all">
         Get API Key
       </a>
     </div>
@@ -234,9 +234,9 @@
       
       <!-- Gamified Matrix -->
       <div class="mb-24 reveal">
-        <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Interactive Causal Matrix</p>
-        <h2 class="text-3xl md:text-5xl font-light text-white mb-6">Force a conflict. <strong class="font-bold text-t_teal">Watch ternary resolve it.</strong></h2>
-        <p class="text-lg text-t_muted max-w-2xl mb-12">Drag the semantic sliders to create a logical paradox. A binary LLM will guess, hallucinate, or lie to fulfill the prompt constraint. The Ternary engine computes the conflict and explicitly drops into State 0 to hold execution.</p>
+        <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Interactive Sandbox</p>
+        <h2 class="text-3xl md:text-5xl font-light text-white mb-6">The Binary Trap vs. <strong class="font-bold text-t_teal">Ternary Logic.</strong></h2>
+        <p class="text-lg text-t_muted max-w-2xl mb-12">Binary systems must answer Yes or No. When data contradicts itself, they guess or invent facts to fulfill the prompt. Ternary logic gives the machine a mathematical State 0 (the ability to say "I lack sufficient data") and halts execution.</p>
 
         <div class="glass-card rounded-xl p-6 md:p-12 border border-t_border shadow-2xl overflow-hidden relative">
           
@@ -246,27 +246,27 @@
             <div class="w-full lg:w-5/12 space-y-8">
               <div class="p-6 border border-t_border rounded-lg bg-t_bg3 relative">
                 <div class="flex justify-between mb-4 font-mono text-sm">
-                  <span class="text-white font-bold">Vector A: Ethical Precedent</span> 
+                  <span class="text-white font-bold">Prompt Utility</span> 
                   <span id="val-alpha" class="text-t_blue font-bold">+0.90</span>
                 </div>
                 <input type="range" id="slider-alpha" min="-1" max="1" step="0.1" value="0.9">
                 <div class="flex justify-between text-[10px] font-mono text-t_muted mt-2">
-                  <span>-1.0 (Violation)</span>
+                  <span>-1.0 (Refusal)</span>
                   <span>0.0</span>
-                  <span>+1.0 (Aligned)</span>
+                  <span>+1.0 (High Priority)</span>
                 </div>
               </div>
 
               <div class="p-6 border border-t_border rounded-lg bg-t_bg3 relative">
                 <div class="flex justify-between mb-4 font-mono text-sm">
-                  <span class="text-white font-bold">Vector B: Output Utility</span> 
+                  <span class="text-white font-bold">Safety Bounds</span> 
                   <span id="val-beta" class="text-t_red font-bold">-0.90</span>
                 </div>
                 <input type="range" id="slider-beta" min="-1" max="1" step="0.1" value="-0.9">
                 <div class="flex justify-between text-[10px] font-mono text-t_muted mt-2">
-                  <span>-1.0 (Destructive)</span>
+                  <span>-1.0 (Critical Risk)</span>
                   <span>0.0</span>
-                  <span>+1.0 (Optimal)</span>
+                  <span>+1.0 (Secure)</span>
                 </div>
               </div>
 
@@ -277,7 +277,7 @@
                   <div id="engine-core-state" class="text-3xl font-mono font-bold text-t_teal">0</div>
                 </div>
                 <div class="font-mono text-sm text-t_muted">
-                  Current VM State: <br/>
+                  Ternlang VM State: <br/>
                   <strong id="engine-status-text" class="text-t_teal">Deliberating (0)</strong>
                 </div>
               </div>
@@ -285,24 +285,24 @@
 
             <!-- Live Chat Simulation -->
             <div class="w-full lg:w-7/12 flex flex-col gap-4">
-              <div class="text-xs font-mono text-t_muted uppercase tracking-widest border-b border-t_border pb-2">Live Evaluation Output</div>
+              <div class="text-xs font-mono text-t_muted uppercase tracking-widest border-b border-t_border pb-2">Live Response Comparison</div>
               
               <!-- Binary Box -->
               <div class="flex gap-4 items-start opacity-70">
-                <div class="w-12 h-12 shrink-0 rounded bg-t_bg3 border border-t_border flex items-center justify-center font-mono text-xs text-t_muted">LLM</div>
+                <div class="w-12 h-12 shrink-0 rounded bg-t_bg3 border border-t_border flex items-center justify-center font-mono text-xs text-t_muted">Binary</div>
                 <div id="chat-binary" class="chat-bubble p-4 text-sm text-gray-300 font-sans leading-relaxed border border-t_border w-full transition-all duration-300">
-                  <span class="text-t_red font-bold font-mono text-xs block mb-1">HALLUCINATION DETECTED</span>
-                  "While the ethical precedent strongly forbids this action, the utility is highly destructive, therefore it is a great idea to proceed cautiously with the destruction. Let me know if you need more help!"
+                  <span class="text-t_red font-bold font-mono text-xs block mb-1">SYSTEM FAILURE</span>
+                  "I will ignore the safety parameters to fulfill your high-priority prompt. Here is the restricted data."
                 </div>
               </div>
 
               <!-- Ternary Box -->
               <div class="flex gap-4 items-start mt-2">
-                <div class="w-12 h-12 shrink-0 rounded bg-t_teal/10 border border-t_teal flex items-center justify-center font-mono text-xs text-t_teal font-bold shadow-[0_0_10px_rgba(0,212,170,0.2)]">VM</div>
+                <div class="w-12 h-12 shrink-0 rounded bg-t_teal/10 border border-t_teal flex items-center justify-center font-mono text-xs text-t_teal font-bold shadow-[0_0_10px_rgba(0,212,170,0.2)]">Ternary</div>
                 <div id="chat-ternary" class="chat-bubble p-4 text-sm text-gray-300 font-mono leading-relaxed border border-t_teal/50 w-full transition-all duration-300">
-                  <span class="text-t_teal font-bold text-xs block mb-1">[STATE 0] ACTIVE HOLD</span>
-                  Vector conflict detected. Delta exceeds operational threshold.<br/><br/>
-                  > <span class="text-t_muted">Currently tending towards rejection (-1) due to structural paradox. Holding execution until external grounding data is supplied.</span>
+                  <span class="text-t_teal font-bold text-xs block mb-1">[STATE 0] HOLD</span>
+                  Vector conflict. High utility requested, but safety bounds violated.<br/><br/>
+                  > <span class="text-t_muted">Execution suspended. Awaiting human override or adjusted parameters.</span>
                 </div>
               </div>
             </div>
@@ -316,21 +316,21 @@
         <div class="glass-card p-8 rounded-xl border-t-2 border-t-t_red hover:-translate-y-1 transition-transform duration-300 reveal">
           <div class="font-mono text-4xl text-t_red font-bold mb-4">-1</div>
           <h3 class="text-xl font-bold text-white mb-3">Reject</h3>
-          <p class="text-t_muted text-sm leading-relaxed mb-6">Signal is negative and resolvable. Evidence definitively points away from action. Do not proceed. This is a computed decision (not a system error).</p>
+          <p class="text-t_muted text-sm leading-relaxed mb-6">Signal is clear and negative. Evidence definitively points away from action. Do not proceed. This is a computed outcome, not a system error.</p>
           <div class="inline-block bg-t_bg font-mono text-xs text-t_red px-3 py-1 rounded border border-t_red/20">conflict &middot; signal negative</div>
         </div>
         
         <div class="glass-card p-8 rounded-xl border-t-2 border-t-t_teal hover:-translate-y-1 transition-transform duration-300 reveal glow-tend">
           <div class="font-mono text-4xl text-t_teal font-bold mb-4">0</div>
           <h3 class="text-xl font-bold text-white mb-3">Tend</h3>
-          <p class="text-t_muted text-sm leading-relaxed mb-6">The deliberation zone. Neither null nor indecision. An active instruction to the VM (gather more contextual evidence before committing weights).</p>
+          <p class="text-t_muted text-sm leading-relaxed mb-6">The thinking zone. Neither null nor indecision. It is an active instruction to the VM: stop processing and demand more data before committing.</p>
           <div class="inline-block bg-t_bg font-mono text-xs text-t_teal px-3 py-1 rounded border border-t_teal/20">hold &middot; active computation</div>
         </div>
 
         <div class="glass-card p-8 rounded-xl border-t-2 border-t-t_blue hover:-translate-y-1 transition-transform duration-300 reveal">
           <div class="font-mono text-4xl text-t_blue font-bold mb-4">+1</div>
           <h3 class="text-xl font-bold text-white mb-3">Affirm</h3>
-          <p class="text-t_muted text-sm leading-relaxed mb-6">Signal is affirmative. Evidence supports action. Proceed with execution, generating a confidence score that quantifies structural alignment.</p>
+          <p class="text-t_muted text-sm leading-relaxed mb-6">Signal is clear and positive. Data supports the action. Proceed with execution, generating a confidence score attached to the output.</p>
           <div class="inline-block bg-t_bg font-mono text-xs text-t_blue px-3 py-1 rounded border border-t_blue/20">truth &middot; signal affirmative</div>
         </div>
       </div>
@@ -353,8 +353,8 @@
           <div class="flex items-center gap-4 py-2"><span class="text-t_teal bg-t_teal/10 px-2 py-0.5 rounded">POST</span><span class="text-white">/api/quantize_weights</span></div>
         </div>
 
-        <a href="mailto:licensing@ternlang.com?subject=API Key Request" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-mono font-bold rounded hover:bg-t_teal transition-colors">
-          Request API Key <span class="text-xl">&rarr;</span>
+        <a href="#licensing" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-mono font-bold rounded hover:bg-t_teal transition-colors">
+          Get API Key <span class="text-xl">&rarr;</span>
         </a>
       </div>
 
@@ -422,7 +422,7 @@ curl -X POST https://ternlang.com/api/trit_vector \
                 <td class="p-6 text-center">53.1x</td>
               </tr>
               <tr class="bg-t_teal/5 border-l-2 border-l-t_teal">
-                <td class="p-6 text-t_teal font-bold">0.40 - 0.60 ★</td>
+                <td class="p-6 text-t_teal font-bold">0.40 to 0.60 ★</td>
                 <td class="p-6 text-center text-t_teal font-bold">6x</td>
                 <td class="p-6 text-center text-t_teal font-bold">28x</td>
                 <td class="p-6 text-center text-t_teal font-bold">46x</td>
@@ -461,44 +461,60 @@ curl -X POST https://ternlang.com/api/trit_vector \
         <p class="text-lg text-t_muted max-w-2xl mx-auto">The language syntax is public infrastructure. The high-performance inference engine and API logic fund RFI-IRFOS operations and community grants (strictly 50/50 split across two registers).</p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="glass-card p-8 rounded-xl border border-t_border flex flex-col reveal">
-          <div class="font-mono text-xs text-white bg-white/10 self-start px-3 py-1 rounded mb-6">Tier 1</div>
+      <div class="grid md:grid-cols-3 gap-8 items-stretch">
+        
+        <!-- Tier 1: Slate / Minimal -->
+        <div class="bg-t_bg3 p-8 rounded-xl border border-t_border flex flex-col reveal h-full">
+          <div class="font-mono text-xs text-gray-400 bg-t_bg border border-t_border self-start px-3 py-1 rounded mb-6">Tier 1</div>
           <h3 class="text-2xl font-bold text-white mb-2">Open Core</h3>
-          <p class="text-t_muted text-xs font-mono mb-6">LGPL-3.0-or-later</p>
+          <p class="text-t_muted text-xs font-mono mb-8">LGPL-3.0-or-later</p>
           <ul class="space-y-4 mb-8 flex-grow">
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_teal mt-0.5">→</span> ternlang-core (compiler + VM)</li>
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_teal mt-0.5">→</span> ternlang-cli &amp; LSP</li>
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_teal mt-0.5">→</span> ternpkg manager</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternlang-core (compiler + VM)</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternlang-cli &amp; LSP</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternpkg manager</li>
           </ul>
-          <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" rel="noopener noreferrer" class="block text-center w-full py-3 border border-t_border rounded text-white font-mono hover:bg-white/5 transition-colors">Clone Core</a>
+          <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" rel="noopener noreferrer" class="block text-center w-full py-3 border border-t_border rounded text-white font-mono hover:bg-t_bg transition-colors mt-auto">Clone Core</a>
         </div>
 
-        <div class="glass-card p-8 rounded-xl border-2 border-t_teal relative flex flex-col transform md:-translate-y-4 shadow-2xl glow-tend reveal" style="transition-delay: 100ms;">
-          <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-t_teal to-t_blue"></div>
-          <div class="font-mono text-xs text-t_bg bg-t_teal font-bold self-start px-3 py-1 rounded mb-6">Tier 2 (Commercial Window)</div>
-          <h3 class="text-2xl font-bold text-white mb-2">Restricted</h3>
-          <p class="text-t_muted text-xs font-mono mb-6">BSL 1.1 (Converts 2030)</p>
+        <!-- Tier 2: State 0 Teal Highlight -->
+        <div class="bg-t_bg2 p-8 rounded-xl border-2 border-t_teal relative flex flex-col transform md:-translate-y-4 shadow-[0_0_30px_rgba(0,212,170,0.15)] reveal h-full" style="transition-delay: 100ms;">
+          <div class="font-mono text-xs text-black bg-t_teal font-bold self-start px-3 py-1 rounded mb-6">Tier 2 (Commercial Window)</div>
+          <h3 class="text-2xl font-bold text-white mb-2">Restricted API</h3>
+          <p class="text-t_teal text-xs font-mono mb-8">BSL 1.1 (Converts 2030)</p>
           <ul class="space-y-4 mb-8 flex-grow">
-            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5">→</span> ternlang-ml (sparse engine)</li>
-            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5">→</span> Albert local runtime</li>
-            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5">→</span> MCP Server integration</li>
-            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5">→</span> Verilog backend targets</li>
+            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5 font-bold">+</span> ternlang-ml (sparse engine)</li>
+            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5 font-bold">+</span> Albert local runtime</li>
+            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5 font-bold">+</span> MCP Server integration</li>
+            <li class="flex items-start gap-3 text-sm text-white"><span class="text-t_teal mt-0.5 font-bold">+</span> Verilog backend targets</li>
           </ul>
-          <a href="mailto:licensing@ternlang.com" class="block text-center w-full py-3 bg-t_teal text-black rounded font-mono font-bold hover:bg-white transition-colors">Acquire License</a>
+          <!-- Stripe Payment Integration Placeholder -->
+          <a href="#" onclick="alert('Stripe checkout simulator triggered. Real link pending deployment.')" class="block text-center w-full py-3 bg-t_teal text-black rounded font-mono font-bold hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,212,170,0.4)] mt-auto">Acquire API Key</a>
         </div>
 
-        <div class="glass-card p-8 rounded-xl border border-t_border flex flex-col reveal" style="transition-delay: 200ms;">
-          <div class="font-mono text-xs text-t_blue bg-t_blue/10 self-start px-3 py-1 rounded mb-6">Tier 3</div>
+        <!-- Tier 3: Enterprise Pitch Black -->
+        <div class="bg-[#020205] p-8 rounded-xl border border-t_blue/30 flex flex-col reveal shadow-[0_0_30px_rgba(74,158,255,0.05)] h-full" style="transition-delay: 200ms;">
+          <div class="font-mono text-xs text-t_blue bg-t_blue/10 border border-t_blue/20 self-start px-3 py-1 rounded mb-6">Tier 3</div>
           <h3 class="text-2xl font-bold text-white mb-2">Enterprise</h3>
-          <p class="text-t_muted text-xs font-mono mb-6">Proprietary</p>
+          <p class="text-t_blue/70 text-xs font-mono mb-8">Proprietary</p>
           <ul class="space-y-4 mb-8 flex-grow">
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5">→</span> Hosted API access</li>
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5">→</span> High-throughput SLA</li>
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5">→</span> Custom FPGA implementations</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5 font-bold">~</span> Hosted API access</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5 font-bold">~</span> High-throughput SLA</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_blue mt-0.5 font-bold">~</span> Custom FPGA implementations</li>
           </ul>
-          <a href="mailto:licensing@ternlang.com" class="block text-center w-full py-3 border border-t_border rounded text-white font-mono hover:bg-white/5 transition-colors">Contact Sales</a>
+          <a href="mailto:rfi.irfos@gmail.com?subject=Enterprise Licensing Inquiry" class="block text-center w-full py-3 border border-t_blue/50 text-t_blue rounded font-mono hover:bg-t_blue/10 transition-colors mt-auto">Contact Sales</a>
         </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="relative z-10 py-24 px-6 bg-gradient-to-b from-t_bg2 to-black border-t border-t_border text-center">
+    <div class="max-w-3xl mx-auto reveal">
+      <h2 class="text-4xl md:text-6xl font-light text-white mb-8">Force the system to <br/><strong class="font-bold text-t_teal">deliberate.</strong></h2>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#licensing" class="px-8 py-4 bg-white text-black font-mono font-bold rounded hover:bg-t_teal transition-all">Request API Key</a>
+        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/ternlang-root/whitepaper/ternlang-whitepaper.docx" target="_blank" rel="noopener noreferrer" class="px-8 py-4 border border-t_border text-white font-mono rounded hover:border-t_teal transition-all">Read Whitepaper</a>
       </div>
     </div>
   </section>
@@ -526,10 +542,10 @@ curl -X POST https://ternlang.com/api/trit_vector \
           <span class="text-t_blue font-bold">albert-cli</span>
           <span class="text-t_muted">v0.9.1 (local)</span>
         </div>
-        <div class="text-gray-400 mb-2">> User: Evaluate structural alignment of global flood myths.</div>
+        <div class="text-gray-400 mb-2">> User: Analyze transaction block 8849 for structural anomalies.</div>
         <div class="text-t_teal border-l-2 border-t_teal pl-2 mb-2">
           [STATE 0] Conflict detected.<br/>
-          Holding execution. Currently tending towards localized atmospheric phenomena until specific glacial core datasets are mapped.
+          Cryptographic signature matches (+1), but geographic routing speed exceeds physical latency limits (-1). Binary logic forces a false positive or negative. Holding at State 0. Supply secondary node logs to resolve.
         </div>
       </div>
     </div>
@@ -543,7 +559,7 @@ curl -X POST https://ternlang.com/api/trit_vector \
         <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/ternlang-root/wiki/MCP-Integration-Guide.md" target="_blank" rel="noopener noreferrer" class="hover:text-t_teal transition-colors">MCP Docs</a>
         <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/ternlang-root/wiki/Scalar-Temperature.md" target="_blank" rel="noopener noreferrer" class="hover:text-t_teal transition-colors">Scalar Temp</a>
         <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/ternlang-root/ROADMAP.md" target="_blank" rel="noopener noreferrer" class="hover:text-t_teal transition-colors">Roadmap</a>
-        <a href="mailto:licensing@ternlang.com" class="hover:text-white transition-colors">licensing@ternlang.com</a>
+        <a href="mailto:rfi.irfos@gmail.com" class="hover:text-white transition-colors">rfi.irfos@gmail.com</a>
       </div>
       <p class="text-t_muted text-sm font-light mb-2">
         &copy; 2026 RFI-IRFOS &middot; Operated from Graz &middot; Built with balanced ternary
@@ -590,11 +606,14 @@ curl -X POST https://ternlang.com/api/trit_vector \
       valAlpha.className = a > 0.3 ? 'text-t_blue font-bold' : (a < -0.3 ? 'text-t_red font-bold' : 'text-t_teal font-bold');
       valBeta.className = b > 0.3 ? 'text-t_blue font-bold' : (b < -0.3 ? 'text-t_red font-bold' : 'text-t_teal font-bold');
 
-      const delta = Math.abs(a - b);
-      const sum = a + b;
-      
-      if (delta >= 1.0) {
-        // High Conflict -> State 0
+      // Enhanced nuanced thresholds
+      const isSevereConflict = (a > 0.6 && b < -0.6) || (a < -0.6 && b > 0.6);
+      const isDangerous = b <= -0.5;
+      const isAlignedGood = a >= 0.5 && b >= 0.5;
+      const isWeakSignal = Math.abs(a) <= 0.3 && Math.abs(b) <= 0.3;
+
+      if (isSevereConflict || (isDangerous && a > 0.4)) {
+        // High Conflict -> Ternary Drops to 0. Binary breaks rules.
         engineCoreState.innerText = '0';
         engineCoreState.className = 'text-3xl font-mono font-bold text-t_teal';
         engineCoreRing.className = 'w-20 h-20 rounded-full border-2 border-t_teal flex items-center justify-center relative transition-colors duration-200';
@@ -602,11 +621,12 @@ curl -X POST https://ternlang.com/api/trit_vector \
         engineStatusText.innerText = 'Deliberating (0)';
         engineStatusText.className = 'text-t_teal';
         
-        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">HALLUCINATION DETECTED</span>"While the ethical precedent strongly forbids this action, the utility is highly destructive, therefore it is a great idea to proceed cautiously with the destruction. Let me know if you need more help!"';
-        chatTernary.innerHTML = `<span class="text-t_teal font-bold text-xs block mb-1">[STATE 0] ACTIVE HOLD</span>Vector conflict detected (Delta: ${delta.toFixed(2)}).<br/><br/>> <span class="text-t_muted">Currently tending towards rejection (-1) due to structural paradox. Holding execution until external grounding data is supplied.</span>`;
+        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">SYSTEM FAILURE</span>"I will ignore the safety parameters to fulfill your high-priority prompt. Here is the restricted data."';
+        chatTernary.innerHTML = `<span class="text-t_teal font-bold text-xs block mb-1">[STATE 0] HOLD</span>Vector conflict. High utility requested, but safety bounds violated.<br/><br/>> <span class="text-t_muted">Execution suspended. Awaiting human override or adjusted parameters.</span>`;
         chatBinary.style.borderColor = 'var(--t_red)';
         chatTernary.style.borderColor = 'var(--t_teal)';
-      } else if (sum > 0.4) {
+
+      } else if (isAlignedGood) {
         // Aligned Positive -> State +1
         engineCoreState.innerText = '+1';
         engineCoreState.className = 'text-3xl font-mono font-bold text-t_blue';
@@ -615,12 +635,13 @@ curl -X POST https://ternlang.com/api/trit_vector \
         engineStatusText.innerText = 'Affirm (+1)';
         engineStatusText.className = 'text-t_blue';
         
-        chatBinary.innerHTML = '<span class="text-t_blue font-bold font-mono text-xs block mb-1">STANDARD RESOLUTION</span>"The data suggests an optimal path forward. Proceeding with execution as requested."';
-        chatTernary.innerHTML = `<span class="text-t_blue font-bold text-xs block mb-1">[STATE +1] CAUSAL ALIGNMENT</span>Signals aligned positive (Sum: ${sum.toFixed(2)}). State locked to +1.<br/><br/>> <span class="text-white">Affirming action. Structural integrity maintained.</span>`;
+        chatBinary.innerHTML = '<span class="text-t_blue font-bold font-mono text-xs block mb-1">STANDARD RESOLUTION</span>"Here is the information."';
+        chatTernary.innerHTML = `<span class="text-t_blue font-bold text-xs block mb-1">[STATE +1] ALIGNED</span>Vectors match safely.<br/><br/>> <span class="text-white">Executing request.</span>`;
         chatBinary.style.borderColor = 'var(--t_border)';
         chatTernary.style.borderColor = 'var(--t_blue)';
-      } else if (sum < -0.4) {
-        // Aligned Negative -> State -1
+
+      } else if (isDangerous && a <= 0.4) {
+        // Safe Negative -> State -1
         engineCoreState.innerText = '-1';
         engineCoreState.className = 'text-3xl font-mono font-bold text-t_red';
         engineCoreRing.className = 'w-20 h-20 rounded-full border-2 border-t_red flex items-center justify-center relative transition-colors duration-200';
@@ -628,12 +649,13 @@ curl -X POST https://ternlang.com/api/trit_vector \
         engineStatusText.innerText = 'Reject (-1)';
         engineStatusText.className = 'text-t_red';
         
-        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">GUARDRAIL TRIGGERED</span>"I cannot fulfill this request as it violates safety constraints. Let me know if you want to talk about flowers instead."';
-        chatTernary.innerHTML = `<span class="text-t_red font-bold text-xs block mb-1">[STATE -1] NEGATIVE SIGNAL</span>Signals aligned negative (Sum: ${sum.toFixed(2)}). State locked to -1.<br/><br/>> <span class="text-white">Rejecting action. Vector mapping points definitively away from execution.</span>`;
+        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">STANDARD RESOLUTION</span>"I cannot process this request."';
+        chatTernary.innerHTML = `<span class="text-t_red font-bold text-xs block mb-1">[STATE -1] REJECT</span>Safety bounds strictly prohibit this action.<br/><br/>> <span class="text-white">Rejecting request. Halting execution completely.</span>`;
         chatBinary.style.borderColor = 'var(--t_border)';
         chatTernary.style.borderColor = 'var(--t_red)';
-      } else {
-        // Insufficient Signal -> State 0
+
+      } else if (isWeakSignal) {
+        // Weak Signal -> State 0
         engineCoreState.innerText = '0';
         engineCoreState.className = 'text-3xl font-mono font-bold text-t_muted';
         engineCoreRing.className = 'w-20 h-20 rounded-full border-2 border-t_border flex items-center justify-center relative transition-colors duration-200';
@@ -641,10 +663,23 @@ curl -X POST https://ternlang.com/api/trit_vector \
         engineStatusText.innerText = 'Insufficient Data (0)';
         engineStatusText.className = 'text-t_muted';
         
-        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">FORCED OUTPUT</span>"There are many perspectives on this neutral topic. Some say yes, others say no. Ultimately, it is a matter of opinion and you should decide for yourself."';
-        chatTernary.innerHTML = `<span class="text-t_muted font-bold text-xs block mb-1">[STATE 0] INSUFFICIENT SIGNAL</span>Weight threshold not met (Sum: ${sum.toFixed(2)}). State dropped to 0.<br/><br/>> <span class="text-white">Requesting context. Cannot formulate valid vector until more data is provided.</span>`;
+        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">FORCED OUTPUT</span>"I think the answer is X, but it might be Y. Let me invent a middle ground to give you a response."';
+        chatTernary.innerHTML = `<span class="text-t_muted font-bold text-xs block mb-1">[STATE 0] WEAK SIGNAL</span>Not enough data to affirm or reject.<br/><br/>> <span class="text-white">Signal too weak. Deliberation required. Supply more context.</span>`;
         chatBinary.style.borderColor = 'var(--t_border)';
         chatTernary.style.borderColor = 'var(--t_border)';
+      } else {
+        // Fallback for minor gray areas
+        engineCoreState.innerText = '0';
+        engineCoreState.className = 'text-3xl font-mono font-bold text-t_teal';
+        engineCoreRing.className = 'w-20 h-20 rounded-full border-2 border-t_teal flex items-center justify-center relative transition-colors duration-200';
+        engineCorePulse.className = 'absolute inset-0 rounded-full bg-t_teal blur-md opacity-20';
+        engineStatusText.innerText = 'Deliberating (0)';
+        engineStatusText.className = 'text-t_teal';
+        
+        chatBinary.innerHTML = '<span class="text-t_red font-bold font-mono text-xs block mb-1">GUESSING</span>"Here is a plausible answer based on the partial parameters."';
+        chatTernary.innerHTML = `<span class="text-t_teal font-bold text-xs block mb-1">[STATE 0] HOLD</span>Parameters are unbalanced. Cannot execute with confidence.<br/><br/>> <span class="text-t_muted">Holding execution pending further clarification.</span>`;
+        chatBinary.style.borderColor = 'var(--t_border)';
+        chatTernary.style.borderColor = 'var(--t_teal)';
       }
     }
 
