@@ -12,7 +12,6 @@ Compiles to BET bytecode · Runs on the BET VM · Ships an MCP server.
 
 Binary systems treat absence as null. Ternary systems treat it as a **state**.
 
-`0` in ternlang is not empty — it is *hold*. A live, active trit that has not resolved. This distinction unlocks a class of computation that binary systems can only approximate: ambiguity-aware inference, conflict-aware logic, and sparse neural computation where zero-weighted connections are skipped *at the instruction level* — not masked in software.
 
 ---
 
