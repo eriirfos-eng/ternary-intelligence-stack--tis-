@@ -1,0 +1,28 @@
+{
+  "keywords": [
+    "let",
+    "fn",
+    "trit",
+    "trittensor",
+    "match",
+    "spawn",
+    "send",
+    "hold",
+    "truth",
+    "conflict"
+  ],
+  "operators": ["+", "-", "*", "/", "==", "=>", "::"],
+  "literals": {
+    "truth": +1,
+    "hold": 0,
+    "conflict": -1
+  },
+  "types": [
+    "trit",
+    "int",
+    "float",
+    "trittensor",
+    "agentref"
+  ]
+}
+
