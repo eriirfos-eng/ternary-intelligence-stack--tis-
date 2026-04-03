@@ -1,7 +1,14 @@
 [package]
-name = "ternlang-runtime"
-version = "0.1.0"
-edition = "2021"
+name        = "ternlang-runtime"
+description = "Distributed actor runtime for ternlang — TCP-based TernNode with remote spawn/send/await over newline-JSON protocol."
+version.workspace   = true
+edition.workspace   = true
+license.workspace   = true
+repository.workspace = true
+homepage.workspace  = true
+authors.workspace   = true
+keywords.workspace  = true
+categories.workspace = true
 
 [dependencies]
 ternlang-core = { path = "../ternlang-core" }

@@ -1,7 +1,14 @@
 [package]
-name = "ternlang-ml"
-version = "0.1.0"
-edition = "2024"
+name        = "ternlang-ml"
+description = "BitNet-style ternary quantization, sparse matrix multiply kernels, and benchmarking for balanced ternary ML."
+version.workspace   = true
+edition.workspace   = true
+license.workspace   = true
+repository.workspace = true
+homepage.workspace  = true
+authors.workspace   = true
+keywords.workspace  = true
+categories.workspace = true
 
 [dependencies]
 ternlang-core = { path = "../ternlang-core" }

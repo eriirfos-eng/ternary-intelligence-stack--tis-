@@ -1,19 +1,40 @@
 {
   "name": "ternlang",
   "displayName": "Ternlang",
-  "description": "Syntax highlighting for .tern (balanced ternary) source files — RFI-IRFOS Ternary Intelligence Stack",
+  "description": "Balanced ternary language support for .tern files — syntax highlighting, snippets, hover docs, and live diagnostics via ternlang-lsp.",
   "version": "0.1.0",
   "publisher": "rfi-irfos",
   "license": "LGPL-3.0",
+  "keywords": [
+    "ternlang",
+    "ternary",
+    "balanced ternary",
+    "trit",
+    "ternary logic",
+    "BET VM",
+    "sparse inference",
+    "actor model"
+  ],
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#1a1a2e",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
+  },
+  "homepage": "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/blob/main/ternlang-vscode/README.md",
+  "bugs": {
+    "url": "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/issues"
   },
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Snippets",
+    "Linters"
   ],
   "activationEvents": ["onLanguage:ternlang"],
   "main": "./extension.js",
@@ -33,5 +54,15 @@
         "path": "./syntaxes/ternlang.tmLanguage.json"
       }
     ]
+  },
+  "scripts": {
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
   }
 }

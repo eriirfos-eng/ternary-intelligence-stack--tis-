@@ -1,7 +1,14 @@
 [package]
-name = "ternlang-core"
-version = "0.1.0"
-edition = "2024"
+name        = "ternlang-core"
+description = "Compiler core for ternlang — lexer, parser, AST, BET bytecode emitter, and VM for balanced ternary computing."
+version.workspace   = true
+edition.workspace   = true
+license.workspace   = true
+repository.workspace = true
+homepage.workspace  = true
+authors.workspace   = true
+keywords.workspace  = true
+categories.workspace = true
 
 [dependencies]
 ariadne = "0.6.0"
