@@ -29,6 +29,7 @@ The final PDF is `ternlang-whitepaper.pdf`.
    - cs.AR (Hardware Architecture)
    - cs.NE (Neural and Evolutionary Computing)
 3. Upload: `ternlang-whitepaper.tex` + `references.bib`
+
 4. arXiv will compile the PDF on their servers
 
 ## Target venues (beyond arXiv)

@@ -2,6 +2,7 @@ use logos::Logos;
 
 #[derive(Logos, Debug, PartialEq, Clone)]
 #[logos(skip r"[ \t\n\f]+")] // Skip whitespace
+#[logos(skip(r"//[^\n]*", allow_greedy = true))]   // Skip line comments
 pub enum Token {
     // Ternary Specific
     #[token("-1")]

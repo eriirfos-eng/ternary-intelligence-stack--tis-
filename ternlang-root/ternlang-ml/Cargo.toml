@@ -12,3 +12,4 @@ categories.workspace = true
 
 [dependencies]
 ternlang-core = { path = "../ternlang-core" }
+rayon = "1"

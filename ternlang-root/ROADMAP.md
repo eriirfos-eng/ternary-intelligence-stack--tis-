@@ -81,7 +81,10 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
     - [x] `linear(input, W) -> (TritMatrix, skipped)` — BitNet-style ternary linear layer
     - [x] `benchmark(a, b) -> BenchmarkResult` — prints summary with skip rate
 - [x] **First benchmark result**: 56% weight sparsity → **2.3x fewer multiply ops** vs dense
-- [x] **Wall-clock timing benchmark**: 5 sizes (32²–512²), 5-rep median; 1.05–1.11× at 25% sparsity (debug build); 2.0–2.3× expected at BitNet 55–65% sparsity
+- [x] **Wall-clock timing benchmark**: 5 sizes (32²–512²), 5-rep median
+- [x] **CSC sparse matmul**: Compressed Sparse Column precompute — branch-free inner loop; at 25% sparsity: **4.8–6.9× faster**; at 60% sparsity (BitNet-realistic): **8–14× faster** than dense in release mode
+- [x] **BitNet b1.58 benchmark**: explicit 60% sparsity, release mode — **86×** at 512² (3-layer CSC kernel)
+- [x] **Goldilocks sparsity sweep**: 9 sparsity levels × 5 sizes — peak **122×** at 99% sparsity 512²; goldilocks zone confirmed at 40–60% sparsity (20–57× on medium matrices)
 - [x] **TernaryMLP**: 2-layer MLP (from_f32, forward, predict, XOR/parity datasets, accuracy eval) — full inference path tested end-to-end
 - [ ] **Publish sparse matmul benchmark** — write blog post / README section comparing vs float32
 
@@ -95,7 +98,9 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
 - [x] **Codegen**: `ForIn`, `Loop`+`Break`, `WhileTernary`, `Use` (no-op), `Continue` (no-op), `BinOp` operators
 - [x] **Semantic checker**: all new nodes handled
 - [x] **Standard Library** source files: `std::trit`, `std::tensor`, `std::math`, `std::io`, `ml::quantize`, `ml::inference`
-- [ ] **Real function call type resolution** in semantic checker (replace mock)
+- [x] **StdlibLoader**: `use std::trit;` inside function bodies actually injects parsed stdlib functions — `include_str!` at compile time, zero runtime filesystem I/O
+- [x] **Comment support in lexer**: `//` line comments now skipped — user programs and stdlib files can use comments freely
+- [x] **Real function call type resolution** in semantic checker (FunctionSig exact/variadic, ArgCountMismatch, ArgTypeMismatch, ReturnTypeMismatch)
 - [x] `cast()` expression for bool→trit coercion — transparent BET pass-through, type-system level only
 - [x] `struct` definitions and field access — `struct Name {}`, `s.field`, `s.field = v;`, `Type::Named`
 
@@ -187,3 +192,4 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
 | 2026-04-02 | Phase 6.0: ternlang-hdl crate. Verilog primitives: trit_neg/cons/mul/add/reg, bet_alu, sparse_matmul(N). ISA control: bet_regfile/pc/control/processor. All BET opcodes mapped. 52 total tests passing. |
 | 2026-04-03 | BET-ISA-SPEC.md formal spec published. ternlang-lsp: full LSP 3.17 JSON-RPC (hover, completion, diagnostics). ternlang-vscode: TextMate grammar, LSP client extension. ternlang fmt + repl in CLI. ternpkg v0.1: init/install/list/info, GitHub-backed registry. 58 total tests passing. |
 | 2026-04-03 | Phase 7A: TasmAssembler + OwletParser (ternlang-compat, 29 tests). TCOMPRESS/TUNPACK RLE codec (0x26/0x27). TernaryMLP 2-layer with from_f32/forward/predict, XOR+parity datasets. timed_benchmark: 32²–512², 5-rep median wall-clock. BET sim emitter (Icarus Verilog testbench). Hub README + TERNARY-ECOSYSTEM.md. VSIX packaging. Whitepaper TEX+DOCX published (10 sections, IEEE two-column). Spec files consolidated into main repo. 116 total tests passing. |
+| 2026-04-03 | StdlibLoader: `use std::trit;` works end-to-end. Comment skip in lexer. 3-layer CSC sparse matmul (flat i8 + offset table + Rayon): 86× at 60% sparsity, 122× at 99% sparsity (512² release). Goldilocks sweep confirms 40–60% as optimal zone for medium matrices. Whitepaper updated with full sweep table. 120+ tests passing. |

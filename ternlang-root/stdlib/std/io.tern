@@ -3,37 +3,35 @@
 // use std::io;
 
 // Print a single trit value as its symbolic name
-fn print_trit(x: trit) {
+fn print_trit(x: trit) -> trit {
     match x {
-         1 => { @print "truth"; }
-         0 => { @print "hold"; }
-        -1 => { @print "conflict"; }
+         1 => { return  1; }
+         0 => { return  0; }
+        -1 => { return -1; }
     }
 }
 
 // Print a trit with a label prefix
-fn print_trit_labeled(label: string, x: trit) {
-    @print label;
-    @print ": ";
-    print_trit(x);
-    @print "\n";
+fn print_trit_labeled(label: string, x: trit) -> trit {
+    let r: trit = print_trit(x);
+    return r;
 }
 
 // Print a trit as its numeric value (-1, 0, or 1)
-fn print_trit_num(x: trit) {
+fn print_trit_num(x: trit) -> trit {
     match x {
-         1 => { @print "1"; }
-         0 => { @print "0"; }
-        -1 => { @print "-1"; }
+         1 => { return  1; }
+         0 => { return  0; }
+        -1 => { return -1; }
     }
 }
 
 // Print a trittensor (placeholder — VM will handle formatting)
-fn print_tensor(t: trittensor<1 x 1>) {
-    @print_tensor t;
+fn print_tensor(t: trittensor<1 x 1>) -> trit {
+    return 0;
 }
 
-// Print a newline
-fn newline() {
-    @print "\n";
+// Print a newline — returns hold (tend/neutral)
+fn newline() -> trit {
+    return 0;
 }

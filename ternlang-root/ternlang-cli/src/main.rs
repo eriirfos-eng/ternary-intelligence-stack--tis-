@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use ternlang_core::parser::Parser;
 use ternlang_core::codegen::betbc::BytecodeEmitter;
 use ternlang_core::vm::{BetVm, Value};
+use ternlang_core::StdlibLoader;
 use ternlang_ml::{TritMatrix, bitnet_threshold, benchmark};
 use ternlang_hdl::BetSimEmitter;
 
@@ -67,7 +68,8 @@ fn main() {
 
             // Try parsing as a program first
             match parser.parse_program() {
-                Ok(prog) => {
+                Ok(mut prog) => {
+                    StdlibLoader::resolve(&mut prog);
                     emitter.emit_program(&prog);
                 }
                 Err(e) => {
@@ -128,7 +130,10 @@ fn main() {
             let mut emitter = BytecodeEmitter::new();
 
             match parser.parse_program() {
-                Ok(prog) => emitter.emit_program(&prog),
+                Ok(mut prog) => {
+                    StdlibLoader::resolve(&mut prog);
+                    emitter.emit_program(&prog);
+                }
                 Err(_) => {
                     let mut parser = Parser::new(&input);
                     while let Ok(stmt) = parser.parse_stmt() {
@@ -159,7 +164,10 @@ fn run_sim(file: &std::path::PathBuf, output: Option<&std::path::Path>, run: boo
     let mut emitter = BytecodeEmitter::new();
 
     match parser.parse_program() {
-        Ok(prog) => emitter.emit_program(&prog),
+        Ok(mut prog) => {
+            StdlibLoader::resolve(&mut prog);
+            emitter.emit_program(&prog);
+        }
         Err(e) => {
             eprintln!("Parse error: {:?}", e);
             return;

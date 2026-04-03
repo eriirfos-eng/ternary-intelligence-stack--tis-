@@ -475,6 +475,11 @@ impl<'a> Parser<'a> {
                 loop {
                     let d = match self.next_token()? {
                         Token::Int(v) => v as usize,
+                        // TritLiteral matches "0" and "1" — accept them as dims
+                        Token::TritLiteral => {
+                            let s = self.lex.slice();
+                            s.parse::<i8>().unwrap_or(0).max(0) as usize
+                        }
                         t => return Err(ParseError::ExpectedToken("dimension".into(), format!("{:?}", t))),
                     };
                     dims.push(d);
