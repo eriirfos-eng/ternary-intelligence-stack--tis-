@@ -302,6 +302,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ternlang-hdl"
+version = "0.1.0"
+
+[[package]]
 name = "ternlang-mcp"
 version = "0.1.0"
 dependencies = [
