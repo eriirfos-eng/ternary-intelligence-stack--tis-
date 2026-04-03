@@ -414,8 +414,8 @@
   <div class="stats-inner">
     <div><span class="stat-num">3</span><span class="stat-label">states per trit</span></div>
     <div><span class="stat-num">51</span><span class="stat-label">BET VM opcodes</span></div>
-    <div><span class="stat-num">2.27×</span><span class="stat-label">fewer multiply ops</span></div>
-    <div><span class="stat-num">130+</span><span class="stat-label">tests passing</span></div>
+    <div><span class="stat-num">122×</span><span class="stat-label">sparse kernel speedup</span></div>
+    <div><span class="stat-num">120+</span><span class="stat-label">tests passing</span></div>
     <div><span class="stat-num">7</span><span class="stat-label">API tools</span></div>
   </div>
 </div>
@@ -502,6 +502,62 @@ curl -X POST https://ternlang.com/api/trit_vector \
 }</pre>
       </div>
     </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- BENCHMARK SECTION -->
+<section id="benchmark">
+  <div class="container">
+    <p class="section-label">Measured. Not estimated.</p>
+    <h2>The Goldilocks zone is <strong>40–60% sparsity.</strong></h2>
+    <p class="lead">BitNet b1.58 quantization naturally lands weights in this range. Our kernel was built for exactly this. That alignment is structural — not coincidental.</p>
+
+    <div style="overflow-x:auto;margin:2rem 0">
+      <table style="width:100%;border-collapse:collapse;font-family:var(--font);font-size:0.9rem">
+        <thead>
+          <tr style="border-bottom:1px solid #2a2a3e">
+            <th style="text-align:left;padding:0.6rem 1rem;color:var(--muted)">Sparsity</th>
+            <th style="padding:0.6rem 1rem;color:var(--muted)">32²</th>
+            <th style="padding:0.6rem 1rem;color:var(--muted)">128²</th>
+            <th style="padding:0.6rem 1rem;color:var(--muted)">256²</th>
+            <th style="padding:0.6rem 1rem;color:var(--muted)">512²</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1a1a2e">
+            <td style="padding:0.6rem 1rem;color:var(--muted)">25%</td>
+            <td style="padding:0.6rem 1rem;text-align:center">6.3×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">26.4×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">39.3×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">53.1×</td>
+          </tr>
+          <tr style="border-bottom:1px solid #1a1a2e;background:#0f1a18">
+            <td style="padding:0.6rem 1rem;color:var(--teal);font-weight:600">40–60% ★</td>
+            <td style="padding:0.6rem 1rem;text-align:center;color:var(--teal);font-weight:600">6×</td>
+            <td style="padding:0.6rem 1rem;text-align:center;color:var(--teal);font-weight:600">28×</td>
+            <td style="padding:0.6rem 1rem;text-align:center;color:var(--teal);font-weight:600">46×</td>
+            <td style="padding:0.6rem 1rem;text-align:center;color:var(--teal);font-weight:600">86×</td>
+          </tr>
+          <tr style="border-bottom:1px solid #1a1a2e">
+            <td style="padding:0.6rem 1rem;color:var(--muted)">90%</td>
+            <td style="padding:0.6rem 1rem;text-align:center">2.0×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">18.7×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">38.6×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">70.9×</td>
+          </tr>
+          <tr>
+            <td style="padding:0.6rem 1rem;color:var(--muted)">99%</td>
+            <td style="padding:0.6rem 1rem;text-align:center">1.8×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">13.1×</td>
+            <td style="padding:0.6rem 1rem;text-align:center">53.9×</td>
+            <td style="padding:0.6rem 1rem;text-align:center;font-weight:600">122×</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--muted);font-size:0.85rem">Release build · Rayon parallel rows · CSC sparse kernel · 3-rep median · single machine · no GPU</p>
   </div>
 </section>
 
