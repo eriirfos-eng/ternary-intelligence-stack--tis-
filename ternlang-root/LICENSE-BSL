@@ -1,0 +1,32 @@
+Business Source License 1.1
+
+Licensor:             RFI-IRFOS (Simeon Kepp)
+Licensed Work:        ternlang-ml, ternlang-mcp, ternlang-hdl, ternlang-runtime
+                      (the "Restricted Crates") — Version 0.1 and later
+Additional Use Grant: You may use the Licensed Work for non-commercial,
+                      personal, research, or evaluation purposes only,
+                      provided you do not offer it as a hosted or managed
+                      service to third parties.
+Change Date:          2030-04-03
+Change License:       Apache License, Version 2.0
+
+For commercial licensing: licensing@ternlang.com
+BSL specification:    https://mariadb.com/bsl11/
+
+-----------------------------------------------------------------------------
+
+The Licensed Work is provided under the terms of the Business Source
+License 1.1 ("BSL"). Subject to the Additional Use Grant above, you may
+not use the Licensed Work for a Commercial Purpose (defined as any use
+that generates revenue, whether direct or indirect, including offering
+the Licensed Work as a service or incorporating it into a commercial
+product or workflow) without purchasing a commercial license from
+RFI-IRFOS.
+
+On the Change Date (2030-04-03), the Licensed Work will automatically
+convert to and be made available under the Apache License, Version 2.0.
+
+THE LICENSED WORK IS PROVIDED "AS IS". LICENSOR HEREBY DISCLAIMS ALL
+WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT.

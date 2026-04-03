@@ -1,0 +1,15 @@
+Ternlang Open Core — LGPL-3.0-or-later
+Copyright (C) 2026 RFI-IRFOS (Simeon Kepp)
+
+This license applies to the open core components:
+  ternlang-core, ternlang-cli, ternlang-lsp, ternlang-compat, ternpkg, spec/
+
+Full license text: https://www.gnu.org/licenses/lgpl-3.0.html
+SPDX-License-Identifier: LGPL-3.0-or-later
+
+The following components are governed by the Business Source License 1.1:
+  ternlang-ml, ternlang-mcp, ternlang-hdl, ternlang-runtime
+See: LICENSE-BSL
+
+Machine learning training restriction applies to all components.
+See: LICENSE-ML-TRAINING

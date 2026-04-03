@@ -11,9 +11,9 @@ resolver = "2"
 [workspace.package]
 version     = "0.1.0"
 edition     = "2024"
-license     = "LGPL-3.0"
-repository  = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
-homepage    = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
-authors     = ["RFI-IRFOS <simeon@rfi-irfos.com>"]
+license     = "LGPL-3.0-or-later"
+repository  = "https://github.com/eriirfos-eng/ternary-intelligence-stack"
+homepage    = "https://ternlang.com"
+authors     = ["RFI-IRFOS <licensing@ternlang.com>"]
 keywords    = ["ternary", "trit", "balanced-ternary", "vm", "compiler"]
 categories  = ["compilers", "science"]

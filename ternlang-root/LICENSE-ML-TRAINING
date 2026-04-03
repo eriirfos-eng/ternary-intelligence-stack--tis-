@@ -1,0 +1,41 @@
+ML TRAINING DATA RESTRICTION
+RFI-IRFOS Ternary Intelligence Stack (TIS)
+Copyright (C) 2026 RFI-IRFOS (Simeon Kepp)
+
+NOTICE: USE IN MACHINE LEARNING TRAINING IS RESTRICTED
+
+The source code, documentation, specifications, whitepaper, wiki,
+benchmark results, and all other content in this repository (collectively
+the "Work") may NOT be used, in whole or in part, for any of the following
+purposes without explicit written permission from RFI-IRFOS:
+
+  1. Training, fine-tuning, or instruction-tuning any machine learning model
+  2. Pre-training any language model, code model, or multimodal model
+  3. Distillation or knowledge transfer from a model trained on this Work
+  4. Generating synthetic training data derived from this Work
+  5. Benchmarking proprietary models against results derived from this Work
+     without attribution and written consent
+
+This restriction applies regardless of whether the resulting model or
+dataset is made publicly available or kept private.
+
+PERMITTED USES (no written permission required):
+  - Academic research with full attribution (cite the whitepaper)
+  - Personal study and experimentation
+  - Building software that uses ternlang as a tool or library
+    (subject to the applicable crate license: LGPL or BSL)
+  - Reproducing results in academic papers with attribution
+
+ATTRIBUTION REQUIREMENT:
+Any academic work, publication, or derivative research that builds upon,
+references, or is inspired by the Ternlang / TIS project must cite:
+
+  Kepp, S. (2026). Ternlang: Balanced Ternary Intelligence Stack.
+  RFI-IRFOS. https://github.com/eriirfos-eng/ternary-intelligence-stack
+  [ternlang.com]
+
+To request a machine learning training license:
+  licensing@ternlang.com
+
+Violation of this notice is a breach of copyright and applicable
+intellectual property law.

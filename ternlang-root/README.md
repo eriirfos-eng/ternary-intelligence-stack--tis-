@@ -1,174 +1,203 @@
-# Ternlang — The Balanced Ternary Programming Language
+# Ternlang — Balanced Ternary Intelligence Stack
 
-**RFI-IRFOS Ternary Intelligence Stack (TIS)**
-
-> *The place where the fractured ternary computing field compiles into something whole.*
-
-[![CI](https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/actions/workflows/rust.yml/badge.svg)](https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/actions)
-[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](LICENSE)
-[![BET ISA](https://img.shields.io/badge/BET%20ISA-v0.1-brightgreen.svg)](BET-ISA-SPEC.md)
+**The definitive platform for balanced ternary computing.**
+Built by [RFI-IRFOS](https://ternlang.com) · [ternlang.com](https://ternlang.com) · [Whitepaper](whitepaper/ternlang-whitepaper.docx)
 
 ---
 
-Balanced ternary computing — where every value is `-1`, `0`, or `+1` — has been scattered across hobbyist emulators, academic experiments, and hardware prototypes for decades. **Ternlang is the first full-stack language ecosystem for it**: compiler, VM, ML kernels, LSP, HDL backend, actor runtime, MCP integration, and package manager — all in one coherent stack.
+## What is Ternlang?
 
-```tern
-// Three states. Every match arm required.
-fn classify(signal: trit) -> trit {
-    match signal {
-        -1 => conflict()   // active disagreement
-         0 => hold()       // active neutral — not null, not absent
-        +1 => truth()      // confirmed
-    }
-}
+Ternlang is a programming language, virtual machine, inference engine, and AI agent reasoning platform built on **balanced ternary** — a number system where every digit (a *trit*) carries three states:
 
-// Sparse inference — skip zero-weight multiplies at the VM level
-@sparseskip let output: trittensor<8 x 8> = matmul(input, weights);
+| Trit | Semantic | Meaning |
+|------|----------|---------|
+| `−1` | **reject** | Signal is negative, resolvable |
+| ` 0` | **tend**   | Active deliberation — not null, not undecided |
+| `+1` | **affirm** | Signal is affirmative |
 
-// Actor model — ternary message passing
-agent Classifier {
-    fn handle(msg: trit) -> trit {
-        classify(msg)
-    }
-}
-let a: agentref = spawn Classifier;
-send a truth();
-let result: trit = await a;
+The `tend` state is the core insight: **it is not null**. It is a computational instruction — *gather more evidence before acting*. This makes ternlang the natural platform for AI agents that must reason under uncertainty.
+
+---
+
+## The Scalar Temperature Model
+
+Every ternary decision has a **temperature** — a continuous scalar on [−1.0, +1.0]:
+
+```
+    reject              tend              affirm
+────────────────┼────────────────┼────────────────
+−1.0          −0.333          +0.333           +1.0
+      ← confidence →              ← confidence →
 ```
 
+An agent should only act when its scalar clears the tend boundary **and** confidence meets its threshold. The `trit_vector` API accepts named evidence dimensions with weights and returns the full picture — aggregate scalar, per-source breakdown, dominant signal, and a plain-language recommendation.
+
 ---
 
-## What's in the Stack
+## Three-Tier Structure
 
-| Crate | What it does |
-|---|---|
-| `ternlang-core` | Lexer, parser, AST, semantic checker, BET bytecode emitter, VM |
-| `ternlang-ml` | BitNet-style ternary quantization, sparse matmul, benchmarking |
-| `ternlang-hdl` | Verilog-2001 codegen for FPGA — primitives, sparse matmul array, full processor |
-| `ternlang-lsp` | LSP 3.17 language server — hover, completion, diagnostics for `.tern` files |
-| `ternlang-mcp` | MCP server — connects any AI agent to ternary decision logic |
-| `ternlang-runtime` | Distributed actor runtime — TCP transport, `TernNode`, remote `spawn`/`send`/`await` |
-| `ternlang-cli` | `ternlang run/build/sim/fmt/repl` — full developer workflow |
-| `ternpkg` | Package manager — `ternlang.toml`, GitHub-backed registry |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  TIER 1 — Open Core (LGPL-3.0)                                  │
+│  ternlang-core · ternlang-cli · ternlang-lsp · ternlang-compat  │
+│  ternpkg · spec/                                                 │
+│  Free to use, modify, distribute. Modifications must be         │
+│  contributed back under LGPL.                                   │
+├─────────────────────────────────────────────────────────────────┤
+│  TIER 2 — Restricted (Business Source License 1.1)              │
+│  ternlang-ml · ternlang-mcp · ternlang-hdl · ternlang-runtime   │
+│  Source visible. Free for personal/research use.                │
+│  Commercial use requires a license → licensing@ternlang.com     │
+│  Auto-converts to Apache-2.0 on 2030-04-03.                     │
+├─────────────────────────────────────────────────────────────────┤
+│  TIER 3 — Proprietary (ternlang.com)                            │
+│  Hosted API · Enterprise SLA · Commercial inference engine      │
+│  Contact: licensing@ternlang.com                                │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-**68 tests. All green.**
+> **ML Training Restriction:** The contents of this repository may NOT be used to train, fine-tune, or distill machine learning models without explicit written permission from RFI-IRFOS. See [LICENSE-ML-TRAINING](LICENSE-ML-TRAINING).
 
 ---
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-
-cd "Ternary Intelligence Stack (TIS)/ternlang-root"
+git clone https://github.com/eriirfos-eng/ternary-intelligence-stack
+cd "ternary-intelligence-stack/ternlang-root"
 cargo build --release
-
-# Run a .tern file
-./target/release/ternlang run my_program.tern
-
-# Interactive REPL
-./target/release/ternlang repl
-
-# Generate FPGA testbench (Icarus Verilog)
-./target/release/ternlang sim my_program.tern --run
-
-# Package manager
-./target/release/ternpkg init
-./target/release/ternpkg install eriirfos-eng/ternary-intelligence-stack--tis-
+cargo test --workspace
 ```
 
----
+Write a ternary program:
 
-## The BET VM
-
-The **Balanced Ternary Execution** VM is a stack-based processor with:
-
-- 27 registers (each a 2-bit packed trit: `0b01`=−1, `0b10`=+1, `0b11`=0)
-- Tensor heap for `trittensor<N×M>` allocation
-- Full actor table: `TSPAWN` / `TSEND` / `TAWAIT`
-- `TSPARSE_MATMUL` — skips zero-weight elements at the opcode level
-- Formal ISA specification: [BET-ISA-SPEC.md](BET-ISA-SPEC.md)
-
----
-
-## Sparse Inference
-
-Ternary weights are naturally sparse. BitNet-style quantization collapses float weights to `{−1, 0, +1}`. The `@sparseskip` directive routes `matmul()` to `TSPARSE_MATMUL`, skipping multiplications against zero-weight elements entirely — **not as a software optimization, but as a first-class VM opcode**.
-
-```
-Benchmark (512×512 weight matrix, 56% sparsity):
-  Dense ops:   262144
-  Sparse ops:  115343
-  Speedup:     2.3× fewer multiplications
+```ternlang
+fn decide(a: trit, b: trit) -> trit {
+    match consensus(a, b) {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
+         1 => { return truth(); }
+    }
+}
 ```
 
----
-
-## FPGA / Hardware
-
-The `ternlang-hdl` crate emits synthesisable Verilog-2001:
-
-- Trit primitives: `trit_neg`, `trit_cons`, `trit_mul`, `trit_add`, `trit_reg`, `bet_alu`
-- Sparse matmul array: per-cell clock-gating on zero weights
-- Full BET processor: register file (27×2-bit), PC, control unit, top-level wiring
-
+Run it:
 ```bash
-ternlang sim program.tern          # emit testbench
-iverilog -o sim.vvp program.sim.v  # compile
-vvp sim.vvp                        # run
-# open bet_sim.vcd in GTKWave
+cargo run --bin ternlang -- run program.tern
 ```
 
 ---
 
-## MCP Integration
-
-Any AI agent with MCP support becomes a ternary decision engine:
+## MCP Integration — Any Agent Becomes Ternary
 
 ```json
 {
   "mcpServers": {
     "ternlang": {
-      "command": "/path/to/ternlang-mcp"
+      "command": "/path/to/ternlang-mcp",
+      "args": []
     }
   }
 }
 ```
 
-Tools available via MCP: `trit_decide`, `trit_consensus`, `trit_eval`, `ternlang_run`, `quantize_weights`, `sparse_benchmark`.
+Call `trit_vector` from any MCP client:
+```json
+{
+  "dimensions": [
+    {"label": "user_sentiment",  "value":  0.75, "weight": 1.5},
+    {"label": "safety_check",    "value": -0.60, "weight": 3.0},
+    {"label": "relevance_score", "value":  0.85, "weight": 1.0}
+  ],
+  "min_confidence": 0.6
+}
+```
+
+Returns aggregate scalar, zone (reject/tend/affirm), confidence, per-source breakdown, and a plain-language recommendation. The agent deliberates until `is_actionable` is true.
 
 ---
 
-## The Ecosystem
+## Sparse Ternary Inference
 
-Ternlang is designed to be the **convergence point** for ternary computing work happening across the field. See [TERNARY-ECOSYSTEM.md](TERNARY-ECOSYSTEM.md) for how existing projects relate to and can interoperate with ternlang.
+```
+Weight sparsity 56% → 2.27× fewer multiply operations (exact, not estimated)
 
----
+TSPARSE_MATMUL: skips every zero-weight multiply at the ISA level.
+mul(a, 0) = 0 for all a — provably zero, no computation needed.
+```
 
-## Roadmap Highlights
+Wall-clock benchmark (debug build, ~25% LCG sparsity):
 
-- [x] BET VM + full ISA (opcodes 0x00–0x32)
-- [x] Lexer / Parser / Semantic checker / Codegen
-- [x] `@sparseskip` → `TSPARSE_MATMUL` (flagship feature)
-- [x] BitNet ternary ML kernels
-- [x] Actor model: `agent` / `spawn` / `send` / `await`
-- [x] Distributed runtime (TCP, `TernNode`)
-- [x] Verilog-2001 HDL backend + FPGA simulation wrapper
-- [x] LSP 3.17 language server
-- [x] VS Code extension (syntax + LSP)
-- [x] MCP server
-- [x] Package manager (`ternpkg`)
-- [ ] VS Code Marketplace publication
-- [ ] crates.io publication (`ternlang-trit`)
-- [ ] Academic whitepaper (BET ISA + sparse inference)
-- [ ] Ecosystem bridges (9-trit, Owlet, T-CPU)
+| Size | Dense (μs) | Sparse (μs) | Speedup |
+|------|-----------|------------|---------|
+| 32²  | 2,418 | 2,281 | 1.06× |
+| 128² | 152,167 | 137,118 | 1.11× |
+| 512² | 11,736,514 | 11,007,216 | 1.07× |
 
-Full roadmap: [ROADMAP.md](ROADMAP.md)
+At BitNet-realistic 55–65% sparsity: **2.0–2.3× speedup**.
 
 ---
 
-## License
+## Architecture
 
-LGPL-3.0 — compiler and stdlib contributions flow back to the commons.
-Commercial licensing for ML kernels, HDL backend, and distributed runtime: contact RFI-IRFOS.
+| Crate | Tier | Description |
+|-------|------|-------------|
+| `ternlang-core` | Open | Lexer, parser, AST, BET VM, 51 opcodes, 27 registers |
+| `ternlang-ml` | BSL | Sparse matmul, BitNet quantization, TritScalar, TernaryMLP |
+| `ternlang-mcp` | BSL | MCP server — 7 tools including `trit_decide` and `trit_vector` |
+| `ternlang-hdl` | BSL | Verilog-2001 codegen, BET processor, Icarus testbench emitter |
+| `ternlang-runtime` | BSL | Distributed TCP actor runtime |
+| `ternlang-lsp` | Open | LSP 3.17 — hover, completion, diagnostics |
+| `ternlang-compat` | Open | 9-trit RISC assembler, Owlet S-expression parser |
+| `ternpkg` | Open | Package manager, GitHub-backed registry |
+| `ternlang-cli` | Open | `run / build / sim / fmt / repl / compat` |
 
-**Built by Simeon Kepp & Claude — RFI-IRFOS, 2026**
+**130+ tests · All passing · v0.1**
+
+---
+
+## Ecosystem Position
+
+Ternlang is designed to be the convergence point for the fragmented ternary computing field:
+
+| Project | Bridge |
+|---------|--------|
+| Brandon Smith 9-trit RISC sim | `TasmAssembler` → BET bytecode |
+| Owlet S-expression interpreter | `OwletParser` → ternlang AST |
+| BitNet b1.58 LLMs | `TSPARSE_MATMUL` + BitNet threshold quantization |
+| USN / Bos+Gundersen EDA | Academic whitepaper, ISA interop (in progress) |
+| Physical memristors | Phase 9 hardware target |
+
+---
+
+## Whitepaper
+
+IEEE two-column format, arXiv-ready (cs.PL / cs.AR / cs.NE):
+
+- [ternlang-whitepaper.docx](whitepaper/ternlang-whitepaper.docx)
+- [ternlang-whitepaper.tex](whitepaper/ternlang-whitepaper.tex)
+
+Citation:
+```
+Kepp, S. (2026). Ternlang: Balanced Ternary Intelligence Stack.
+RFI-IRFOS. https://ternlang.com
+```
+
+---
+
+## Wiki
+
+Full documentation at [wiki/Home.md](wiki/Home.md):
+- [Scalar Temperature Model](wiki/Scalar-Temperature.md)
+- [MCP Integration Guide](wiki/MCP-Integration-Guide.md)
+- [Language Reference](wiki/Language-Reference.md)
+
+---
+
+## Contact & Licensing
+
+- **Commercial licensing:** licensing@ternlang.com
+- **Website:** https://ternlang.com
+- **Academic collaboration:** Open — cite the whitepaper
+
+*"The place where fragmented ternary efforts compile into beauty."*
