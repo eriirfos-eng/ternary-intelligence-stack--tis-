@@ -79,13 +79,6 @@ At 4 AM on March 31, 2026, the developer community was shaken by the exposure of
 
 The result is **Albert-Code**: a bridge between the sophisticated agentic workflows of the future and the fast, local, offline-first reality of today.
 
-## Built with `oh-my-codex`
-
-The restructuring and documentation work on this repository was AI-assisted and orchestrated with Yeachan Heo's [oh-my-codex (OmX)](https://github.com/Yeachan-Heo/oh-my-codex), layered on top of Codex.
-
-- **`$team` mode:** used for coordinated parallel review and architectural feedback
-- **`$ralph` mode:** used for persistent execution, verification, and completion discipline
-
 ---
 
 ## Community
