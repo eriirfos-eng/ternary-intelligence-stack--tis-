@@ -4,7 +4,8 @@
 /// Transport: JSON-RPC 2.0 over stdio (MCP standard).
 ///
 /// Tools exposed:
-///   trit_decide       — the flagship: evidence → -1/0/+1 ternary decision
+///   trit_decide       — scalar ternary decision: evidence[] → reject/tend/affirm + confidence
+///   trit_vector       — multi-dimensional evidence aggregation with named dimensions + weights
 ///   trit_consensus    — consensus(a, b) → ternary result
 ///   trit_eval         — evaluate a trit expression string
 ///   ternlang_run      — compile + run a .tern snippet
@@ -15,7 +16,8 @@ use std::io::{self, BufRead, Write};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use ternlang_core::{trit::Trit, parser::Parser, codegen::betbc::BytecodeEmitter, vm::BetVm};
-use ternlang_ml::{TritMatrix, bitnet_threshold, benchmark, dense_matmul, sparse_matmul};
+use ternlang_ml::{TritMatrix, TritScalar, TritEvidenceVec, TEND_BOUNDARY,
+                   bitnet_threshold, benchmark, dense_matmul, sparse_matmul};
 
 // ─── JSON-RPC types ──────────────────────────────────────────────────────────
 
@@ -59,8 +61,8 @@ fn trit_to_i8(t: Trit) -> i8 {
     match t { Trit::NegOne => -1, Trit::Zero => 0, Trit::PosOne => 1 }
 }
 
-fn trit_semantic(t: Trit) -> &'static str {
-    match t { Trit::NegOne => "conflict", Trit::Zero => "hold", Trit::PosOne => "truth" }
+fn trit_label(t: Trit) -> &'static str {
+    match t { Trit::NegOne => "reject", Trit::Zero => "tend", Trit::PosOne => "affirm" }
 }
 
 fn i8_to_trit(v: i64) -> Option<Trit> {
@@ -88,50 +90,150 @@ fn tool_trit_decide(params: &Value) -> Result<Value, String> {
         return Err("evidence array cannot be empty".into());
     }
 
-    let threshold = params["threshold"].as_f64().unwrap_or_else(|| {
-        // Auto-compute BitNet threshold if not provided
-        let mean_abs = evidence.iter().map(|w| w.abs()).sum::<f32>() / evidence.len() as f32;
-        (0.5 * mean_abs) as f64
-    }) as f32;
+    let min_confidence = params["min_confidence"].as_f64().unwrap_or(0.0) as f32;
 
-    // Quantize each signal to a trit
-    let trits: Vec<Trit> = evidence.iter().map(|&e| {
-        if e > threshold { Trit::PosOne }
-        else if e < -threshold { Trit::NegOne }
-        else { Trit::Zero }
+    // Mean of clamped evidence values → aggregate TritScalar
+    let mean: f32 = evidence.iter().sum::<f32>() / evidence.len() as f32;
+    let scalar = TritScalar::new(mean);
+
+    // Per-signal breakdown
+    let per_signal: Vec<Value> = evidence.iter().enumerate().map(|(i, &v)| {
+        let s = TritScalar::new(v);
+        json!({
+            "index": i,
+            "raw": (v * 1000.0).round() / 1000.0,
+            "label": s.label(),
+            "confidence": (s.confidence() * 1000.0).round() / 1000.0,
+            "trit": trit_to_i8(s.trit()),
+        })
     }).collect();
 
-    // Consensus across all signals: sum, clamp to [-1, 0, +1]
-    let raw_sum: i32 = trits.iter().map(|&t| trit_to_i8(t) as i32).sum();
-    let decision = if raw_sum > 0 { Trit::PosOne }
-                   else if raw_sum < 0 { Trit::NegOne }
-                   else { Trit::Zero };
+    let zeros = per_signal.iter().filter(|s| s["trit"] == 0).count();
+    let sparsity = zeros as f64 / evidence.len() as f64;
+    let actionable = scalar.is_actionable(min_confidence);
 
-    // Confidence: how far from zero is the raw sum, relative to max possible
-    let max_sum = evidence.len() as f32;
-    let confidence_raw = raw_sum.abs() as f32 / max_sum;
-    let confidence = if confidence_raw > 0.66 { "high" }
-                     else if confidence_raw > 0.33 { "medium" }
-                     else { "low" };
-
-    let zeros = trits.iter().filter(|&&t| t == Trit::Zero).count();
-    let sparsity = zeros as f64 / trits.len() as f64;
-
-    let trit_repr: Vec<i8> = trits.iter().map(|&t| trit_to_i8(t)).collect();
+    let recommendation = match scalar.trit() {
+        Trit::PosOne => format!(
+            "Affirm — confidence {:.0}%{}. Proceed with action.",
+            scalar.confidence() * 100.0,
+            if actionable { "" } else { " (below min_confidence threshold — gather more evidence)" }
+        ),
+        Trit::NegOne => format!(
+            "Reject — confidence {:.0}%{}. Do not proceed.",
+            scalar.confidence() * 100.0,
+            if actionable { "" } else { " (below min_confidence threshold — gather more evidence)" }
+        ),
+        Trit::Zero => format!(
+            "Tend — scalar {:.3} is within the deliberation zone [{:.3}, +{:.3}]. \
+             Gather more evidence before acting.",
+            scalar.raw(), -TEND_BOUNDARY, TEND_BOUNDARY
+        ),
+    };
 
     Ok(json!({
-        "decision": trit_to_i8(decision),
-        "semantic": trit_semantic(decision),
-        "confidence": confidence,
-        "raw_consensus": raw_sum,
-        "threshold_used": threshold,
-        "quantized_trits": trit_repr,
+        "scalar":          (scalar.raw() * 1000.0).round() / 1000.0,
+        "trit":            trit_to_i8(scalar.trit()),
+        "label":           scalar.label(),
+        "confidence":      (scalar.confidence() * 1000.0).round() / 1000.0,
+        "is_actionable":   actionable,
+        "tend_boundary":   TEND_BOUNDARY,
         "signal_sparsity": sparsity,
-        "interpretation": match decision {
-            Trit::PosOne  => "Evidence supports action. Proceed.",
-            Trit::NegOne  => "Evidence contradicts action. Do not proceed.",
-            Trit::Zero    => "Evidence is ambiguous. Hold — gather more information before deciding.",
-        }
+        "recommendation":  recommendation,
+        "per_signal":      per_signal,
+    }))
+}
+
+// ─── Tool: trit_vector ───────────────────────────────────────────────────────
+//
+// Multi-dimensional evidence aggregation with named dimensions and weights.
+// The flagship agent-reasoning tool: give it your evidence sources by name,
+// get back an aggregate scalar decision + per-dimension breakdown.
+
+fn tool_trit_vector(params: &Value) -> Result<Value, String> {
+    let dims = params["dimensions"]
+        .as_array()
+        .ok_or("dimensions must be an array of {label, value, weight} objects")?;
+
+    if dims.is_empty() {
+        return Err("dimensions cannot be empty".into());
+    }
+
+    let min_confidence = params["min_confidence"].as_f64().unwrap_or(0.5) as f32;
+
+    let mut labels  = Vec::new();
+    let mut values  = Vec::new();
+    let mut weights = Vec::new();
+
+    for (i, d) in dims.iter().enumerate() {
+        let label  = d["label"].as_str()
+            .unwrap_or_else(|| "unnamed")
+            .to_string();
+        let value  = d["value"].as_f64()
+            .ok_or(format!("dimension[{}].value must be a number", i))? as f32;
+        let weight = d["weight"].as_f64().unwrap_or(1.0) as f32;
+        if weight < 0.0 { return Err(format!("dimension[{}].weight must be >= 0", i)); }
+        labels.push(label);
+        values.push(value);
+        weights.push(weight);
+    }
+
+    let ev  = TritEvidenceVec::new(labels, values, weights);
+    let agg = ev.aggregate();
+    let scalars = ev.scalars();
+
+    let breakdown: Vec<Value> = ev.dimensions.iter()
+        .zip(ev.values.iter())
+        .zip(ev.weights.iter())
+        .zip(scalars.iter())
+        .map(|(((label, &raw), &weight), s)| json!({
+            "label":      label,
+            "raw":        (raw * 1000.0).round() / 1000.0,
+            "weight":     weight,
+            "trit":       trit_to_i8(s.trit()),
+            "zone":       s.label(),
+            "confidence": (s.confidence() * 1000.0).round() / 1000.0,
+        }))
+        .collect();
+
+    let dominant = ev.dominant().map(|(label, s)| json!({
+        "label":      label,
+        "zone":       s.label(),
+        "confidence": (s.confidence() * 1000.0).round() / 1000.0,
+    }));
+
+    let actionable = agg.is_actionable(min_confidence);
+
+    let recommendation = match agg.trit() {
+        Trit::PosOne => format!(
+            "Affirm — aggregate scalar {:.3}, confidence {:.0}%{}.",
+            agg.raw(), agg.confidence() * 100.0,
+            if actionable { ". Act." } else { ". Confidence below threshold — continue gathering evidence." }
+        ),
+        Trit::NegOne => format!(
+            "Reject — aggregate scalar {:.3}, confidence {:.0}%{}.",
+            agg.raw(), agg.confidence() * 100.0,
+            if actionable { ". Do not act." } else { ". Confidence below threshold — continue gathering evidence." }
+        ),
+        Trit::Zero => format!(
+            "Tend — aggregate scalar {:.3} is in the deliberation zone [{:.3}, +{:.3}]. \
+             Do not act yet. Strongest signal: {}.",
+            agg.raw(), -TEND_BOUNDARY, TEND_BOUNDARY,
+            ev.dominant().map(|(l, _)| l).unwrap_or("none")
+        ),
+    };
+
+    Ok(json!({
+        "aggregate": {
+            "scalar":       (agg.raw() * 1000.0).round() / 1000.0,
+            "trit":         trit_to_i8(agg.trit()),
+            "label":        agg.label(),
+            "confidence":   (agg.confidence() * 1000.0).round() / 1000.0,
+            "is_actionable": actionable,
+        },
+        "breakdown":      breakdown,
+        "dominant":       dominant,
+        "tend_boundary":  TEND_BOUNDARY,
+        "recommendation": recommendation,
     }))
 }
 
@@ -145,7 +247,7 @@ fn tool_trit_consensus(params: &Value) -> Result<Value, String> {
     let (sum, carry) = a + b;
     Ok(json!({
         "result": trit_to_i8(sum),
-        "semantic": trit_semantic(sum),
+        "label": trit_label(sum),
         "carry": trit_to_i8(carry),
         "expression": format!("consensus({}, {}) = {}", a_val, b_val, trit_to_i8(sum))
     }))
@@ -311,6 +413,7 @@ fn tool_sparse_benchmark(params: &Value) -> Result<Value, String> {
 fn dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
     match name {
         "trit_decide"       => tool_trit_decide(params),
+        "trit_vector"       => tool_trit_vector(params),
         "trit_consensus"    => tool_trit_consensus(params),
         "trit_eval"         => tool_trit_eval(params),
         "ternlang_run"      => tool_ternlang_run(params),
@@ -326,21 +429,48 @@ fn tools_list() -> Value {
     json!({ "tools": [
         {
             "name": "trit_decide",
-            "description": "THE flagship tool. Turns any binary agent into a ternary decision engine.\n\nPass in floating-point evidence signals (your confidence scores, probabilities, sentiment values, anything numeric). The engine quantizes them to balanced ternary (-1/0/+1), runs consensus across all signals, and returns a ternary decision:\n\n  +1 (truth)    → evidence supports action. Proceed.\n   0 (hold)     → evidence is ambiguous. Gather more before deciding.\n  -1 (conflict) → evidence contradicts action. Do not proceed.\n\nThe HOLD state is the key innovation: instead of forcing a binary YES/NO from ambiguous evidence, the agent gets a computational instruction to stay in uncertainty until it has enough signal.",
+            "description": "Scalar ternary decision engine. Pass in floating-point evidence signals on [-1.0, +1.0]. Returns a continuous scalar temperature, a discrete ternary decision (reject/tend/affirm), and a confidence score.\n\nThe three zones:\n  affirm  (+0.33, +1.0] — signal is affirmative. Act if confidence is high enough.\n  tend    [-0.33, +0.33] — deliberation zone. Do NOT act. Gather more evidence.\n  reject  [-1.0, -0.33) — signal is negative. Do not proceed.\n\nThe 'tend' zone is the key innovation: it is not null or undecided — it is an active computational instruction to remain in uncertainty until the scalar clears a boundary. Confidence tells you HOW decisive the signal is within its zone.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "evidence": {
                         "type": "array",
                         "items": { "type": "number" },
-                        "description": "Array of numeric evidence signals (confidence scores, probabilities, sentiment values, etc). Positive = supporting, negative = contradicting, near-zero = uncertain."
+                        "description": "Array of numeric evidence signals on [-1.0, +1.0]. Positive = supporting, negative = contradicting, near-zero = uncertain. Mean is computed as the aggregate scalar."
                     },
-                    "threshold": {
+                    "min_confidence": {
                         "type": "number",
-                        "description": "Quantization threshold τ. Values with |e| > τ become ±1, others become 0 (hold). Omit to auto-compute using BitNet formula: 0.5 × mean(|evidence|)."
+                        "description": "Minimum confidence threshold for is_actionable (0.0–1.0). Default 0.0 (any decisive signal is actionable)."
                     }
                 },
                 "required": ["evidence"]
+            }
+        },
+        {
+            "name": "trit_vector",
+            "description": "Multi-dimensional ternary evidence aggregation. The full agent reasoning tool.\n\nProvide named evidence dimensions, each with a scalar value [-1.0, +1.0] and an importance weight. The engine computes a weighted-mean aggregate TritScalar and returns:\n  - aggregate: scalar, trit, label (reject/tend/affirm), confidence, is_actionable\n  - breakdown: per-dimension zone classification\n  - dominant: which evidence dimension is pulling hardest\n  - recommendation: plain-language decision guidance\n\nUse case: an AI agent collects evidence from multiple sources (visual, textual, contextual, historical) before deciding whether to act. The tend zone means 'keep deliberating'. Only act when is_actionable is true.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "dimensions": {
+                        "type": "array",
+                        "description": "Array of evidence dimensions. Each: {label: string, value: number [-1,1], weight: number >= 0 (default 1.0)}",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "label":  { "type": "string",  "description": "Name of this evidence source" },
+                                "value":  { "type": "number",  "description": "Evidence scalar, clamped to [-1.0, +1.0]" },
+                                "weight": { "type": "number",  "description": "Importance weight (default 1.0)" }
+                            },
+                            "required": ["label", "value"]
+                        }
+                    },
+                    "min_confidence": {
+                        "type": "number",
+                        "description": "Minimum confidence for is_actionable (0.0–1.0). Default 0.5."
+                    }
+                },
+                "required": ["dimensions"]
             }
         },
         {
@@ -461,7 +591,7 @@ fn main() {
     let stdout = io::stdout();
     let mut out = io::BufWriter::new(stdout.lock());
 
-    eprintln!("[ternlang-mcp] server ready — ternary intelligence stack v0.1");
+    eprintln!("[ternlang-mcp] server ready — ternary intelligence stack v0.2");
     eprintln!("[ternlang-mcp] waiting for MCP client on stdin...");
 
     for line in stdin.lock().lines() {

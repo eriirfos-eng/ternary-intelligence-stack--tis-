@@ -430,6 +430,120 @@ pub fn evaluate(mlp: &TernaryMLP, dataset: &[(TritMatrix, usize)]) -> (usize, us
     (correct, total, accuracy)
 }
 
+// ─── Trit Scalar Temperature ─────────────────────────────────────────────────
+//
+// A continuous ternary confidence scalar on [-1.0, +1.0].
+// Divides the real line into three semantic zones:
+//
+//   reject  ∈ [-1.0, -TEND_BOUNDARY)   — signal is negative, resolvable
+//   tend    ∈ [-TEND_BOUNDARY, +TEND_BOUNDARY]  — active deliberation zone
+//   affirm  ∈ (+TEND_BOUNDARY, +1.0]   — signal is affirmative
+//
+// The key insight: tend is NOT null. It is the zone where an AI agent should
+// continue gathering evidence rather than acting. The confidence value tells
+// you HOW DEEP into a zone you are — 1.0 = at the extreme, 0.0 = at the boundary.
+
+/// Zone boundary: 1/3 of the full scale.
+pub const TEND_BOUNDARY: f32 = 1.0 / 3.0;
+
+/// A continuous ternary confidence scalar, clamped to [-1.0, +1.0].
+pub struct TritScalar(pub f32);
+
+impl TritScalar {
+    /// Create a new TritScalar, clamping to [-1.0, +1.0].
+    pub fn new(v: f32) -> Self { TritScalar(v.clamp(-1.0, 1.0)) }
+
+    /// Discrete trit classification.
+    pub fn trit(&self) -> Trit {
+        if self.0 > TEND_BOUNDARY       { Trit::PosOne }
+        else if self.0 < -TEND_BOUNDARY { Trit::NegOne }
+        else                            { Trit::Zero   }
+    }
+
+    /// Semantic label: "reject" | "tend" | "affirm".
+    pub fn label(&self) -> &'static str {
+        match self.trit() {
+            Trit::PosOne => "affirm",
+            Trit::NegOne => "reject",
+            Trit::Zero   => "tend",
+        }
+    }
+
+    /// Confidence score ∈ [0.0, 1.0].
+    ///
+    /// For reject/affirm: how far past the zone boundary (0.0 = at boundary, 1.0 = at extreme).
+    /// For tend:          how close to the center       (1.0 = scalar=0, 0.0 = at boundary).
+    pub fn confidence(&self) -> f32 {
+        let v = self.0.abs();
+        if v > TEND_BOUNDARY {
+            (v - TEND_BOUNDARY) / (1.0 - TEND_BOUNDARY)
+        } else {
+            1.0 - v / TEND_BOUNDARY
+        }
+    }
+
+    /// True if the signal is in a decisive zone AND confidence meets the threshold.
+    /// Agents should only act when is_actionable returns true.
+    pub fn is_actionable(&self, min_confidence: f32) -> bool {
+        self.trit() != Trit::Zero && self.confidence() >= min_confidence
+    }
+
+    /// Raw scalar value.
+    pub fn raw(&self) -> f32 { self.0 }
+}
+
+// ─── Trit Evidence Vector ────────────────────────────────────────────────────
+//
+// Multi-dimensional evidence aggregation. Each dimension carries a name,
+// a scalar value ∈ [-1.0, +1.0], and an importance weight.
+// The aggregate weighted mean gives the final TritScalar decision.
+//
+// Use case: an AI agent collects evidence from multiple sources before acting.
+//   "visual_evidence": 0.8 (weight 1.0) → strongly affirm
+//   "textual_evidence": -0.2 (weight 0.5) → weakly reject
+//   "contextual_cue": 0.4 (weight 1.5) → affirm
+//   → aggregate: weighted mean → TritScalar → is_actionable?
+
+/// A named, weighted multi-dimensional evidence vector.
+pub struct TritEvidenceVec {
+    pub dimensions: Vec<String>,
+    pub values:     Vec<f32>,   // each clamped to [-1.0, +1.0]
+    pub weights:    Vec<f32>,   // must have same length; all >= 0
+}
+
+impl TritEvidenceVec {
+    pub fn new(dimensions: Vec<String>, values: Vec<f32>, weights: Vec<f32>) -> Self {
+        assert_eq!(dimensions.len(), values.len(), "dimensions and values must match");
+        assert_eq!(dimensions.len(), weights.len(), "dimensions and weights must match");
+        let values = values.iter().map(|&v| v.clamp(-1.0, 1.0)).collect();
+        TritEvidenceVec { dimensions, values, weights }
+    }
+
+    /// Weighted mean of all evidence values → TritScalar.
+    pub fn aggregate(&self) -> TritScalar {
+        let total_weight: f32 = self.weights.iter().sum();
+        if total_weight == 0.0 { return TritScalar::new(0.0); }
+        let weighted_sum: f32 = self.values.iter()
+            .zip(self.weights.iter())
+            .map(|(v, w)| v * w)
+            .sum();
+        TritScalar::new(weighted_sum / total_weight)
+    }
+
+    /// Per-dimension scalars (not weighted — raw values for inspection).
+    pub fn scalars(&self) -> Vec<TritScalar> {
+        self.values.iter().map(|&v| TritScalar::new(v)).collect()
+    }
+
+    /// The dimension with the strongest absolute signal (most decisive input).
+    pub fn dominant(&self) -> Option<(&str, TritScalar)> {
+        self.values.iter()
+            .enumerate()
+            .max_by(|(_, a), (_, b)| a.abs().partial_cmp(&b.abs()).unwrap_or(std::cmp::Ordering::Equal))
+            .map(|(i, &v)| (self.dimensions[i].as_str(), TritScalar::new(v)))
+    }
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -623,5 +737,103 @@ mod tests {
         let results = timed_benchmark(&[32, 64, 128, 256, 512], 5);
         assert_eq!(results.len(), 5);
         print_benchmark_table(&results);
+    }
+
+    // ── TritScalar ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_trit_scalar_zones() {
+        assert_eq!(TritScalar::new(0.9).label(),  "affirm");
+        assert_eq!(TritScalar::new(-0.9).label(), "reject");
+        assert_eq!(TritScalar::new(0.0).label(),  "tend");
+        assert_eq!(TritScalar::new(0.33).label(), "tend");    // on boundary → tend
+        assert_eq!(TritScalar::new(0.34).label(), "affirm");  // just past → affirm
+    }
+
+    #[test]
+    fn test_trit_scalar_confidence() {
+        // Dead center → tend with 1.0 confidence
+        let s = TritScalar::new(0.0);
+        assert_eq!(s.label(), "tend");
+        assert!((s.confidence() - 1.0).abs() < 0.01);
+
+        // At extreme → affirm/reject with 1.0 confidence
+        let s = TritScalar::new(1.0);
+        assert_eq!(s.label(), "affirm");
+        assert!((s.confidence() - 1.0).abs() < 0.01);
+
+        // At boundary → 0.0 confidence (just crossed)
+        let s = TritScalar::new(TEND_BOUNDARY + 0.001);
+        assert_eq!(s.label(), "affirm");
+        assert!(s.confidence() < 0.01);
+    }
+
+    #[test]
+    fn test_trit_scalar_actionable() {
+        // Strong affirm → actionable at 0.5 threshold
+        assert!(TritScalar::new(0.9).is_actionable(0.5));
+        // Weak affirm → not actionable at 0.8 threshold
+        assert!(!TritScalar::new(0.35).is_actionable(0.8));
+        // Tend → never actionable regardless of confidence
+        assert!(!TritScalar::new(0.0).is_actionable(0.0));
+    }
+
+    #[test]
+    fn test_trit_scalar_clamp() {
+        assert!((TritScalar::new(5.0).raw() - 1.0).abs() < 0.001);
+        assert!((TritScalar::new(-5.0).raw() + 1.0).abs() < 0.001);
+    }
+
+    // ── TritEvidenceVec ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_evidence_vec_aggregate_uniform() {
+        // Equal weights, all strongly affirm → affirm aggregate
+        let ev = TritEvidenceVec::new(
+            vec!["a".into(), "b".into(), "c".into()],
+            vec![0.8, 0.9, 0.7],
+            vec![1.0, 1.0, 1.0],
+        );
+        let agg = ev.aggregate();
+        assert_eq!(agg.label(), "affirm");
+        assert!(agg.confidence() > 0.5);
+    }
+
+    #[test]
+    fn test_evidence_vec_mixed_signals() {
+        // Strong reject + weak affirm → aggregate stays in reject or tend
+        let ev = TritEvidenceVec::new(
+            vec!["strong_reject".into(), "weak_affirm".into()],
+            vec![-0.9, 0.1],
+            vec![1.0, 1.0],
+        );
+        let agg = ev.aggregate();
+        // mean = (-0.9 + 0.1) / 2 = -0.4 → reject
+        assert_eq!(agg.label(), "reject");
+    }
+
+    #[test]
+    fn test_evidence_vec_weighted_override() {
+        // Low-value reject with very high weight overrides high-value affirm with low weight
+        let ev = TritEvidenceVec::new(
+            vec!["weak_reject".into(), "strong_affirm".into()],
+            vec![-0.4, 0.9],
+            vec![10.0, 1.0],  // reject dimension dominates by weight
+        );
+        let agg = ev.aggregate();
+        // weighted mean = (-0.4*10 + 0.9*1) / 11 = (-4 + 0.9) / 11 = -3.1/11 ≈ -0.28 → tend
+        assert_eq!(agg.label(), "tend");
+    }
+
+    #[test]
+    fn test_evidence_vec_dominant() {
+        let ev = TritEvidenceVec::new(
+            vec!["low".into(), "high".into(), "mid".into()],
+            vec![0.2, -0.95, 0.5],
+            vec![1.0, 1.0, 1.0],
+        );
+        let (label, scalar) = ev.dominant().unwrap();
+        assert_eq!(label, "high");
+        assert_eq!(scalar.label(), "reject");
     }
 }

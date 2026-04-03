@@ -506,7 +506,7 @@ body(
 
 heading("5.4  Wall-clock timing benchmark", 2)
 body(
-    "Table 5 extends the multiply-operation analysis to measured wall-clock timing across "
+    "Table 5 (below) extends the multiply-operation analysis to measured wall-clock timing across "
     "five matrix sizes, run as 5-repetition median measurements on an unoptimised debug "
     "build (cargo test profile). All weights were generated deterministically via an LCG "
     "and quantized with the BitNet threshold (τ = 0.5 × mean(|w|)), yielding approximately "
@@ -578,6 +578,71 @@ body(
     "round-trip decompression verified by 5 dedicated VM tests."
 )
 
+heading("5.7  Scalar ternary temperature and ambiguity detection", 2)
+body(
+    "Discrete ternary decisions — reject / tend / affirm — are necessary but not sufficient "
+    "for AI agent reasoning. An agent that knows it is in the 'affirm' zone but does not "
+    "know how strongly cannot calibrate when to act vs. when to gather more evidence. "
+    "Ternlang introduces a continuous scalar temperature model that unifies the discrete "
+    "and continuous views."
+)
+body(
+    "A TritScalar is a real value clamped to [−1.0, +1.0]. The full range is partitioned "
+    "into three zones by the tend boundary β = 1/3:"
+)
+code_block(
+    "reject  ∈ [−1.000, −0.333)   // negative, resolvable\n"
+    "tend    ∈ [−0.333, +0.333]   // deliberation zone — do NOT act yet\n"
+    "affirm  ∈ (+0.333, +1.000]   // affirmative\n\n"
+    "confidence = (|scalar| − β) / (1 − β)   for reject/affirm\n"
+    "           = 1 − |scalar| / β            for tend"
+)
+body_parts([
+    ("The tend zone is the most misunderstood trit.  ", True, False),
+    ("It is not null. It is not indecision. It is an active computational instruction: "
+     "the agent's evidence has not yet cleared a boundary sufficient to act. "
+     "The confidence score tells the agent how far it is from that boundary — "
+     "and therefore how much additional evidence is needed.", False, False)
+])
+
+heading("5.8  Multi-dimensional evidence vectors (trit_vector)", 2)
+body(
+    "Real reasoning agents collect evidence from multiple sources simultaneously. "
+    "The TritEvidenceVec type represents a named, weighted set of evidence dimensions, "
+    "each carrying its own scalar value. The aggregate scalar is a weighted mean:"
+)
+code_block(
+    "scalar_aggregate = Σᵢ (wᵢ · vᵢ) / Σᵢ wᵢ\n\n"
+    "Example:\n"
+    "  visual_evidence:    +0.80 (weight 1.0) → affirm, confidence 70%\n"
+    "  textual_evidence:   −0.20 (weight 0.5) → tend,   confidence 40%\n"
+    "  contextual_signal:  +0.40 (weight 1.5) → affirm, confidence 10%\n"
+    "  ─────────────────────────────────────────────────────────────\n"
+    "  aggregate scalar:   +0.36             → affirm, confidence  8%\n"
+    "  is_actionable(0.5): false             → continue gathering evidence"
+)
+body(
+    "The MCP server exposes this as the trit_vector tool: any AI agent can submit "
+    "its named evidence sources and receive back a full breakdown — per-dimension zone "
+    "classification, dominant dimension, aggregate scalar, and a plain-language "
+    "recommendation. The architecture is model-agnostic: any agent that can produce "
+    "numeric confidence scores can become a ternary reasoner without modification."
+)
+
+add_table(
+    ["Component", "Type", "Description"],
+    [
+        ["TritScalar",       "f32 ∈ [−1, +1]",     "Continuous ternary temperature; maps to reject/tend/affirm + confidence"],
+        ["TritEvidenceVec",  "Vec<(String, f32, f32)>", "Named, weighted evidence dimensions; aggregates to TritScalar"],
+        ["TEND_BOUNDARY",    "const 1/3 ≈ 0.333",  "Zone boundary: decisive vs. deliberation"],
+        ["confidence()",     "f32 ∈ [0, 1]",       "Depth into zone: 0.0 = at boundary, 1.0 = at extreme"],
+        ["is_actionable(τ)", "bool",                "True iff zone is reject/affirm AND confidence ≥ τ"],
+        ["trit_decide",      "MCP tool",            "Evidence[] → scalar, label, confidence, per-signal breakdown"],
+        ["trit_vector",      "MCP tool",            "Named dimensions + weights → aggregate + breakdown + recommendation"],
+    ],
+    "Table 6. Scalar temperature and evidence vector API."
+)
+
 divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -599,7 +664,7 @@ add_table(
         ["trit_reg",  "D register",  "synchronous write, asynchronous reset to 2'b11 (hold)"],
         ["bet_alu",   "Full ALU",    "op[1:0] selects ADD/MUL/NEG/CONS"],
     ],
-    "Table 5. BET Verilog-2001 primitive modules."
+    "Table 7. BET Verilog-2001 primitive modules."
 )
 
 heading("6.2  Sparse matmul array", 2)
@@ -734,7 +799,7 @@ add_table(
         ["Trit-Rust",                "Rust, i8-backed trits",    "Superseded by ternlang-core",        "Complete"],
         ["Q-Ternary",                "Qutrit DSL",               "trittensor state model mapping",     "Future work"],
     ],
-    "Table 6. Ternary ecosystem compatibility map."
+    "Table 8. Ternary ecosystem compatibility map."
 )
 
 divider()
@@ -763,7 +828,7 @@ add_table(
         ["ternpkg",          "5",  "Package manager: ternlang.toml, GitHub-backed registry"],
         ["ternlang-cli",     "1",  "run / build / sim / fmt / repl / compat commands"],
     ],
-    "Table 8. Ternlang crate inventory and test counts (v0.1, 2026-04-03)."
+    "Table 9. Ternlang crate inventory and test counts (v0.1, 2026-04-03)."
 )
 
 body("Developer tooling: VS Code extension with TextMate grammar and LSP client (packaged as ternlang-0.1.0.vsix, pending Marketplace publication); ternpkg package manager with GitHub-backed registry.")
