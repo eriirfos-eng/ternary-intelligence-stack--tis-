@@ -206,6 +206,7 @@ impl<'a> Parser<'a> {
                 let target = self.parse_unary_expr()?;
                 Ok(Expr::Await { target: Box::new(target) })
             }
+            Token::NodeId => Ok(Expr::NodeId),
             Token::Minus => {
                 let expr = self.parse_unary_expr()?;
                 Ok(Expr::UnaryOp { op: UnOp::Neg, expr: Box::new(expr) })

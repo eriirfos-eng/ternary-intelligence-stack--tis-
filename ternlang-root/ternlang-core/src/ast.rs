@@ -38,6 +38,8 @@ pub enum Expr {
     Await {
         target: Box<Expr>,
     },
+    /// nodeid — returns the current node's address (Phase 5.1)
+    NodeId,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

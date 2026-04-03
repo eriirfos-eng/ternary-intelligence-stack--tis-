@@ -34,6 +34,26 @@ By utilizing [Ollama](https://ollama.com/) for local inference of the `albert:la
 
 ---
 
+## Requirements & Installation
+
+### 1. Prerequisites
+- **Python 3.10+**
+- **Ollama**: [Download and install Ollama](https://ollama.com/)
+- **Albert Model**: Create the local model using the provided `Modelfile`:
+  ```bash
+  ollama pull qwen2.5:3b
+  ollama create albert -f Modelfile
+  ```
+
+### 2. Install Dependencies
+Clone the repository and install the required Python packages:
+```bash
+cd albert-agent
+pip install -r requirements.txt
+```
+
+---
+
 ## Quickstart
 
 ### 1. Ensure Ollama is running with the Albert model
@@ -41,9 +61,16 @@ By utilizing [Ollama](https://ollama.com/) for local inference of the `albert:la
 ollama run albert
 ```
 
-### 2. Start the Albert-Code chat
+### 2. Launch Albert
+
+**Option A: Terminal Chat (Albert-Code)**
 ```bash
 python3 -m src.main chat
+```
+
+**Option B: Web UI (Albert-Agent)**
+```bash
+streamlit run albert.py
 ```
 
 ### 3. Ask Albert to act

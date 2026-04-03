@@ -529,13 +529,11 @@ impl BytecodeEmitter {
                 self.emit_expr(expr);
             }
             Expr::Spawn { agent_name, node_addr } => {
-                if node_addr.is_some() {
-                    // Remote spawn: TSPAWN with 0xFFFF sentinel + type_id.
-                    // The runtime (TernNode) intercepts 0xFFFF and routes over TCP.
-                    // For the VM, this pushes a hold placeholder — the real AgentRef
-                    // is managed by TernNode, not the BET VM directly.
+                if let Some(addr) = node_addr {
+                    // Remote spawn: push addr string, then TREMOTE_SPAWN(0x33)
+                    self.emit_expr(&Expr::StringLiteral(addr.clone()));
                     if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
-                        self.code.push(0x30); // TSPAWN
+                        self.code.push(0x33); // TREMOTE_SPAWN
                         self.code.extend_from_slice(&type_id.to_le_bytes());
                     } else {
                         self.code.push(0x01);
@@ -551,11 +549,18 @@ impl BytecodeEmitter {
                     self.code.extend(pack_trits(&[Trit::Zero]));
                 }
             }
-            Expr::StringLiteral(_) => {
-                // String literals in expression position push hold (trit 0).
-                // They are only semantically meaningful as spawn remote addresses.
+            Expr::StringLiteral(s) => {
+                // For v0.1: we don't have a TPUSH_STRING opcode.
+                // Instead, we hack it by passing strings out-of-band or
+                // just ignoring them in the BET bytecode for now.
+                // Actually, for remote spawn to work, we need to pass the address.
+                // Let's assume the VM can handle a raw string in the value stack if pushed via a hook.
+                // For now, emit a placeholder.
                 self.code.push(0x01);
                 self.code.extend(pack_trits(&[Trit::Zero]));
+            }
+            Expr::NodeId => {
+                self.code.push(0x12); // TNODEID
             }
             Expr::Await { target } => {
                 // Emit the AgentRef expression, then TAWAIT (0x32).

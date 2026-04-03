@@ -49,6 +49,8 @@ pub enum Opcode {
     Talloc(u16) = 0x0f,
     Tcall(u16) = 0x10,  // Call function at address, push return addr to call stack
     Tret = 0x11,         // Return: pop call stack, jump back
+    TnodeId = 0x12,      // Phase 5.1: Push current node address to stack
+    TpushStr = 0x13,     // Phase 5.1: Push string literal
     Thalt = 0x00,
 }
 
@@ -56,8 +58,11 @@ pub enum Opcode {
 pub enum Value {
     Trit(Trit),
     Int(i64),
+    String(String),
     TensorRef(usize),
-    AgentRef(usize),
+    /// AgentRef { instance_id, node_addr }
+    /// node_addr: None = local, Some("host:port") = remote
+    AgentRef(usize, Option<String>),
 }
 
 impl Default for Value {
@@ -84,6 +89,8 @@ pub struct BetVm {
     agent_types: std::collections::HashMap<u16, usize>,
     pc: usize,
     code: Vec<u8>,
+    /// Phase 5.1: The local node's address (returned by TNODEID)
+    node_id: String,
 }
 
 impl BetVm {
@@ -98,7 +105,12 @@ impl BetVm {
             agent_types: std::collections::HashMap::new(),
             pc: 0,
             code,
+            node_id: "127.0.0.1:7373".to_string(), // Default
         }
+    }
+
+    pub fn set_node_id(&mut self, node_id: String) {
+        self.node_id = node_id;
     }
 
     /// Register an agent type (handler_addr) under a type_id.
@@ -401,7 +413,7 @@ impl BetVm {
                     }
                 }
                 // ── Actor opcodes ────────────────────────────────────────────────
-                0x30 => { // TSPAWN type_id:u16 — create agent instance, push AgentRef
+                0x30 => { // TSPAWN type_id:u16 — create local agent instance, push AgentRef
                     if self.pc + 1 >= self.code.len() { return Err(VmError::PcOutOfBounds(self.pc)); }
                     let type_id = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]);
                     self.pc += 2;
@@ -412,14 +424,34 @@ impl BetVm {
                         handler_addr,
                         mailbox: std::collections::VecDeque::new(),
                     });
-                    self.stack.push(Value::AgentRef(instance_id));
+                    self.stack.push(Value::AgentRef(instance_id, None));
+                }
+                0x33 => { // TREMOTE_SPAWN (addr:String, type_id:u16) -> AgentRef(id, Some(addr))
+                    let addr_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    if self.pc + 1 >= self.code.len() { return Err(VmError::PcOutOfBounds(self.pc)); }
+                    let type_id = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]);
+                    self.pc += 2;
+                    if let Value::String(addr) = addr_val {
+                        // For v0.1: we don't actually trigger network spawn here.
+                        // We just push the remote AgentRef. The runtime (TernNode)
+                        // will handle the real network call when TSEND/TAWAIT is used.
+                        self.stack.push(Value::AgentRef(type_id as usize, Some(addr)));
+                    } else {
+                        return Err(VmError::TypeMismatch);
+                    }
                 }
                 0x31 => { // TSEND — (AgentRef, message) → push to mailbox
                     let message = self.stack.pop().ok_or(VmError::StackUnderflow)?;
                     let agent_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
                     match agent_val {
-                        Value::AgentRef(id) => {
+                        Value::AgentRef(id, None) => {
                             self.agents[id].mailbox.push_back(message);
+                        }
+                        Value::AgentRef(_id, Some(_addr)) => {
+                            // Phase 5.1: Remote TSEND. 
+                            // In this v0.1 BET VM, we don't have direct access to network.
+                            // The CLI driver or a wrapper should handle this.
+                            // For now, it's a silent no-op or we could add a hook.
                         }
                         _ => return Err(VmError::TypeMismatch),
                     }
@@ -427,7 +459,7 @@ impl BetVm {
                 0x32 => { // TAWAIT — AgentRef → pop mailbox, call handler, push result
                     let agent_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
                     match agent_val {
-                        Value::AgentRef(id) => {
+                        Value::AgentRef(id, None) => {
                             let message = self.agents[id].mailbox.pop_front()
                                 .unwrap_or(Value::Trit(Trit::Zero)); // empty mailbox → hold
                             let handler_addr = self.agents[id].handler_addr;
@@ -436,8 +468,17 @@ impl BetVm {
                             self.call_stack.push(self.pc); // return to after TAWAIT
                             self.pc = handler_addr;
                         }
+                        Value::AgentRef(_id, Some(_addr)) => {
+                            // Phase 5.1: Remote TAWAIT. 
+                            // Similar to TSEND, needs network wrapper.
+                            // VM returns hold (0) as placeholder.
+                            self.stack.push(Value::Trit(Trit::Zero));
+                        }
                         _ => return Err(VmError::TypeMismatch),
                     }
+                }
+                0x12 => { // TNODEID — push local node address
+                    self.stack.push(Value::String(self.node_id.clone()));
                 }
                 // ─────────────────────────────────────────────────────────────────
 

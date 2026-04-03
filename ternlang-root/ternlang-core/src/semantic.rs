@@ -363,6 +363,7 @@ impl SemanticAnalyzer {
             Expr::Cast { ty, .. }     => Ok(ty.clone()),
             Expr::Spawn { .. }        => Ok(Type::AgentRef),
             Expr::Await { .. }        => Ok(Type::Trit),
+            Expr::NodeId              => Ok(Type::String),
 
             Expr::FieldAccess { object, field } => {
                 let obj_ty = self.infer_expr_type(object)?;

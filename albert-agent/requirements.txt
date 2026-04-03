@@ -1,0 +1,10 @@
+streamlit
+ollama
+requests
+psutil
+pypdf
+duckduckgo-search
+pyautogui
+Pillow
+scikit-learn
+numpy
