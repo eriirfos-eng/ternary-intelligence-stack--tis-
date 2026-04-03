@@ -319,6 +319,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ternlang-runtime"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "ternlang-core",
+]
+
+[[package]]
 name = "ternlang-test"
 version = "0.1.0"
 
