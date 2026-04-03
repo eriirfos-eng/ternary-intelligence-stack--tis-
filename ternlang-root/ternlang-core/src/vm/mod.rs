@@ -367,6 +367,39 @@ impl BetVm {
                         None => return Ok(()), // top-level return = halt
                     }
                 }
+                // ── Tensor compression opcodes ───────────────────────────────────
+                0x26 => { // TCOMPRESS — TensorRef → TensorRef (run-length compressed)
+                    // Run-length encoding of a sparse trit tensor.
+                    // Format: alternating (count: u8, trit: encoded) pairs.
+                    // Compressed tensor is stored as a new entry in self.tensors.
+                    // Stack: tensor_ref → compressed_ref
+                    let ref_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    match ref_val {
+                        Value::TensorRef(idx) => {
+                            let src = &self.tensors[idx].clone();
+                            let compressed = rle_compress(src);
+                            let new_idx = self.tensors.len();
+                            self.tensors.push(compressed);
+                            self.stack.push(Value::TensorRef(new_idx));
+                        }
+                        _ => return Err(VmError::TypeMismatch),
+                    }
+                }
+                0x27 => { // TUNPACK — compressed TensorRef → TensorRef (restored)
+                    // Decodes a run-length compressed tensor back to dense form.
+                    // Stack: compressed_ref → restored_ref
+                    let ref_val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    match ref_val {
+                        Value::TensorRef(idx) => {
+                            let src = &self.tensors[idx].clone();
+                            let unpacked = rle_decompress(src);
+                            let new_idx = self.tensors.len();
+                            self.tensors.push(unpacked);
+                            self.stack.push(Value::TensorRef(new_idx));
+                        }
+                        _ => return Err(VmError::TypeMismatch),
+                    }
+                }
                 // ── Actor opcodes ────────────────────────────────────────────────
                 0x30 => { // TSPAWN type_id:u16 — create agent instance, push AgentRef
                     if self.pc + 1 >= self.code.len() { return Err(VmError::PcOutOfBounds(self.pc)); }
@@ -425,6 +458,89 @@ impl BetVm {
 
     pub fn peek_stack(&self) -> Option<Value> {
         self.stack.last().copied()
+    }
+}
+
+// ─── Run-length compression helpers (used by TCOMPRESS / TUNPACK) ────────────
+
+/// Run-length encode a trit slice.
+/// Output format: pairs of (run_length: u8 encoded as Trit::Zero count trick,
+/// but since Trit has 3 values we encode runs as sequences of a sentinel + count.
+///
+/// Actual encoding stored in the tensor heap as a flat Vec<Trit>:
+///   [Trit value, count_high, count_low, Trit value, count_high, count_low, ...]
+/// where count = count_high * 3 + count_low  (base-3, max run = 8 trits)
+/// For simplicity max run length is 255, encoded as two trits (base 16 = 4 bits).
+///
+/// We use a simple scheme: store pairs (value_trit, length_trit_sequence)
+/// terminated by a sentinel. Here we use a flat encoding:
+///   even index → trit value, odd index → run length as Int packed as Trit
+/// Since we can't store arbitrary ints as trits, we store the raw Vec<Trit>
+/// with a header sentinel (NegOne) followed by (value, count) pairs where
+/// count is clamped to a single trit (1–3). For longer runs we emit multiple pairs.
+pub fn rle_compress(src: &[Trit]) -> Vec<Trit> {
+    if src.is_empty() { return vec![]; }
+    let mut out = Vec::new();
+    // Header: NegOne sentinel marks this as a compressed tensor
+    out.push(Trit::NegOne);
+
+    let mut i = 0;
+    while i < src.len() {
+        let val = src[i];
+        let mut run = 1usize;
+        while i + run < src.len() && src[i + run] == val && run < 255 {
+            run += 1;
+        }
+        // Encode run as series of (val, count_trit) pairs.
+        // count_trit: PosOne=1, Zero=2 (by convention), NegOne=3... not ideal.
+        // Use a simpler scheme: emit val followed by run-length in unary trit pairs.
+        // For portability just encode run as (run / 3) Zero-trits + (run % 3) marker.
+        // Simplest correct scheme: emit val, then run count in base 3 (2 trits = max 8).
+        // For runs > 8 we emit multiple pairs.
+        let mut remaining = run;
+        while remaining > 0 {
+            let chunk = remaining.min(8); // max 8 per pair (2×3+2, max 2-digit base-3)
+            out.push(val);
+            out.push(int_to_trit((chunk / 3) as i8)); // high trit
+            out.push(int_to_trit((chunk % 3) as i8)); // low trit
+            remaining -= chunk;
+        }
+        i += run;
+    }
+    out
+}
+
+/// Decode a run-length encoded trit slice back to dense form.
+pub fn rle_decompress(src: &[Trit]) -> Vec<Trit> {
+    if src.is_empty() { return vec![]; }
+    // Check header sentinel
+    if src[0] != Trit::NegOne { return src.to_vec(); } // not compressed
+    let mut out = Vec::new();
+    let mut i = 1;
+    while i + 2 < src.len() {
+        let val   = src[i];
+        let hi    = trit_to_int(src[i + 1]) as usize;
+        let lo    = trit_to_int(src[i + 2]) as usize;
+        let count = hi * 3 + lo;
+        for _ in 0..count.max(1) { out.push(val); }
+        i += 3;
+    }
+    out
+}
+
+fn int_to_trit(v: i8) -> Trit {
+    match v {
+        0 => Trit::Zero,
+        1 => Trit::PosOne,
+        _ => Trit::NegOne,
+    }
+}
+
+fn trit_to_int(t: Trit) -> i8 {
+    match t {
+        Trit::Zero   => 0,
+        Trit::PosOne => 1,
+        Trit::NegOne => 2, // used as digit '2' in base-3 run-length
     }
 }
 
@@ -597,5 +713,87 @@ mod tests {
         vm.run().unwrap();
         assert_eq!(vm.get_register(0), Value::Trit(Trit::NegOne)); // Sum
         assert_eq!(vm.get_register(1), Value::Trit(Trit::PosOne)); // Carry
+    }
+}
+
+#[cfg(test)]
+mod compress_tests {
+    use super::*;
+    use crate::trit::Trit;
+
+    #[test]
+    fn test_rle_compress_all_zeros() {
+        let src = vec![Trit::Zero; 9];
+        let c = rle_compress(&src);
+        // Must start with sentinel and be shorter than raw
+        assert_eq!(c[0], Trit::NegOne);
+        assert!(c.len() < src.len(), "compressed should be shorter than 9 zeros");
+    }
+
+    #[test]
+    fn test_rle_roundtrip_uniform() {
+        let src = vec![Trit::PosOne; 6];
+        let compressed = rle_compress(&src);
+        let restored   = rle_decompress(&compressed);
+        assert_eq!(restored, src, "roundtrip must be lossless");
+    }
+
+    #[test]
+    fn test_rle_roundtrip_mixed() {
+        let src = vec![
+            Trit::PosOne, Trit::PosOne, Trit::PosOne,
+            Trit::Zero,   Trit::Zero,
+            Trit::NegOne,
+            Trit::Zero,   Trit::Zero,   Trit::Zero,
+        ];
+        let compressed = rle_compress(&src);
+        let restored   = rle_decompress(&compressed);
+        assert_eq!(restored, src, "roundtrip must be lossless for mixed tensor");
+    }
+
+    #[test]
+    fn test_rle_compress_single_element() {
+        let src = vec![Trit::NegOne];
+        let c = rle_compress(&src);
+        let r = rle_decompress(&c);
+        assert_eq!(r, src);
+    }
+
+    #[test]
+    fn test_tcompress_tunpack_opcodes() {
+        // Test TCOMPRESS (0x26) and TUNPACK (0x27) via VM bytecode.
+        // Strategy: TALLOC a sparse tensor, compress it, unpack it,
+        // check TSPARSITY is preserved. Use a pre-filled tensor (all zeros = maximum sparsity).
+        let mut code = Vec::new();
+
+        // TALLOC 9 elements (all zero by default)
+        code.push(0x0f);
+        code.extend_from_slice(&9u16.to_le_bytes());
+        code.push(0x08); code.push(0x00); // TSTORE r0
+
+        // TCOMPRESS r0 → compressed ref in r1
+        code.push(0x09); code.push(0x00); // TLOAD r0
+        code.push(0x26);                   // TCOMPRESS
+        code.push(0x08); code.push(0x01); // TSTORE r1
+
+        // TUNPACK r1 → restored ref in r2
+        code.push(0x09); code.push(0x01); // TLOAD r1
+        code.push(0x27);                   // TUNPACK
+        code.push(0x08); code.push(0x02); // TSTORE r2
+
+        // TSPARSITY on restored tensor → should be 9 (all zeros)
+        code.push(0x09); code.push(0x02); // TLOAD r2
+        code.push(0x25);                   // TSPARSITY
+        code.push(0x08); code.push(0x03); // TSTORE r3
+
+        code.push(0x00); // THALT
+
+        let mut vm = BetVm::new(code);
+        vm.run().unwrap();
+
+        // All 9 elements should still be zero after compress→unpack
+        let sparsity = vm.get_register(3);
+        assert!(matches!(sparsity, Value::Int(n) if n >= 9),
+            "restored tensor should have 9 zero elements, got {:?}", sparsity);
     }
 }
