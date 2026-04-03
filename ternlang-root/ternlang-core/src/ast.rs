@@ -2,6 +2,7 @@
 pub enum Expr {
     TritLiteral(i8),
     IntLiteral(i64),
+    StringLiteral(String),
     Ident(String),
     BinaryOp {
         op: BinOp,
@@ -26,9 +27,12 @@ pub enum Expr {
         expr: Box<Expr>,
         ty: Type,
     },
-    /// spawn AgentName — creates an agent instance, evaluates to AgentRef
+    /// spawn AgentName — creates a local agent instance, evaluates to AgentRef
+    /// spawn remote "addr" AgentName — creates a remote agent instance (Phase 5.1)
     Spawn {
         agent_name: String,
+        /// None = local, Some("host:port") = remote node
+        node_addr: Option<String>,
     },
     /// await <agentref_expr> — receive result from agent mailbox
     Await {

@@ -90,6 +90,12 @@ pub enum Token {
     #[token("agentref", priority = 3)]
     AgentRef,
 
+    #[token("remote", priority = 3)]
+    Remote,
+
+    #[token("nodeid", priority = 3)]
+    NodeId,
+
     // Operators
     #[token("+")]
     Plus,
@@ -170,6 +176,13 @@ pub enum Token {
 
     #[regex("[0-9]+", |lex| lex.slice().parse::<i64>().ok(), priority = 1)]
     Int(i64),
+
+    /// Double-quoted string literal: "value"
+    #[regex(r#""[^"]*""#, |lex| {
+        let s = lex.slice();
+        Some(s[1..s.len()-1].to_string())
+    }, priority = 2)]
+    StringLit(String),
 }
 
 #[cfg(test)]

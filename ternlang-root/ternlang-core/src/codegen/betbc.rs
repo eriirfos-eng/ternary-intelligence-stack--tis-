@@ -528,9 +528,21 @@ impl BytecodeEmitter {
                 // Emit the inner expression; the type annotation guides the type checker only.
                 self.emit_expr(expr);
             }
-            Expr::Spawn { agent_name } => {
-                // TSPAWN type_id:u16 — creates instance, pushes AgentRef.
-                if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
+            Expr::Spawn { agent_name, node_addr } => {
+                if node_addr.is_some() {
+                    // Remote spawn: TSPAWN with 0xFFFF sentinel + type_id.
+                    // The runtime (TernNode) intercepts 0xFFFF and routes over TCP.
+                    // For the VM, this pushes a hold placeholder — the real AgentRef
+                    // is managed by TernNode, not the BET VM directly.
+                    if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
+                        self.code.push(0x30); // TSPAWN
+                        self.code.extend_from_slice(&type_id.to_le_bytes());
+                    } else {
+                        self.code.push(0x01);
+                        self.code.extend(pack_trits(&[Trit::Zero]));
+                    }
+                } else if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
+                    // Local spawn
                     self.code.push(0x30); // TSPAWN
                     self.code.extend_from_slice(&type_id.to_le_bytes());
                 } else {
@@ -538,6 +550,12 @@ impl BytecodeEmitter {
                     self.code.push(0x01);
                     self.code.extend(pack_trits(&[Trit::Zero]));
                 }
+            }
+            Expr::StringLiteral(_) => {
+                // String literals in expression position push hold (trit 0).
+                // They are only semantically meaningful as spawn remote addresses.
+                self.code.push(0x01);
+                self.code.extend(pack_trits(&[Trit::Zero]));
             }
             Expr::Await { target } => {
                 // Emit the AgentRef expression, then TAWAIT (0x32).

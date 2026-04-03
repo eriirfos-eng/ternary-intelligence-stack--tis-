@@ -183,13 +183,23 @@ impl<'a> Parser<'a> {
     fn parse_primary_expr(&mut self) -> Result<Expr, ParseError> {
         let token = self.next_token()?;
         match token {
-            // spawn AgentName — creates a new agent instance
+            // spawn AgentName           — local agent
+            // spawn remote "addr" Name  — remote agent (Phase 5.1)
             Token::Spawn => {
+                let node_addr = if let Ok(Token::Remote) = self.peek_token() {
+                    self.next_token()?; // consume `remote`
+                    match self.next_token()? {
+                        Token::StringLit(addr) => Some(addr),
+                        t => return Err(ParseError::ExpectedToken("node address string".into(), format!("{:?}", t))),
+                    }
+                } else {
+                    None
+                };
                 let agent_name = match self.next_token()? {
                     Token::Ident(n) => n,
                     t => return Err(ParseError::ExpectedToken("agent name".into(), format!("{:?}", t))),
                 };
-                Ok(Expr::Spawn { agent_name })
+                Ok(Expr::Spawn { agent_name, node_addr })
             }
             // await <agentref_expr> — receive from agent mailbox
             Token::Await => {
@@ -207,6 +217,7 @@ impl<'a> Parser<'a> {
                 Ok(Expr::TritLiteral(val))
             }
             Token::Int(val) => Ok(Expr::IntLiteral(val)),
+            Token::StringLit(s) => Ok(Expr::StringLiteral(s)),
             Token::Ident(name) => {
                 // cast(expr) built-in: returns Cast node
                 if name == "cast" {
@@ -653,10 +664,24 @@ mod tests {
         let input = "let v: agentref = spawn Voter;";
         let mut parser = Parser::new(input);
         let stmt = parser.parse_stmt().unwrap();
-        if let Stmt::Let { ty: Type::AgentRef, value: Expr::Spawn { agent_name }, .. } = stmt {
+        if let Stmt::Let { ty: Type::AgentRef, value: Expr::Spawn { agent_name, node_addr }, .. } = stmt {
             assert_eq!(agent_name, "Voter");
+            assert_eq!(node_addr, None);
         } else {
             panic!("Expected spawn in let binding");
+        }
+    }
+
+    #[test]
+    fn test_parse_spawn_remote() {
+        let input = r#"let v: agentref = spawn remote "10.0.0.1:7373" Voter;"#;
+        let mut parser = Parser::new(input);
+        let stmt = parser.parse_stmt().unwrap();
+        if let Stmt::Let { ty: Type::AgentRef, value: Expr::Spawn { agent_name, node_addr }, .. } = stmt {
+            assert_eq!(agent_name, "Voter");
+            assert_eq!(node_addr, Some("10.0.0.1:7373".to_string()));
+        } else {
+            panic!("Expected remote spawn in let binding");
         }
     }
 

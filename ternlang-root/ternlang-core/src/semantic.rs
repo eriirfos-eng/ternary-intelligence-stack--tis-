@@ -176,9 +176,10 @@ impl SemanticAnalyzer {
 
     fn infer_expr_type(&self, expr: &Expr) -> Result<Type, SemanticError> {
         match expr {
-            Expr::TritLiteral(_) => Ok(Type::Trit),
-            Expr::IntLiteral(_)  => Ok(Type::Int),
-            Expr::Ident(name)    => self.lookup_var(name),
+            Expr::TritLiteral(_)    => Ok(Type::Trit),
+            Expr::IntLiteral(_)     => Ok(Type::Int),
+            Expr::StringLiteral(_)  => Ok(Type::String),
+            Expr::Ident(name)       => self.lookup_var(name),
             Expr::BinaryOp { op: _, lhs, rhs } => {
                 let l_ty = self.infer_expr_type(lhs)?;
                 let r_ty = self.infer_expr_type(rhs)?;
