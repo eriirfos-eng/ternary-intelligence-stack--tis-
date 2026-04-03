@@ -1,0 +1,23 @@
+[package]
+name              = "ternlang-api"
+description       = "ternlang.com HTTP API — REST wrapper for the Ternary Intelligence Stack. Powers /api/trit_decide, /api/trit_vector, and friends."
+version.workspace = true
+edition.workspace = true
+license           = "LicenseRef-BSL-1.1"
+repository.workspace = true
+homepage.workspace   = true
+authors.workspace    = true
+
+[[bin]]
+name = "ternlang-api"
+path = "src/main.rs"
+
+[dependencies]
+axum            = "0.8"
+tokio           = { version = "1", features = ["full"] }
+tower           = "0.5"
+tower-http      = { version = "0.6", features = ["cors", "trace"] }
+serde           = { version = "1", features = ["derive"] }
+serde_json      = "1"
+ternlang-core   = { path = "../ternlang-core" }
+ternlang-ml     = { path = "../ternlang-ml" }
