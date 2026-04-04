@@ -1,0 +1,50 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 62_rail_block_occupancy.tern — Rail block occupancy detection
+//
+// Binary rail sensors (Occupied/Clear) can fail "open," causing signals to
+// erroneously turn green when a train is present. Ternary logic 
+// distinguishes between a 'clear' block, an 'occupied' (Truth) block, 
+// and a 'cautionary' (Hold) state for sensor mismatches or signal noise.
+//   +1: Occupied
+//    0: Cautionary (Hold)
+//   -1: Clear (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn track_circuit(signal: trit) -> trit { return signal; }
+fn axle_counter(count: trit) -> trit { return count; }
+fn radio_ping(heartbeat: trit) -> trit { return heartbeat; }
+
+fn rail_occupancy_logic(circuit: trit, axles: trit, radio: trit) -> trit {
+    // If the primary track circuit is definitely occupied, the block is occupied
+    match circuit {
+        1 => { return truth(); } // Primary sensor detects presence
+         0 => { 
+             // Uncertain track circuit, check secondary systems
+             let secondary: trit = consensus(axles, radio);
+             return secondary;
+         }
+         -1 => {
+             // Circuit says clear, but must verify via consensus
+             let verification: trit = consensus(axles, radio);
+             match verification {
+                 1 => { return hold(); } // Mismatch: circuit clear, axles occupied
+                  0 => { return hold(); } // Mismatch: circuit clear, radio signal weak
+                  -1 => { return conflict(); } // All sensors agree: clear
+             }
+         }
+    }
+}
+
+// ── Concrete scenario: freight train on a mountain pass during blizzard ──
+let track_current: trit = hold();  // Electrical noise from frost interfering
+let wheel_count: trit = truth();   // Axle counter registered entry
+let train_radio: trit = truth();   // Heartbeat confirmed from train tail unit
+
+let result: trit = rail_occupancy_logic(track_current, wheel_count, train_radio);
+
+// Final decision mapping
+match result {
+    1 => { return truth();    } // OCCUPIED: Block is in use
+    0 => { return hold();     } // CAUTIONARY: Signal fault or sensor drift
+   -1 => { return conflict(); } // CLEAR: Block is available for entry
+}

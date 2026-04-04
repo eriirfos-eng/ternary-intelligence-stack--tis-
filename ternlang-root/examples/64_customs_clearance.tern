@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 64_customs_clearance.tern — Customs cargo clearance
+//
+// Binary customs systems (Pass/Seize) either slow down trade for minor 
+// paperwork errors or miss hidden contraband. Ternary logic 
+// allows an 'inspect' (Hold) state where containers are flagged for physical 
+// verification without being immediately seized or returned.
+//   +1: Clear
+//    0: Inspect (Hold)
+//   -1: Detain (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn manifest_match(declaration: trit) -> trit { return declaration; }
+fn xray_scan(imagery: trit) -> trit { return imagery; }
+fn origin_risk(history: trit) -> trit { return history; }
+
+fn customs_logic(manifest: trit, xray: trit, origin: trit) -> trit {
+    // X-ray finding of contraband is a hard gate
+    match xray {
+        -1 => { return conflict(); } // Illegal goods detected
+         0 => { 
+             // Ambiguous x-ray (organic shapes detected), must inspect
+             return hold();
+         }
+         1 => {
+             // X-ray clear, now check paperwork and source risk
+             let document_risk: trit = consensus(manifest, origin);
+             return document_risk;
+         }
+    }
+}
+
+// ── Concrete scenario: container ship arrival from a high-risk port ──
+let manifest_data: trit = truth();  // Weight matches declaration to within 1%
+let x_ray_result: trit = truth();   // Cargo is clearly industrial machinery
+let port_history: trit = hold();    // Origin port has recent security alerts
+
+let result: trit = customs_logic(manifest_data, x_ray_result, port_history);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // DETAIN: Cargo confiscated
+     0 => { return hold();     } // INSPECT: Flag for physical seal verification
+     1 => { return truth();    } // CLEAR: Cargo released for domestic transport
+}

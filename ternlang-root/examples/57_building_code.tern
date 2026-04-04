@@ -1,0 +1,49 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 57_building_code.tern — Building code compliance
+//
+// Binary building codes (Pass/Fail) often delay occupancy for trivial errors 
+// or allow dangerous compromises to pass through paperwork. Ternary logic 
+// distinguishes between minor infractions (reparable) and structural failures,
+// allowing safe progress while mandating fixes.
+//   +1: Compliant
+//    0: Minor Infraction (Hold)
+//   -1: Major Infraction (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn structural_safety(beams: trit) -> trit { return beams; }
+fn fire_egress(exits: trit) -> trit { return exits; }
+fn electrical_load(wiring: trit) -> trit { return wiring; }
+
+fn code_inspector(structural: trit, fire: trit, elec: trit) -> trit {
+    // Structural safety is the primary hard gate
+    match structural {
+        -1 => { return conflict(); } // Foundation or load-bearing failure
+         0 => { 
+             // Uncertain structural data requires immediate stop/review
+             return hold();
+         }
+         1 => {
+             // Structure is sound, check secondary systems
+             let life_safety: trit = consensus(fire, elec);
+             match life_safety {
+                 -1 => { return conflict(); } // Multiple safety violations
+                  0 => { return hold();     } // Requires remediation
+                  1 => { return truth();    } // Fully compliant
+             }
+         }
+    }
+}
+
+// ── Concrete scenario: mixed-use development final inspection ──
+let load_test: trit = truth();     // All beams pass ultrasonic testing
+let exit_signs: trit = hold();     // Two signs have dead batteries
+let wire_gauge: trit = truth();    // All copper meets high-voltage spec
+
+let result: trit = code_inspector(load_test, exit_signs, wire_gauge);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // MAJOR INFRACTION: Building condemned
+     0 => { return hold();     } // MINOR INFRACTION: Correct exit signs before occupancy
+     1 => { return truth();    } // COMPLIANT: Certificate of Occupancy issued
+}

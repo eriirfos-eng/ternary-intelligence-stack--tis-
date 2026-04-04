@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 63_av_lane_change.tern — Autonomous vehicle lane change
+//
+// Binary lane change decisions (Go/Stop) can cause jerky braking or dangerous
+// cut-offs in heavy traffic. Ternary logic allows a 'wait' (Hold) state 
+// where the vehicle signals its intent while monitoring for a safe gap,
+// creating smoother and more predictable maneuvers.
+//   +1: Safe
+//    0: Wait (Hold)
+//   -1: Unsafe (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn blind_spot_clear(lidar: trit) -> trit { return lidar; }
+fn gap_size(radar: trit) -> trit { return radar; }
+fn relative_velocity(camera: trit) -> trit { return camera; }
+
+fn maneuver_logic(blind: trit, gap: trit, vel: trit) -> trit {
+    // Blind spot is the absolute hard gate
+    match blind {
+        -1 => { return conflict(); } // Obstacle detected
+         0 => { 
+             // Sensor obscured (e.g., rain), must wait for clear data
+             return hold();
+         }
+         1 => {
+             // Side is clear, now check gap and closure speed
+             let path_safety: trit = consensus(gap, vel);
+             return path_safety;
+         }
+    }
+}
+
+// ── Concrete scenario: highway merge into fast-moving traffic ──
+let side_lidar: trit = truth();    // No vehicles within 10 meters of flank
+let radar_gap: trit = hold();      // Gap is tight (2.0 seconds)
+let rear_closure: trit = truth();  // Approaching vehicle is not speeding
+
+let result: trit = maneuver_logic(side_lidar, radar_gap, rear_closure);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // UNSAFE: Maneuver aborted
+     0 => { return hold();     } // WAIT: Signaling, waiting for gap to widen
+     1 => { return truth();    } // SAFE: Commencing lane change
+}

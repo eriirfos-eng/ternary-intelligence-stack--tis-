@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 70_ship_collision_avoidance.tern — Maritime ship collision avoidance
+//
+// Binary maritime ship collision avoidance systems often fail to account for ambiguity, 
+// forcing a binary choice that creates liability or safety gaps. 
+// Ternary logic introduces a 'hold' state (Hold) to handle uncertainty,
+// ensuring a measured response before escalating or clearing.
+//   +1: Clear
+//    0: Hold (Hold)
+//   -1: Course_change (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn radar_echo(input: trit) -> trit { return input; }
+fn ais_data(input: trit) -> trit { return input; }
+fn visual_range(input: trit) -> trit { return input; }
+
+fn navigation_action(radar_echo_val: trit, ais_data_val: trit, visual_range_val: trit) -> trit {
+    // Hard gate: radar echo
+    match radar_echo_val {
+        -1 => { return conflict(); }
+         0 => { 
+             let consensus_all: trit = consensus(ais_data_val, consensus(visual_range_val, 0));
+             return consensus_all;
+         }
+         1 => {
+             // Cascade check
+             let state: trit = consensus(ais_data_val, visual_range_val);
+             return state;
+         }
+    }
+}
+
+// ── Concrete scenario: oil tanker navigating a narrow strait ──
+let radar_echo_input: trit = truth();
+let ais_data_input: trit = hold();
+let visual_range_input: trit = truth();
+
+let result: trit = navigation_action(radar_echo_input, ais_data_input, visual_range_input);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // COURSE_CHANGE
+     0 => { return hold();     } // HOLD
+     1 => { return truth();    } // CLEAR
+}

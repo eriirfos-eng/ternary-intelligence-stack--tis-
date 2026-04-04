@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 59_evidence_admissibility.tern — Evidence admissibility ruling
+//
+// Binary evidence rulings (Admit/Exclude) can trigger mistrials or let dangerous
+// offenders go free. Ternary logic allows a 'review' (Hold) state where
+// a judge can request an 'in camera' hearing or supplementary briefs
+// before finalizing the ruling.
+//   +1: Admit
+//    0: Review (Hold)
+//   -1: Exclude (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn chain_of_custody(logs: trit) -> trit { return logs; }
+fn warrant_validity(court_order: trit) -> trit { return court_order; }
+fn probative_vs_prejudicial(balance: trit) -> trit { return balance; }
+
+fn judge_ruling_logic(custody: trit, warrant: trit, balance: trit) -> trit {
+    // Warrant validity is the constitutional hard gate
+    match warrant {
+        -1 => { return conflict(); } // Illegal search, fruit of poisonous tree
+         0 => { 
+             // Unclear warrant scope requires a suppression hearing
+             return hold();
+         }
+         1 => {
+             // Warrant is valid, now check procedural and evidentiary rules
+             let procedural: trit = consensus(custody, balance);
+             return procedural;
+         }
+    }
+}
+
+// ── Concrete scenario: encrypted hard drive seized during search ──
+let log_history: trit = truth();   // Forensics logs are complete
+let warrant_scope: trit = truth(); // Search for "digital storage" is clear
+let bias_check: trit = hold();      // Contains private photos, balance is tricky
+
+let result: trit = judge_ruling_logic(log_history, warrant_scope, bias_check);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // EXCLUDE: Constitutional violation
+     0 => { return hold();     } // REVIEW: Request in-camera review of files
+     1 => { return truth();    } // ADMIT: Enter evidence into trial record
+}

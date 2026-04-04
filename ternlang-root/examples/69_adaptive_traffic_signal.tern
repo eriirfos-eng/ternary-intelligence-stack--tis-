@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 69_adaptive_traffic_signal.tern — Adaptive traffic signal control
+//
+// Binary adaptive traffic signal control systems often fail to account for ambiguity, 
+// forcing a binary choice that creates liability or safety gaps. 
+// Ternary logic introduces a 'caution' state (Hold) to handle uncertainty,
+// ensuring a measured response before escalating or clearing.
+//   +1: Green
+//    0: Caution (Hold)
+//   -1: Red (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn queue_length(input: trit) -> trit { return input; }
+fn emergency_preempt(input: trit) -> trit { return input; }
+fn pedestrian_presence(input: trit) -> trit { return input; }
+
+fn signal_state(queue_length_val: trit, emergency_preempt_val: trit, pedestrian_presence_val: trit) -> trit {
+    // Hard gate: queue length
+    match queue_length_val {
+        -1 => { return conflict(); }
+         0 => { 
+             let consensus_all: trit = consensus(emergency_preempt_val, consensus(pedestrian_presence_val, 0));
+             return consensus_all;
+         }
+         1 => {
+             // Cascade check
+             let state: trit = consensus(emergency_preempt_val, pedestrian_presence_val);
+             return state;
+         }
+    }
+}
+
+// ── Concrete scenario: smart city intersection optimization ──
+let queue_length_input: trit = truth();
+let emergency_preempt_input: trit = hold();
+let pedestrian_presence_input: trit = truth();
+
+let result: trit = signal_state(queue_length_input, emergency_preempt_input, pedestrian_presence_input);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // RED
+     0 => { return hold();     } // CAUTION
+     1 => { return truth();    } // GREEN
+}

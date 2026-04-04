@@ -1,0 +1,50 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 66_fleet_maintenance_dispatch.tern — Fleet maintenance dispatch
+//
+// Binary maintenance systems (Run/Fix) lead to roadside breakdowns or 
+// excessive downtime for healthy vehicles. Ternary logic 
+// allows a 'standby' (Hold) state where a vehicle remains active for 
+// local routes only until it reaches a scheduled repair window.
+//   +1: Active
+//    0: Standby (Hold)
+//   -1: Maintenance (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn oil_life(percentage: trit) -> trit { return percentage; }
+fn brake_pad_wear(depth: trit) -> trit { return depth; }
+fn tire_pressure(psi: trit) -> trit { return psi; }
+
+fn fleet_dispatch_logic(oil: trit, brakes: trit, tires: trit) -> trit {
+    // Brake safety is the primary hard gate for heavy duty fleets
+    match brakes {
+        -1 => { return conflict(); } // Brakes below safe limit, ground vehicle
+         0 => { 
+             // Brakes nearing limit, check other components
+             let vehicle_health: trit = consensus(oil, tires);
+             match vehicle_health {
+                 -1 => { return conflict(); } // Multiple systems failing
+                  0 => { return hold();     } // All nearing limit, standby only
+                  1 => { return hold();     } // Only brakes nearing limit, standby
+             }
+         }
+         1 => {
+             // Brakes are fresh, now check general health
+             let health: trit = consensus(oil, tires);
+             return health;
+         }
+    }
+}
+
+// ── Concrete scenario: regional delivery truck morning inspection ──
+let last_service: trit = truth();  // Synthetic oil changed 1,000 miles ago
+let pad_sensors: trit = hold();    // Left rear sensor indicates 20% remaining
+let tpms_signal: trit = truth();   // All tires balanced at 105 PSI
+
+let result: trit = fleet_dispatch_logic(last_service, pad_sensors, tpms_signal);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // MAINTENANCE: Pull from rotation immediately
+     0 => { return hold();     } // STANDBY: Short-haul city routes only
+     1 => { return truth();    } // ACTIVE: Dispatched for long-haul interstate
+}

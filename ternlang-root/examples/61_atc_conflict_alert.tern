@@ -1,0 +1,50 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 61_atc_conflict_alert.tern — Air Traffic Control conflict alert
+//
+// Binary collision warnings (Safe/Conflict) often trigger nuisance alerts that
+// pilots ignore, or fail to warn of rapid closure rates. Ternary logic 
+// distinguishes between a 'clear' flight path, an 'alert' (Hold) for
+// crossing trajectories, and a 'warning' for imminent loss of separation.
+//   +1: Clear
+//    0: Alert (Hold)
+//   -1: Warning (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn vertical_separation(feet: trit) -> trit { return feet; }
+fn lateral_distance(miles: trit) -> trit { return miles; }
+fn closure_rate(velocity: trit) -> trit { return velocity; }
+
+fn atc_alert_logic(alt: trit, lat: trit, vel: trit) -> trit {
+    // Closure rate is a hard gate — high velocity closure is always a warning
+    match vel {
+        -1 => { return conflict(); } // Fast closure detected
+         0 => { 
+             // Moderate closure, check separation
+             let separation: trit = consensus(alt, lat);
+             match separation {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return hold();     } // Closure exists, so alert even if sep is good
+             }
+         }
+         1 => {
+             // Low closure, separation governs
+             let state: trit = consensus(alt, lat);
+             return state;
+         }
+    }
+}
+
+// ── Concrete scenario: two aircraft at FL350 in converging path ──
+let alt_sep: trit = truth();   // 1000ft vertical separation maintained
+let lat_sep: trit = hold();    // Lateral distance decreasing below 5nm
+let approach: trit = truth();  // Low closure rate (overtaking slowly)
+
+let result: trit = atc_alert_logic(alt_sep, lat_sep, approach);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // WARNING: Immediate evasive action required (TCAS)
+     0 => { return hold();     } // ALERT: Advise aircraft to change heading
+     1 => { return truth();    } // CLEAR: Flight paths are safe
+}

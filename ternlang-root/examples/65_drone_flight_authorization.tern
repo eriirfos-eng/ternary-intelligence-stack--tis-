@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 65_drone_flight_authorization.tern — Drone flight authorization
+//
+// Binary drone authorization (Go/No-go) often restricts operation in safe areas
+// due to coarse map data or allows flight in dangerous gusts. Ternary logic 
+// distinguishes between an 'approved' flight, a 'hold' for localized 
+// weather/congestion, and a 'denied' status for restricted airspace.
+//   +1: Approved
+//    0: Hold (Hold)
+//   -1: Denied (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn airspace_status(zone: trit) -> trit { return zone; }
+fn wind_velocity(gusts: trit) -> trit { return gusts; }
+fn remote_id_signal(health: trit) -> trit { return health; }
+
+fn drone_auth_logic(airspace: trit, wind: trit, id: trit) -> trit {
+    // Airspace restriction is a non-negotiable hard gate
+    match airspace {
+        -1 => { return conflict(); } // Prohibited area (e.g., airport radius)
+         0 => { 
+             // Temporary flight restriction or caution area
+             return hold();
+         }
+         1 => {
+             // Airspace is open, check local conditions
+             let system_safety: trit = consensus(wind, id);
+             return system_safety;
+         }
+    }
+}
+
+// ── Concrete scenario: autonomous pharmacy delivery drone launching ──
+let flight_zone: trit = truth();   // Airspace is Class G (Uncontrolled)
+let ground_winds: trit = truth();  // Gusts at 5mph, well within limits
+let pki_id: trit = hold();         // Remote ID signal is intermittent
+
+let result: trit = drone_auth_logic(flight_zone, ground_winds, pki_id);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // DENIED: Ground all flights
+     0 => { return hold();     } // HOLD: Wait for stable telemetry or weather clearing
+     1 => { return truth();    } // APPROVED: Permission to launch
+}

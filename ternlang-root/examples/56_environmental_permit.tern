@@ -1,0 +1,50 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 56_environmental_permit.tern — Environmental permit approval
+//
+// Binary permit systems often force a binary choice (Approve/Reject), leading
+// to either ecosystem damage or stalled infrastructure. Ternary logic 
+// introduces 'monitor' (Hold) to mandate real-time sensing or mitigation 
+// before a permanent decision is reached.
+//   +1: Approve
+//    0: Monitor (Hold)
+//   -1: Reject (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn water_quality(sensors: trit) -> trit { return sensors; }
+fn air_emissions(levels: trit) -> trit { return levels; }
+fn soil_integrity(erosion: trit) -> trit { return erosion; }
+
+fn permit_evaluator(water: trit, air: trit, soil: trit) -> trit {
+    // Soil integrity is a hard gate — cannot build on unstable ground
+    match soil {
+        -1 => { return conflict(); }
+         0 => { 
+             // Uncertain soil stability requires monitoring regardless of others
+             let pollution: trit = consensus(water, air);
+             match pollution {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return hold();     }
+             }
+         }
+         1 => {
+             // Soil is fine, check environmental impacts
+             let impact: trit = consensus(water, air);
+             return impact;
+         }
+    }
+}
+
+// ── Concrete scenario: factory expansion near protected creek ──
+let site_water: trit = hold();    // Upstream sensors show periodic spikes
+let site_air: trit = truth();     // Scrubbers exceed local standards
+let site_soil: trit = truth();    // Foundation reports are solid
+
+let result: trit = permit_evaluator(site_water, site_air, site_soil);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // REJECT: Permit denied due to environmental risk
+     0 => { return hold();     } // MONITOR: Approved contingent on weekly water testing
+     1 => { return truth();    } // APPROVE: Permit granted immediately
+}

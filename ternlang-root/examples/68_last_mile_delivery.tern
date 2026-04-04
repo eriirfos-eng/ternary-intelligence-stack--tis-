@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 68_last_mile_delivery.tern — Last-mile delivery feasibility
+//
+// Binary last-mile delivery feasibility systems often fail to account for ambiguity, 
+// forcing a binary choice that creates liability or safety gaps. 
+// Ternary logic introduces a 'reroute' state (Hold) to handle uncertainty,
+// ensuring a measured response before escalating or clearing.
+//   +1: Feasible
+//    0: Reroute (Hold)
+//   -1: Impossible (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn road_access(input: trit) -> trit { return input; }
+fn parking_space(input: trit) -> trit { return input; }
+fn security_level(input: trit) -> trit { return input; }
+
+fn delivery_plan(road_access_val: trit, parking_space_val: trit, security_level_val: trit) -> trit {
+    // Hard gate: road access
+    match road_access_val {
+        -1 => { return conflict(); }
+         0 => { 
+             let consensus_all: trit = consensus(parking_space_val, consensus(security_level_val, 0));
+             return consensus_all;
+         }
+         1 => {
+             // Cascade check
+             let state: trit = consensus(parking_space_val, security_level_val);
+             return state;
+         }
+    }
+}
+
+// ── Concrete scenario: urban parcel delivery in a restricted zone ──
+let road_access_input: trit = truth();
+let parking_space_input: trit = hold();
+let security_level_input: trit = truth();
+
+let result: trit = delivery_plan(road_access_input, parking_space_input, security_level_input);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // IMPOSSIBLE
+     0 => { return hold();     } // REROUTE
+     1 => { return truth();    } // FEASIBLE
+}

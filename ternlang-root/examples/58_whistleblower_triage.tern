@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 58_whistleblower_triage.tern — Whistleblower report triage
+//
+// Binary triage (Act/Ignore) often leads to leaks when valid but messy reports
+// are ignored, or wasted resources on junk tips. Ternary logic 
+// allows a 'review' (Hold) state where additional background checks are 
+// performed before opening a full investigation.
+//   +1: Investigate
+//    0: Review (Hold)
+//   -1: Discard (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn evidence_quality(data: trit) -> trit { return data; }
+fn legal_jurisdiction(location: trit) -> trit { return location; }
+fn source_veracity(credibility: trit) -> trit { return credibility; }
+
+fn triage_logic(evidence: trit, law: trit, source: trit) -> trit {
+    // Jurisdiction is a hard gate — if it's not our department, we can't act
+    match law {
+        -1 => { return conflict(); } // Outside legal scope
+         0 => { 
+             // Ambiguous jurisdiction requires legal review first
+             return hold();
+         }
+         1 => {
+             // Legal to proceed, check internal credibility
+             let report_merit: trit = consensus(evidence, source);
+             return report_merit;
+         }
+    }
+}
+
+// ── Concrete scenario: report of financial misconduct in overseas branch ──
+let files_received: trit = hold();  // Encrypted PDFs, haven't verified contents yet
+let laws_applicable: trit = truth(); // Subject to Sarbanes-Oxley
+let whistleblower: trit = truth();   // Identity confirmed as internal auditor
+
+let result: trit = triage_logic(files_received, laws_applicable, whistleblower);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // DISCARD: False report or irrelevant case
+     0 => { return hold();     } // REVIEW: Open background file, wait for decryption
+     1 => { return truth();    } // INVESTIGATE: Assign agents and issue subpoenas
+}

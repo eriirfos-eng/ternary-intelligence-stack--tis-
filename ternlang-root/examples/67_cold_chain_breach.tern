@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 67_cold_chain_breach.tern — Cold chain integrity monitor
+//
+// Binary temperature loggers (Safe/Breached) often trigger false alarms for
+// momentary sensor spikes or fail to warn of gradual warming. Ternary logic 
+// distinguishes between an 'intact' shipment, an 'alert' (Hold) for
+// near-threshold fluctuations, and a 'compromised' status for loss of cargo.
+//   +1: Intact
+//    0: Alert (Hold)
+//   -1: Compromised (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn temp_sensor(reading: trit) -> trit { return reading; }
+fn humidity_sensor(reading: trit) -> trit { return reading; }
+fn seal_integrity(sensor: trit) -> trit { return sensor; }
+
+fn cold_chain_logic(temp: trit, hum: trit, seal: trit) -> trit {
+    // Temperature is the critical hard gate for perishables
+    match temp {
+        -1 => { return conflict(); } // Absolute temperature breach
+         0 => { 
+             // Near limit, must escalate regardless of other data
+             return hold();
+         }
+         1 => {
+             // Temperature is stable, check seal and environment
+             let enclosure: trit = consensus(hum, seal);
+             return enclosure;
+         }
+    }
+}
+
+// ── Concrete scenario: mRNA vaccine shipment at -70 degrees Celsius ──
+let dry_ice_temp: trit = truth();  // Stable at -78C
+let internal_rh: trit = truth();   // Humidity is nominal (sublimation check)
+let box_seal: trit = hold();       // Gasket sensor reported a micro-vibration
+
+let result: trit = cold_chain_logic(dry_ice_temp, internal_rh, box_seal);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // COMPROMISED: Dispose of shipment
+     0 => { return hold();     } // ALERT: Verify seal before moving to freezer
+     1 => { return truth();    } // INTACT: Shipment accepted at destination
+}

@@ -1,0 +1,45 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 60_regulatory_filing.tern — Regulatory filing validation
+//
+// Binary filing systems (Accept/Reject) create friction and late fees for
+// minor typos. Ternary logic allows an 'incomplete' (Hold) status, letting 
+// the filer correct non-critical data while locking in the submission time 
+// for compliance purposes.
+//   +1: Complete
+//    0: Incomplete (Hold)
+//   -1: Invalid (Conflict)
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn signer_identity(verified: trit) -> trit { return verified; }
+fn mandatory_fields(filled: trit) -> trit { return filled; }
+fn tax_id_lookup(active: trit) -> trit { return active; }
+
+fn filing_validator(signer: trit, fields: trit, tax_id: trit) -> trit {
+    // Identity is a hard gate — you cannot file for someone else
+    match signer {
+        -1 => { return conflict(); } // Impersonation or expired key
+         0 => { 
+             // Unverified ID requires manual document upload
+             return hold();
+         }
+         1 => {
+             // ID is verified, check form data
+             let data_quality: trit = consensus(fields, tax_id);
+             return data_quality;
+         }
+    }
+}
+
+// ── Concrete scenario: quarterly financial disclosure submission ──
+let signature: trit = truth();     // PKI signature is valid
+let main_fields: trit = hold();    // Exhibit B is missing two rows
+let tax_status: trit = truth();    // EIN matches IRS database
+
+let result: trit = filing_validator(signature, main_fields, tax_status);
+
+// Final decision mapping
+match result {
+    -1 => { return conflict(); } // INVALID: Filing rejected due to legal errors
+     0 => { return hold();     } // INCOMPLETE: Submission time recorded, pending correction
+     1 => { return truth();    } // COMPLETE: Filing accepted and published
+}
