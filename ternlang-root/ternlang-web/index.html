@@ -173,7 +173,7 @@
   </nav>
 
   <!-- Hero Section -->
-  <main class="relative z-10 pt-32 pb-20 px-6 min-h-screen flex flex-col justify-center items-center text-center">
+  <main class="relative z-10 pt-24 pb-12 md:pt-32 md:pb-20 px-6 md:min-h-screen flex flex-col justify-center items-center text-center">
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-t_teal/10 rounded-full blur-[100px] -z-10 mix-blend-screen animate-pulse-slow"></div>
     <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-t_blue/10 rounded-full blur-[100px] -z-10 mix-blend-screen animate-pulse-slow" style="animation-delay: 2s;"></div>
 
@@ -186,8 +186,8 @@
         The world operates in three states. Your AI agents should too. Engineered for the 1 out of 10 uncertainty metric inherent in all dynamic causal systems.
       </p>
 
-      <!-- Advanced Zone Diagram -->
-      <div class="glass-card p-6 md:p-8 rounded-xl font-mono text-xs md:text-sm text-left mx-auto max-w-3xl mb-12 overflow-x-auto border border-t_border shadow-2xl relative group">
+      <!-- Advanced Zone Diagram — hidden on mobile -->
+      <div class="hidden md:block glass-card p-6 md:p-8 rounded-xl font-mono text-xs md:text-sm text-left mx-auto max-w-3xl mb-12 overflow-x-auto border border-t_border shadow-2xl relative group">
         <div class="absolute inset-0 bg-gradient-to-r from-t_red/5 via-t_teal/5 to-t_blue/5 opacity-50 rounded-xl pointer-events-none"></div>
         <div class="flex justify-between text-t_muted mb-2">
           <span class="text-t_red font-bold transition-all group-hover:scale-105">reject (-1)</span>
@@ -234,6 +234,37 @@
     </div>
   </div>
 
+  <!-- Mobile Section Nav -->
+  <div class="md:hidden relative z-10 px-4 py-6 bg-t_bg2 border-b border-t_border">
+    <p class="font-mono text-t_muted text-[10px] uppercase tracking-widest text-center mb-4">Jump to</p>
+    <div class="grid grid-cols-3 gap-2">
+      <a href="#why"          class="flex flex-col items-center gap-1 p-3 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/40 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">−1·0·+1</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Why Ternary</span>
+      </a>
+      <a href="#architecture" class="flex flex-col items-center gap-1 p-3 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/40 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">VM</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Architecture</span>
+      </a>
+      <a href="#api"          class="flex flex-col items-center gap-1 p-3 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/40 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">API</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Integration</span>
+      </a>
+      <a href="#examples"    class="flex flex-col items-center gap-1 p-3 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/40 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">265+</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Examples</span>
+      </a>
+      <a href="#benchmark"   class="flex flex-col items-center gap-1 p-3 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/40 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">122×</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Benchmarks</span>
+      </a>
+      <a href="#licensing"   class="flex flex-col items-center gap-1 p-3 bg-t_teal/10 border border-t_teal/40 rounded-lg hover:bg-t_teal/20 transition-colors">
+        <span class="text-t_teal font-mono font-bold text-sm">€24.99</span>
+        <span class="text-t_muted text-[10px] font-mono text-center">Get Access</span>
+      </a>
+    </div>
+  </div>
+
   <!-- Plain Language Section -->
   <section id="why" class="relative z-10 py-24 px-6 bg-t_bg border-b border-t_border">
     <div class="max-w-5xl mx-auto">
@@ -252,12 +283,12 @@
         <div class="glass-card rounded-xl p-8 border border-t_border">
           <div class="font-mono text-xs text-t_muted uppercase tracking-widest mb-4">Medicine</div>
           <h3 class="text-lg font-bold text-white mb-3">Clinical hold is not a refusal. It is a protocol state.</h3>
-          <p class="text-t_muted text-sm leading-relaxed">When a physician orders additional workup before reaching a diagnosis, that is not uncertainty — it is the correct decision given the data available. Binary AI systems are structurally unable to represent this: they must output a verdict. <strong class="text-t_teal">Trit = 0 gives the machine a formal right to request more evidence</strong> before committing to a recommendation.</p>
+          <p class="text-t_muted text-sm leading-relaxed">When a physician orders additional workup before reaching a diagnosis, that is not uncertainty — it is the correct decision given the data available. Binary AI systems are structurally unable to represent this: they must output a verdict. <strong class="text-white/90 font-semibold">Trit = 0 gives the machine a formal right to request more evidence</strong> before committing to a recommendation.</p>
         </div>
         <div class="glass-card rounded-xl p-8 border border-t_border">
           <div class="font-mono text-xs text-t_muted uppercase tracking-widest mb-4">Law</div>
           <h3 class="text-lg font-bold text-white mb-3">"Insufficient evidence" is a verdict, not an abstention.</h3>
-          <p class="text-t_muted text-sm leading-relaxed">A court that dismisses for lack of evidence has made a precise determination — not a failure to decide. This distinction exists in law, in medicine, and in engineering. It does not exist in binary logic. Ternlang gives it a <strong class="text-t_teal">computational name: trit = 0</strong>, a formal type, and runtime semantics that propagate it correctly through every operation.</p>
+          <p class="text-t_muted text-sm leading-relaxed">A court that dismisses for lack of evidence has made a precise determination — not a failure to decide. This distinction exists in law, in medicine, and in engineering. It does not exist in binary logic. Ternlang gives it a <strong class="text-white/90 font-semibold">computational name: trit = 0</strong>, a formal type, and runtime semantics that propagate it correctly through every operation.</p>
         </div>
       </div>
 
@@ -273,7 +304,7 @@
               That's not intelligence — it's a coin flip dressed up as confidence.
             </p>
             <p class="text-white leading-relaxed">
-              Ternlang gives AI agents a <strong class="text-t_teal">mathematical right to say "not yet."</strong> Not as a refusal. As a routing instruction: <em>I need more data before I can commit. Here's what I need. Give me that and I'll decide.</em>
+              Ternlang gives AI agents a <strong class="text-white/90 font-semibold">mathematical right to say "not yet."</strong> Not as a refusal. As a routing instruction: <em>I need more data before I can commit. Here's what I need. Give me that and I'll decide.</em>
             </p>
           </div>
           <div class="space-y-4 font-mono text-sm">
