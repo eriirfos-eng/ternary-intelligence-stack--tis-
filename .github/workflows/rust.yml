@@ -36,11 +36,11 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('ternlang-root/Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-
 
-    - name: Build core crates
-      run: cargo build -p ternlang-core -p ternlang-ml -p ternlang-moe --verbose
+    - name: Build all crates
+      run: cargo build --workspace --verbose
 
     - name: Run tests
-      run: cargo test -p ternlang-core -p ternlang-ml -p ternlang-moe --verbose
+      run: cargo test --workspace --verbose
 
   deploy:
     runs-on: ubuntu-latest

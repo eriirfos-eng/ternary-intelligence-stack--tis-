@@ -4,7 +4,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/ternlang-core.svg)](https://crates.io/crates/ternlang-core)
 [![license](https://img.shields.io/badge/license-LGPL--3.0%20%2F%20BSL--1.1-blue)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-146%2B%20passing-brightgreen)](#architecture)
+[![tests](https://img.shields.io/badge/tests-177%2B%20passing-brightgreen)](#architecture)
 [![API](https://img.shields.io/badge/API-live-brightgreen)](https://ternlang-api.fly.dev/health)
 [![MCP](https://img.shields.io/badge/MCP-10%20tools-purple)](https://ternlang.com/mcp)
 
@@ -77,13 +77,29 @@ match conscious {
 
 **Built-in functions:** `consensus(a, b)` · `invert(x)` · `truth()` · `hold()` · `conflict()`
 
-**Quick start:**
+**Quick start — install the CLI:**
+
+```bash
+cargo install ternlang-cli
+```
+
+Then run any `.tern` file directly from your terminal:
+
+```bash
+ternlang run my_program.tern
+ternlang run examples/03_rocket_launch.tern
+ternlang build my_program.tern --output my_program.bet
+ternlang repl
+ternlang fmt my_program.tern --write
+```
+
+**Or build from source:**
 
 ```bash
 git clone https://github.com/eriirfos-eng/ternary-intelligence-stack
 cd ternary-intelligence-stack/ternlang-root
 cargo build --release
-cargo run --bin ternlang -- run examples/03_rocket_launch.tern
+./target/release/ternlang run examples/03_rocket_launch.tern
 ```
 
 ---

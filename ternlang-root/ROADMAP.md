@@ -1,7 +1,7 @@
 # Ternlang Roadmap: Bridging the Ternary Software Deficit
 ### Project: Ternary Intelligence Stack (TIS) | RFI-IRFOS
-**Current Version:** v0.1 (Foundational)
-**Last Updated:** 2026-04-03
+\*\*Current Version:\*\* v0.1.2
+**Last Updated:** 2026-04-04
 **Repo:** https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-
 **Local:** ~/Desktop/Ternary Intelligence Stack (TIS)/
 
@@ -45,16 +45,16 @@ The academic whitepaper (`whitepaper/ternlang-whitepaper.tex` + `whitepaper/tern
 ## ✅ Phase 2: Standard Library & CLI Integration — COMPLETE
 - [x] **CLI Driver**: `ternlang run <file>` and `ternlang build <file>` (clap-based)
 - [x] **Built-in Functions**: `consensus(a,b)`, `invert(x)`, `truth()`, `hold()`, `conflict()`
-- [ ] **Standard Library (`std::trit`)**: Initial module structure — NOT STARTED
+- [x] **Standard Library (`std::trit`)**: COMPLETE — ModuleResolver with stdlib built-in (compile-time embedded) + filesystem-relative user modules
 
 ---
 
-## 🔴 Known Bugs (Fix Before Phase 3 Progress)
+## ✅ Known Bugs — ALL FIXED
 - [x] **`DimSeparator` vs `Ident` collision**: FIXED — removed dedicated token, `x` now correctly tokenizes as `Ident` everywhere
-- [ ] **No function call dispatch**: Functions emit inline — no `TCALL`/`TRET` opcodes, no call stack
-- [ ] **`@sparseskip` is a stub**: Parsed correctly but codegen ignores it (TODO comment in `betbc.rs`)
-- [ ] **Semantic checker mocks all `Call` return types as `Trit`** — needs real function table lookup
-- [ ] **Match exhaustiveness not enforced** in semantic checker — compiler should reject non-exhaustive 3-way match
+- [x] **No function call dispatch**: FIXED — TCALL/TRET fully implemented with call stack, emit_entry_call("main") in test harness
+- [x] **`@sparseskip` is a stub**: FIXED — codegen emits TSPARSE_MATMUL correctly via BytecodeEmitter
+- [x] **Semantic checker mocks all `Call` return types as `Trit`**: FIXED — real function table lookup implemented in SemanticAnalyzer
+- [x] **Match exhaustiveness not enforced**: FIXED — parser rejects non-exhaustive match at compile time [PARSE-004]
 
 ---
 
