@@ -4,7 +4,21 @@
       "command": "/home/eri-irfos/Desktop/Ternary Intelligence Stack (TIS)/ternlang-root/target/release/ternlang-mcp",
       "args": [],
       "env": {},
-      "description": "Ternary Intelligence Stack — turns binary AI agents into ternary decision engines. Tools: trit_decide, trit_consensus, trit_eval, ternlang_run, quantize_weights, sparse_benchmark"
+      "description": "Ternary Intelligence Stack — turns binary AI agents into ternary decision engines.",
+      "tools": [
+        "trit_decide",
+        "trit_consensus",
+        "trit_eval",
+        "ternlang_run",
+        "quantize_weights",
+        "sparse_benchmark",
+        "moe_orchestrate",
+        "moe_deliberate",
+        "trit_action_gate",
+        "trit_enlighten"
+      ],
+      "homepage": "https://ternlang.com",
+      "repository": "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
     }
   }
 }

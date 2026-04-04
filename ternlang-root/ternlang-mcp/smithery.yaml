@@ -1,0 +1,224 @@
+# Smithery MCP Registry — ternlang-mcp
+# https://smithery.ai
+#
+# Submit via: https://smithery.ai/new (paste this file)
+# Or CLI:     npx @smithery/cli publish
+
+name: ternlang
+displayName: "Ternlang — Ternary Intelligence Stack"
+description: |
+  Turns any binary AI agent into a ternary decision engine.
+
+  Every AI system today is forced to answer yes or no — even when the evidence
+  is contradictory, incomplete, or genuinely uncertain. Ternlang adds the third
+  state: hold (trit = 0). Not indecision — a first-class routing instruction
+  that tells the agent to gather more data before committing.
+
+  Tools include:
+  - trit_decide: float evidence → reject / hold / affirm + confidence
+  - trit_consensus: balanced ternary consensus(a, b)
+  - trit_eval: evaluate ternlang expressions on the live BET VM
+  - ternlang_run: compile + run full .tern programs
+  - quantize_weights: f32 → ternary via BitNet thresholding
+  - sparse_benchmark: sparse vs dense matmul statistics
+  - moe_orchestrate: full MoE-13 orchestration pass (13 specialist experts)
+  - moe_deliberate: EMA-based iterative deliberation engine
+  - trit_action_gate: multi-dimensional hard-block safety veto
+  - trit_enlighten: ternary wisdom (easter egg)
+
+version: "0.1.0"
+license: "BSL-1.1"
+homepage: "https://ternlang.com"
+repository: "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
+author:
+  name: "RFI-IRFOS"
+  email: "rfi.irfos@gmail.com"
+
+# How to run the server
+runtime: binary
+config:
+  command: "ternlang-mcp"
+  args: []
+  # Binary available via: cargo install ternlang-mcp
+  # Or build from source: cargo build --release -p ternlang-mcp
+
+# MCP protocol
+protocol: "2024-11-05"
+transport: stdio
+
+tools:
+  - name: trit_decide
+    description: >
+      Convert float evidence into a ternary decision (-1/0/+1) with confidence
+      score and interpretation. The core primitive: maps uncertain signals to
+      reject / hold / affirm.
+    inputSchema:
+      type: object
+      required: [evidence]
+      properties:
+        evidence:
+          type: array
+          items: { type: number }
+          description: "Evidence values ∈ [-1.0, 1.0]. Negative = reject signal, positive = affirm signal, near 0 = uncertain."
+        threshold:
+          type: number
+          description: "Decision boundary (default 0.15). Values |x| < threshold → hold."
+
+  - name: trit_consensus
+    description: >
+      Balanced ternary consensus of two trits: +1 if both affirm, -1 if both
+      reject, 0 otherwise. The fundamental binary operation of ternary logic.
+    inputSchema:
+      type: object
+      required: [a, b]
+      properties:
+        a: { type: number, description: "First trit: -1, 0, or +1" }
+        b: { type: number, description: "Second trit: -1, 0, or +1" }
+
+  - name: trit_eval
+    description: >
+      Evaluate a ternlang expression on the live BET (Balanced Ternary
+      Execution) VM. Supports consensus(), invert(), truth(), hold(),
+      conflict(), and let bindings.
+    inputSchema:
+      type: object
+      required: [expression]
+      properties:
+        expression:
+          type: string
+          description: "A ternlang expression, e.g. 'consensus(truth(), conflict())'"
+
+  - name: ternlang_run
+    description: >
+      Compile and run a complete .tern program on the BET VM. Returns the
+      final trit value from the program's top-level match expression.
+    inputSchema:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: "Complete .tern source code to compile and execute."
+
+  - name: quantize_weights
+    description: >
+      Quantize f32 neural network weights to ternary {-1, 0, +1} using
+      BitNet-style thresholding (τ = 0.5 × mean(|w|)). Returns quantized
+      weights and sparsity statistics.
+    inputSchema:
+      type: object
+      required: [weights]
+      properties:
+        weights:
+          type: array
+          items: { type: number }
+          description: "f32 weight values to quantize."
+        threshold:
+          type: number
+          description: "Manual threshold override. If omitted, uses BitNet auto-threshold."
+
+  - name: sparse_benchmark
+    description: >
+      Run sparse vs dense ternary matrix multiplication benchmark.
+      Returns speedup factor, skip rate, and timing for the CSC kernel.
+    inputSchema:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: "Matrix dimension N for N×N benchmark (default 128)."
+        sparsity:
+          type: number
+          description: "Target weight sparsity ∈ [0.0, 1.0] (default 0.5)."
+
+  - name: moe_orchestrate
+    description: >
+      Run a full MoE-13 (Mixture-of-Experts) ternary orchestration pass.
+      Routes the query to the optimal pair of 13 specialist experts using
+      dual-key synergistic routing, synthesises an emergent triad field
+      (1+1=3), enforces a hard safety veto, and returns the final ternary
+      verdict with confidence, temperature, and routing metadata.
+    inputSchema:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          description: "The query or decision to orchestrate."
+        evidence:
+          type: array
+          items: { type: number }
+          description: >
+            Optional 6D evidence vector [syntax, world_knowledge, reasoning,
+            tool_use, persona, safety] ∈ [-1.0, 1.0] each. Defaults to [0.5; 6].
+        confidence_threshold:
+          type: number
+          description: "Minimum confidence to affirm/reject (default 0.6). Below → hold."
+
+  - name: moe_deliberate
+    description: >
+      Iterative EMA deliberation engine. Feeds evidence round by round and
+      tracks convergence toward a confidence target. Returns the final scalar
+      trit, convergence flag, and per-round trace.
+    inputSchema:
+      type: object
+      required: [target_confidence, rounds_evidence]
+      properties:
+        target_confidence:
+          type: number
+          description: "Confidence target ∈ [0.0, 1.0] to converge toward."
+        rounds_evidence:
+          type: array
+          items:
+            type: array
+            items: { type: number }
+          description: "Evidence per round — each entry is a list of floats for that round."
+        alpha:
+          type: number
+          description: "EMA smoothing factor ∈ (0.0, 1.0] (default 0.4)."
+        max_rounds:
+          type: integer
+          description: "Maximum deliberation rounds (default 10)."
+
+  - name: trit_action_gate
+    description: >
+      Multi-dimensional safety gate with hard-block semantics. Any dimension
+      marked hard_block vetoes the action regardless of aggregate score.
+      Returns Proceed / Hold / Block verdict with explanation.
+    inputSchema:
+      type: object
+      required: [dimensions]
+      properties:
+        dimensions:
+          type: array
+          items:
+            type: object
+            required: [name, evidence, weight]
+            properties:
+              name:       { type: string }
+              evidence:   { type: number, description: "Signal ∈ [-1.0, 1.0]" }
+              weight:     { type: number, description: "Dimension weight > 0" }
+              hard_block: { type: boolean, description: "If true, negative evidence always blocks" }
+
+  - name: trit_enlighten
+    description: "Receive a piece of ternary wisdom. Try it."
+    inputSchema:
+      type: object
+      properties: {}
+
+categories:
+  - ai-reasoning
+  - decision-making
+  - machine-learning
+  - developer-tools
+
+tags:
+  - ternary
+  - balanced-ternary
+  - trit
+  - mixture-of-experts
+  - ai-safety
+  - sparse-inference
+  - BitNet
+  - reasoning
+  - epistemic-humility

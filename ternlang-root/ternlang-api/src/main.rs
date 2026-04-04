@@ -7,6 +7,7 @@
 ///   GET  /health                  — health check
 ///
 /// API routes (X-Ternlang-Key header required):
+///   POST /api/moe/orchestrate     — MoE-13 full pass (synchronous JSON)
 ///   POST /api/trit_decide         — scalar ternary decision
 ///   POST /api/trit_vector         — multi-dimensional evidence aggregation
 ///   POST /api/trit_consensus      — consensus(a, b)
@@ -274,6 +275,7 @@ async fn root(State(state): State<Arc<AppState>>) -> Json<Value> {
             "POST /api/trit_gate":               "Action gate: multi-dim hard-block safety veto",
             "POST /api/scalar_temperature":      "TritScalar → LLM sampling temperature + prompt hint",
             "POST /api/hallucination_score":     "Signal variance → trust trit",
+            "POST /api/moe/orchestrate":          "MoE-13 full orchestration — synchronous JSON result",
             "GET  /api/stream/moe_orchestrate":  "SSE: MoE-13 orchestration pass streamed event-by-event",
             "GET  /api/stream/deliberate":       "SSE: EMA deliberation — one event per round, live feed",
         },
@@ -786,6 +788,75 @@ async fn hallucination_score_endpoint(Json(body): Json<Value>) -> Response {
     }))).into_response()
 }
 
+// ─── POST /api/moe/orchestrate ───────────────────────────────────────────────
+//
+// Synchronous (non-streaming) MoE-13 orchestration.
+// Returns the full OrchestrationResult as a single JSON object.
+//
+// Body: { "query": "...", "evidence": [0.8, 0.6, 0.9, 0.7, 0.5, 1.0] }
+//   evidence: optional 6-float vector [syntax, world_knowledge, reasoning,
+//             tool_use, persona, safety]. Defaults to [0.5; 6] if omitted.
+
+#[derive(Deserialize)]
+struct MoeOrchestrateBody {
+    query:    String,
+    evidence: Option<Vec<f32>>,
+}
+
+async fn moe_orchestrate(
+    State(_state): State<Arc<AppState>>,
+    Json(body): Json<MoeOrchestrateBody>,
+) -> Response {
+    let evidence = body.evidence.unwrap_or_else(|| vec![0.5f32; 6]);
+
+    // Clamp / pad to exactly 6 dimensions
+    let mut ev6 = [0.5f32; 6];
+    for (i, v) in evidence.iter().take(6).enumerate() {
+        ev6[i] = v.clamp(-1.0, 1.0);
+    }
+
+    let mut orch  = TernMoeOrchestrator::with_standard_experts();
+    let result    = orch.orchestrate(&body.query, &ev6);
+
+    let trit_label = match result.trit {
+         1  => "affirm",
+        -1  => "reject",
+        _   => "hold",
+    };
+
+    let pair_json = result.pair.as_ref().map(|p| json!({
+        "expert_a":  p.expert_a,
+        "expert_b":  p.expert_b,
+        "relevance": p.relevance,
+        "synergy":   p.synergy,
+        "score":     p.combined,
+    }));
+
+    let verdicts_json: Vec<_> = result.verdicts.iter().map(|v| json!({
+        "expert_id":   v.expert_id,
+        "expert_name": v.expert_name,
+        "trit":        v.trit,
+        "confidence":  v.confidence,
+        "reasoning":   v.reasoning,
+    })).collect();
+
+    Json(json!({
+        "trit":          result.trit,
+        "label":         trit_label,
+        "confidence":    result.confidence,
+        "held":          result.held,
+        "safety_vetoed": result.safety_vetoed,
+        "temperature":   result.temperature,
+        "prompt_hint":   result.prompt_hint,
+        "pair":          pair_json,
+        "verdicts":      verdicts_json,
+        "triad_field": {
+            "synergy_weight": result.triad_field.synergy_weight,
+            "is_amplifying":  result.triad_field.is_amplifying(),
+        },
+    })).into_response()
+}
+
 // ─── GET /api/stream/moe_orchestrate ─────────────────────────────────────────
 //
 // SSE stream of a full MoE-13 orchestration pass, broken into discrete events:
@@ -1114,6 +1185,8 @@ async fn main() {
         .route("/api/trit_gate",             post(trit_gate))
         .route("/api/scalar_temperature",    post(scalar_temperature_endpoint))
         .route("/api/hallucination_score",   post(hallucination_score_endpoint))
+        // Phase 9: MoE-13 orchestrator
+        .route("/api/moe/orchestrate",        post(moe_orchestrate))
         // Phase 9: SSE streaming endpoints
         .route("/api/stream/moe_orchestrate", get(stream_moe_orchestrate))
         .route("/api/stream/deliberate",      get(stream_deliberate))
