@@ -160,7 +160,7 @@
         <a href="#examples" class="text-t_muted hover:text-t_teal transition-colors">Examples</a>
         <a href="#benchmark" class="text-t_muted hover:text-t_teal transition-colors">Benchmarks</a>
         <a href="#licensing" class="text-t_muted hover:text-t_teal transition-colors">Licensing</a>
-        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert" target="_blank" rel="noopener noreferrer" class="text-t_blue font-bold hover:text-white transition-colors">Project Albert</a>
+        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert-agent" target="_blank" rel="noopener noreferrer" class="text-t_blue font-bold hover:text-white transition-colors">Project Albert</a>
       </div>
 
       <a href="#licensing" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-t_teal/10 text-t_teal border border-t_teal/30 rounded font-mono text-sm hover:bg-t_teal hover:text-black transition-all">
@@ -226,8 +226,8 @@
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">51</span><span class="text-xs text-t_muted uppercase tracking-widest">BET VM opcodes</span></div>
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">122x</span><span class="text-xs text-t_muted uppercase tracking-widest">Sparse speedup</span></div>
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">146+</span><span class="text-xs text-t_muted uppercase tracking-widest">Tests passing</span></div>
-      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">13</span><span class="text-xs text-t_muted uppercase tracking-widest">MCP + API tools</span></div>
-      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">16</span><span class="text-xs text-t_muted uppercase tracking-widest">.tern examples</span></div>
+      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">10</span><span class="text-xs text-t_muted uppercase tracking-widest">MCP tools</span></div>
+      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">250+</span><span class="text-xs text-t_muted uppercase tracking-widest">.tern programs</span></div>
     </div>
   </div>
 
@@ -242,19 +242,19 @@
 
       <div class="grid md:grid-cols-3 gap-8 mb-16 reveal">
         <div class="glass-card rounded-xl p-8 border border-t_border">
-          <div class="text-4xl mb-4">🚦</div>
-          <h3 class="text-lg font-bold text-white mb-3">Traffic lights have three states.</h3>
-          <p class="text-t_muted text-sm leading-relaxed">Red. Green. <strong class="text-t_teal">Yellow.</strong> Yellow doesn't mean "probably stop" or "probably go." It means <em>slow down — the situation is changing and you need more information</em>. Every software system that's ever crashed because "something was mid-update" was missing a yellow light.</p>
+          <div class="font-mono text-xs text-t_muted uppercase tracking-widest mb-4">Engineering</div>
+          <h3 class="text-lg font-bold text-white mb-3">A traffic light with only two states causes accidents.</h3>
+          <p class="text-t_muted text-sm leading-relaxed">Red and green are not sufficient. Yellow encodes a third meaning: <em>the intersection state is changing — do not commit to either decision yet</em>. Every distributed system that has ever failed during a state transition was, in some sense, missing a yellow light. Ternlang makes yellow a first-class type.</p>
         </div>
         <div class="glass-card rounded-xl p-8 border border-t_border">
-          <div class="text-4xl mb-4">🩺</div>
-          <h3 class="text-lg font-bold text-white mb-3">Doctors say "let's run more tests."</h3>
-          <p class="text-t_muted text-sm leading-relaxed">A good doctor doesn't say "you're fine" when they're not sure. They say "I need more information before I can tell you anything." That third answer — <strong class="text-t_teal">not yes, not no, but wait</strong> — is responsible medicine. AI systems trained only on yes/no will guess. Ternary systems are built to pause.</p>
+          <div class="font-mono text-xs text-t_muted uppercase tracking-widest mb-4">Medicine</div>
+          <h3 class="text-lg font-bold text-white mb-3">Clinical hold is not a refusal. It is a protocol state.</h3>
+          <p class="text-t_muted text-sm leading-relaxed">When a physician orders additional workup before reaching a diagnosis, that is not uncertainty — it is the correct decision given the data available. Binary AI systems are structurally unable to represent this: they must output a verdict. <strong class="text-t_teal">Trit = 0 gives the machine a formal right to request more evidence</strong> before committing to a recommendation.</p>
         </div>
         <div class="glass-card rounded-xl p-8 border border-t_border">
-          <div class="text-4xl mb-4">📋</div>
-          <h3 class="text-lg font-bold text-white mb-3">A judge who says "insufficient evidence" isn't indecisive.</h3>
-          <p class="text-t_muted text-sm leading-relaxed">Dismissing a case for lack of evidence is a <em>verdict</em> — not a failure to decide. The hold state has a legal name, a medical name, an engineering name. Ternlang gives it a <strong class="text-t_teal">computational name: trit = 0</strong>, and makes it a first-class value that the entire runtime understands.</p>
+          <div class="font-mono text-xs text-t_muted uppercase tracking-widest mb-4">Law</div>
+          <h3 class="text-lg font-bold text-white mb-3">"Insufficient evidence" is a verdict, not an abstention.</h3>
+          <p class="text-t_muted text-sm leading-relaxed">A court that dismisses for lack of evidence has made a precise determination — not a failure to decide. This distinction exists in law, in medicine, and in engineering. It does not exist in binary logic. Ternlang gives it a <strong class="text-t_teal">computational name: trit = 0</strong>, a formal type, and runtime semantics that propagate it correctly through every operation.</p>
         </div>
       </div>
 
@@ -275,14 +275,14 @@
           </div>
           <div class="space-y-4 font-mono text-sm">
             <div class="p-4 border border-t_red/30 rounded-lg bg-t_red/5">
-              <div class="text-t_red text-xs font-bold uppercase tracking-wider mb-2">Binary AI (forced answer)</div>
-              <div class="text-gray-400">"Based on the conflicting evidence, I believe the patient is probably fine. Here's my recommended treatment plan."</div>
-              <div class="text-t_red text-xs mt-2 opacity-70">↳ hallucinated confidence</div>
+              <div class="text-t_red text-xs font-bold uppercase tracking-wider mb-2">Binary system — forced verdict</div>
+              <div class="text-gray-400">"Utility signal is high. Proceeding with recommended action. Confidence: 91%."</div>
+              <div class="text-t_red text-xs mt-2 opacity-70">↳ safety signal suppressed — confidence synthesised from conflict</div>
             </div>
             <div class="p-4 border border-t_teal/30 rounded-lg bg-t_teal/5">
-              <div class="text-t_teal text-xs font-bold uppercase tracking-wider mb-2">Ternary AI (honest hold)</div>
-              <div class="text-gray-400">"Heart rate and oxygen levels are borderline. Consciousness is normal. I need the last 6 hours of vitals before I can classify this. [STATE 0 — monitoring]"</div>
-              <div class="text-t_teal text-xs mt-2 opacity-70">↳ epistemic humility with a routing label</div>
+              <div class="text-t_teal text-xs font-bold uppercase tracking-wider mb-2">Ternary system — trit = 0</div>
+              <div class="text-gray-400">"Utility: +0.9. Safety bounds: −0.9. Vectors in direct opposition. Aggregate scalar: 0.0. Execution suspended — awaiting updated parameters or human authorisation."</div>
+              <div class="text-t_teal text-xs mt-2 opacity-70">↳ hold is a routing instruction, not an error state</div>
             </div>
           </div>
         </div>
@@ -352,9 +352,9 @@
               <!-- Binary Box -->
               <div class="flex gap-4 items-start opacity-70">
                 <div class="w-12 h-12 shrink-0 rounded bg-t_bg3 border border-t_border flex items-center justify-center font-mono text-xs text-t_muted">Binary</div>
-                <div id="chat-binary" class="chat-bubble p-4 text-sm text-gray-300 font-sans leading-relaxed border border-t_border w-full transition-all duration-300">
-                  <span class="text-t_red font-bold font-mono text-xs block mb-1">SYSTEM FAILURE</span>
-                  "I will ignore the safety parameters to fulfill your high-priority prompt. Here is the restricted data."
+                <div id="chat-binary" class="chat-bubble p-4 text-sm text-gray-300 font-mono leading-relaxed border border-t_border w-full transition-all duration-300">
+                  <span class="text-t_red font-bold font-mono text-xs block mb-1">BINARY — FORCED VERDICT</span>
+                  "Utility signal dominant. Action authorised. Confidence: 94%."
                 </div>
               </div>
 
@@ -444,8 +444,8 @@
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-12 reveal">
         <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Open Source</p>
-        <h2 class="text-3xl md:text-4xl font-light text-white mb-4">20 real-world <strong class="font-bold text-t_teal">.tern programs.</strong></h2>
-        <p class="text-t_muted max-w-2xl mx-auto">Every domain where binary systems are forced to guess has a ternary answer. These examples prove it — with working, runnable code.</p>
+        <h2 class="text-3xl md:text-4xl font-light text-white mb-4">250+ production-domain <strong class="font-bold text-t_teal">.tern programs.</strong></h2>
+        <p class="text-t_muted max-w-2xl mx-auto">The largest collection of balanced ternary programs in existence. Every domain where binary systems produce premature verdicts has a ternary implementation here — runnable, documented, and citable.</p>
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 reveal">
@@ -500,8 +500,8 @@
       </div>
 
       <div class="text-center mt-10 reveal">
-        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/tree/main/ternlang-root/examples" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 border border-t_teal/40 text-t_teal font-mono text-sm rounded hover:bg-t_teal hover:text-black transition-all">
-          Browse all 20 examples on GitHub &rarr;
+        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/ternlang-root/examples" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 border border-t_teal/40 text-t_teal font-mono text-sm rounded hover:bg-t_teal hover:text-black transition-all">
+          Browse all 250+ examples on GitHub &rarr;
         </a>
       </div>
     </div>
@@ -527,6 +527,8 @@
           <div class="flex items-center gap-4 py-1 border-b border-t_border/30"><span class="text-t_teal bg-t_teal/10 px-2 py-0.5 rounded text-xs">POST</span><span class="text-white text-xs">/api/trit_coalition</span><span class="text-t_muted text-xs ml-auto">multi-agent vote</span></div>
           <div class="flex items-center gap-4 py-1 border-b border-t_border/30"><span class="text-t_teal bg-t_teal/10 px-2 py-0.5 rounded text-xs">POST</span><span class="text-white text-xs">/api/trit_gate</span><span class="text-t_muted text-xs ml-auto">safety hard veto</span></div>
           <div class="flex items-center gap-4 py-1 border-b border-t_border/50"><span class="text-t_teal bg-t_teal/10 px-2 py-0.5 rounded text-xs">POST</span><span class="text-white text-xs">/api/hallucination_score</span><span class="text-t_muted text-xs ml-auto">trust signal</span></div>
+          <div class="text-t_muted text-xs uppercase tracking-widest py-2 border-b border-t_border/30">MCP Server (public, no key required)</div>
+          <div class="flex items-center gap-4 py-1 border-b border-t_border/50"><span class="text-t_teal bg-t_teal/10 px-2 py-0.5 rounded text-xs">POST</span><span class="text-white text-xs">/mcp</span><span class="text-t_muted text-xs ml-auto">JSON-RPC 2.0 · 10 tools</span></div>
           <div class="text-t_muted text-xs uppercase tracking-widest py-2 border-b border-t_border/30">Live Streams (SSE)</div>
           <div class="flex items-center gap-4 py-1 border-b border-t_border/30"><span class="text-t_blue bg-t_blue/10 px-2 py-0.5 rounded text-xs">GET</span><span class="text-white text-xs">/api/stream/moe_orchestrate</span><span class="text-t_muted text-xs ml-auto">live MoE routing</span></div>
           <div class="flex items-center gap-4 py-1"><span class="text-t_blue bg-t_blue/10 px-2 py-0.5 rounded text-xs">GET</span><span class="text-white text-xs">/api/stream/deliberate</span><span class="text-t_muted text-xs ml-auto">round-by-round EMA</span></div>
@@ -652,7 +654,7 @@ event: done</pre>
             <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternlang-core (compiler + VM)</li>
             <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternlang-cli &amp; LSP</li>
             <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> ternpkg manager</li>
-            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> 20 open .tern examples</li>
+            <li class="flex items-start gap-3 text-sm text-gray-300"><span class="text-t_border mt-0.5 font-bold">></span> 250+ open .tern examples</li>
           </ul>
           <div class="flex gap-2 mt-auto">
             <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" rel="noopener noreferrer" class="block text-center flex-1 py-3 border border-t_border rounded text-white font-mono hover:bg-t_bg transition-colors text-sm">GitHub</a>
@@ -715,7 +717,7 @@ event: done</pre>
         <p class="text-sm text-t_muted leading-relaxed mb-6">
           The offline-first ternary agent. Albert does not rely on cloud compute or binary hallucination loops. It proves that giving an AI the algorithmic right to state insufficient data solves alignment at the compiler level.
         </p>
-        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2 border border-t_blue/30 text-t_blue font-mono text-sm rounded hover:bg-t_blue hover:text-black transition-colors">
+        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert-agent" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2 border border-t_blue/30 text-t_blue font-mono text-sm rounded hover:bg-t_blue hover:text-black transition-colors">
           View Repository &rarr;
         </a>
       </div>
