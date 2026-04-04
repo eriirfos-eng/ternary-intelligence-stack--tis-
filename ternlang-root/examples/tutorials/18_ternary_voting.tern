@@ -1,0 +1,37 @@
+// Ternary Voting is a way to reach a quorum while allowing for
+// abstentions (0).
+//
+// In a 3-member committee:
+// - If 2 say YES (1) and 1 says NO (-1), the consensus is 0 (No Quorum).
+// - If 2 say YES (1) and 1 abstains (0), the consensus is 1 (Quorum).
+//
+// This ensures that any strong disagreement halts the process,
+// but lack of participation doesn't.
+//
+// This is much safer than binary majority voting where 2 vs 1
+// would steamroll the dissenter. Ternary respects the dissenter's
+// veto (-1).
+//
+// This program simulates a committee vote.
+
+fn committee_vote(v1: trit, v2: trit, v3: trit) -> trit {
+    let p1: trit = consensus(v1, v2);
+    return consensus(p1, v3);
+}
+
+let alice: trit = 1;
+let bob: trit = 0;
+let charlie: trit = 1;
+let final_decision: trit = committee_vote(alice, bob, charlie);
+
+match final_decision {
+    -1 => {
+        // Rejected
+    }
+     0 => {
+        // No Consensus
+    }
+     1 => {
+        // Approved
+    }
+}

@@ -1,0 +1,37 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 141_space_mission_planning.tern — Space Mission Planning
+//
+// Binary approach vs Ternary approach.
+// Ternary allows for uncertainty (0) in complex decision systems.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn check_fuel(x: trit) -> trit { return x; }
+fn check_comms(x: trit) -> trit { return x; }
+fn check_orbit(x: trit) -> trit { return x; }
+
+fn main_decision(f: trit, c: trit, o: trit) -> trit {
+    match f {
+        -1 => { return -1; }
+         0 => { return 0; }
+         1 => {
+             match c {
+                 -1 => { return 0; }
+                  0 => { return 0; }
+                  1 => { return consensus(c, o); }
+             }
+         }
+    }
+}
+
+// ── Scenario Execution ──
+let s_0: trit = 1;
+let s_1: trit = 0;
+let s_2: trit = -1;
+
+let outcome: trit = main_decision(s_0, s_1, s_2);
+
+match outcome {
+    -1 => { return -1; }
+     0 => { return 0;  }
+     1 => { return 1;  }
+}

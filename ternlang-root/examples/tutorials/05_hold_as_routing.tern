@@ -1,0 +1,54 @@
+// In Ternary logic, '0' (Hold) is not just indecision.
+// It is a powerful routing mechanism.
+//
+// When a signal is '0', it indicates that the current path has no
+// opinion or sufficient data to proceed. This can be used to
+// route the decision to another "Expert" or "Sub-agent".
+//
+// Routing Logic:
+// 1. Check Expert A.
+// 2. If Expert A returns 1 or -1, follow its advice.
+// 3. If Expert A returns 0, "fall through" or route to Expert B.
+//
+// This allows for cascading complexity. Simple cases are handled
+// by early experts who return 1/-1. Nuanced or unknown cases
+// return 0, which triggers more expensive or specialized deliberation.
+//
+// Unlike binary where you must choose True/False, Ternary '0'
+// preserves the option to seek more information.
+//
+// This program shows hold-based routing between two logic blocks.
+
+fn primary_expert() -> trit {
+    return 0; // Undecided
+}
+
+fn secondary_expert() -> trit {
+    return 1; // Decided
+}
+
+let signal: trit = primary_expert();
+
+match signal {
+    -1 => {
+        // Follow primary negative
+    }
+     0 => {
+        // Route to secondary
+        let backup: trit = secondary_expert();
+        match backup {
+            -1 => {
+                // Follow backup negative
+            }
+             0 => {
+                // Still no consensus
+            }
+             1 => {
+                // Follow backup positive
+            }
+        }
+    }
+     1 => {
+        // Follow primary positive
+    }
+}

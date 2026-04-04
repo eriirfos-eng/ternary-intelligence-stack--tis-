@@ -1,0 +1,43 @@
+// Ternary logic provides an 'invert' builtin function.
+// While arithmetic negation (-x) exists, 'invert' is specifically
+// designed for logical opposition.
+//
+// invert(x) Truth Table:
+//  x | invert(x)
+// ---|----------
+// -1 |  1
+//  0 |  0
+//  1 | -1
+//
+// Note that '0' is its own inverse. This reflects the idea that
+// if you are undecided, the "opposite" of being undecided is
+// still being undecided about the same thing.
+//
+// Contrast this with binary logic where NOT(0) = 1.
+// In ternary, the neutral point is a fixed point under inversion.
+//
+// This inversion property is vital for building balanced neural networks
+// and decision pipelines where we need to represent opposing forces.
+// If a signal '1' supports an action, 'invert(1)' (which is -1)
+// actively opposes it.
+//
+// This program demonstrates the use of invert().
+
+fn oppose_signal(signal: trit) -> trit {
+    return invert(signal);
+}
+
+let support: trit = 1;
+let opposition: trit = oppose_signal(support);
+
+match opposition {
+    -1 => {
+        // The support was strong, so opposition is strong negative
+    }
+     0 => {
+        // The support was neutral, so opposition is neutral
+    }
+     1 => {
+        // The support was negative, so opposition is positive
+    }
+}

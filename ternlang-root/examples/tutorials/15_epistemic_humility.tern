@@ -1,0 +1,46 @@
+// Epistemic Humility is the ability of an AI to know when it
+// doesn't know something.
+//
+// In binary systems, a model is often forced to give a probability.
+// 0.5 probability is often treated as "I don't know", but it
+// is easily confused with "I am 100% sure it's half-true".
+//
+// Ternary '0' is an explicit "No Opinion" or "Insufficient Data".
+//
+// By designing systems that default to 0, we build "Humble AI".
+// If a query doesn't match any known patterns, it returns 0.
+// This 0 then routes to a human or a more powerful model.
+//
+// This program shows a humble lookup function.
+
+fn database_lookup(id: trit) -> trit {
+    // If id is 0, we don't know which record to look for
+    let found: trit = 0;
+    match id {
+        -1 => {
+            found = 1;
+        }
+         0 => {
+            found = 0;
+        }
+         1 => {
+            found = -1;
+        }
+    }
+    return found;
+}
+
+let query_id: trit = 0;
+let result: trit = database_lookup(query_id);
+
+match result {
+    -1 => {
+        // Found Record B
+    }
+     0 => {
+        // Humble IDK
+    }
+     1 => {
+        // Found Record A
+    }
+}

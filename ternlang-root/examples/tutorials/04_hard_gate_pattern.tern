@@ -1,0 +1,44 @@
+// The "Hard Gate" pattern uses consensus as a safety mechanism.
+// Imagine a system where multiple components must agree for an action.
+// One component is the "Safety Controller".
+//
+// If the Safety Controller sees danger, it emits -1.
+// If the Main Logic wants to act, it emits 1.
+//
+// consensus(MainLogic, Safety)
+// Logic 1 | Safety -1 => Result 0 (HALT)
+//
+// In this pattern, -1 acts as a "veto". Even if the logic is 1,
+// the presence of a -1 forces the system into a '0' (Hold) state.
+// This is "Safety-as-Veto".
+//
+// Why it works:
+// In binary logic, you might use AND. But what if the safety sensor
+// is broken and sends 0? In binary, 0 might mean "No Danger".
+// In ternary, 0 means "I don't know".
+// consensus(1, 0) = 1.
+//
+// To make it a "Hard Gate", you can chain consensus and then
+// match on the result to only act if it is exactly 1.
+//
+// This program demonstrates a safety veto.
+
+fn safety_gate(request: trit, safety: trit) -> trit {
+    return consensus(request, safety);
+}
+
+let user_request: trit = 1;
+let safety_sensor: trit = -1;
+let final_gate: trit = safety_gate(user_request, safety_sensor);
+
+match final_gate {
+    -1 => {
+        // Both agree it's bad!
+    }
+     0 => {
+        // Veto or conflict occurred
+    }
+     1 => {
+        // Safe to proceed
+    }
+}

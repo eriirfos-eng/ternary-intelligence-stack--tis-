@@ -1,0 +1,46 @@
+// Multi-stage pipelines are built by chaining ternary decisions.
+// The output of one stage is the input (or part of the input)
+// to the next.
+//
+// Stage 1: Permission check
+// Stage 2: Resource check
+// Stage 3: Execution
+//
+// If Stage 1 returns 0 or -1, Stage 2's result is irrelevant if we
+// use consensus to combine them.
+//
+// This creates a "Logical Fuse". If any part of the chain fails
+// or is uncertain, the entire chain's output trends toward 0 or -1.
+//
+// This program shows a three-stage pipeline.
+
+fn step_one() -> trit {
+    return 1;
+}
+
+fn step_two() -> trit {
+    return 1;
+}
+
+fn step_three() -> trit {
+    return -1;
+}
+
+let s1: trit = step_one();
+let s2: trit = step_two();
+let s3: trit = step_three();
+
+let pipe1: trit = consensus(s1, s2);
+let final_pipe: trit = consensus(pipe1, s3);
+
+match final_pipe {
+    -1 => {
+        // Chain failed at s3
+    }
+     0 => {
+        // Chain stalled
+    }
+     1 => {
+        // Chain succeeded
+    }
+}

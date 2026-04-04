@@ -1,0 +1,37 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 161_satellite_uplink.tern — Satellite Uplink Control
+//
+// Binary approach vs Ternary approach.
+// Ternary allows for uncertainty (0) in complex decision systems.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn signal_strength(x: trit) -> trit { return x; }
+fn jam_detection(x: trit) -> trit { return x; }
+fn bandwidth_available(x: trit) -> trit { return x; }
+
+fn main_decision(s: trit, j: trit, b: trit) -> trit {
+    match s {
+        -1 => { return -1; }
+         0 => { return 0; }
+         1 => {
+             match j {
+                 -1 => { return 1; }
+                  0 => { return 0; }
+                  1 => { return consensus(j, b); }
+             }
+         }
+    }
+}
+
+// ── Scenario Execution ──
+let s_0: trit = 1;
+let s_1: trit = 0;
+let s_2: trit = -1;
+
+let outcome: trit = main_decision(s_0, s_1, s_2);
+
+match outcome {
+    -1 => { return -1; }
+     0 => { return 0;  }
+     1 => { return 1;  }
+}

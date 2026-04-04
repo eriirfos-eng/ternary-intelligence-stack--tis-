@@ -1,0 +1,39 @@
+// Modern AI is moving towards "BitNet" or 1.58-bit quantization.
+// This is exactly Ternary weights: {-1, 0, 1}.
+//
+// Why is this better than binary {0, 1} or full precision?
+// 1. Efficiency: Multiplications become simple additions/subtractions.
+// 2. Sparsity: '0' weights effectively prune the network dynamically.
+// 3. Robustness: Ternary weights are more resistant to noise.
+//
+// In BitNet, the '0' weight is a "Don't Care" state. It means this
+// specific feature does not contribute to the current activation.
+//
+// The .tern language is the high-level DSL for managing these
+// quantized activations and weights.
+//
+// This program demonstrates a single "Neuron" with 3 ternary inputs
+// and a consensus-based activation function.
+
+fn ternary_neuron(i1: trit, i2: trit, i3: trit) -> trit {
+    let layer1: trit = consensus(i1, i2);
+    return consensus(layer1, i3);
+}
+
+let input1: trit = 1;
+let input2: trit = 0;
+let input3: trit = 1;
+
+let activation: trit = ternary_neuron(input1, input2, input3);
+
+match activation {
+    -1 => {
+        // Inhibited
+    }
+     0 => {
+        // Neutral
+    }
+     1 => {
+        // Excited
+    }
+}

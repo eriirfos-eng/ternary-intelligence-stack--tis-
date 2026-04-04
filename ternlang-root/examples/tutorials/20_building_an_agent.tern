@@ -1,0 +1,42 @@
+// This final tutorial brings all patterns together into a single
+// Agent Loop.
+//
+// The Agent:
+// 1. Perceives the environment (Evidence Aggregation).
+// 2. Checks internal safety rules (Hard Gate).
+// 3. Deliberates on the action (Deliberation Loop).
+// 4. Executes or Holds (Match block).
+//
+// An agent built this way is naturally robust, safe, and humble.
+// It will not act unless it has consensus, it respects safety vetos,
+// and it can signal when it is undecided.
+//
+// This program implements the core of such an agent.
+
+fn perception() -> trit {
+    return 1;
+}
+
+fn internal_safety() -> trit {
+    return 0;
+}
+
+fn deliberate_action(p: trit, s: trit) -> trit {
+    return consensus(p, s);
+}
+
+let p_signal: trit = perception();
+let s_signal: trit = internal_safety();
+let action_intent: trit = deliberate_action(p_signal, s_signal);
+
+match action_intent {
+    -1 => {
+        // Inhibited action
+    }
+     0 => {
+        // Holding for more info
+    }
+     1 => {
+        // Executing action
+    }
+}

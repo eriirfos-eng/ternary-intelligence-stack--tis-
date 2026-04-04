@@ -1,0 +1,37 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 250_supply_chain_human_rights.tern — Supply Chain Human Rights
+//
+// Binary approach vs Ternary approach.
+// Ternary allows for uncertainty (0) in complex decision systems.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn check_primary(x: trit) -> trit { return x; }
+fn check_secondary(x: trit) -> trit { return x; }
+fn check_auxiliary(x: trit) -> trit { return x; }
+
+fn main_decision(p: trit, s: trit, a: trit) -> trit {
+    match p {
+        -1 => { return -1; }
+         0 => { return 0; }
+         1 => {
+             match s {
+                 -1 => { return 0; }
+                  0 => { return 0; }
+                  1 => { return consensus(s, a); }
+             }
+         }
+    }
+}
+
+// ── Scenario Execution ──
+let s_0: trit = 1;
+let s_1: trit = 0;
+let s_2: trit = -1;
+
+let outcome: trit = main_decision(s_0, s_1, s_2);
+
+match outcome {
+    -1 => { return -1; }
+     0 => { return 0;  }
+     1 => { return 1;  }
+}

@@ -1,0 +1,35 @@
+// A Confidence Threshold is a meta-logic pattern where we decide
+// whether to "Commit" to an action or "Gather More Information".
+//
+// In Ternary systems, this is often implemented as a loop (Deliberation)
+// that continues as long as the state is '0'.
+//
+// Threshold logic:
+// - A result of 1 means "High Confidence Positive"
+// - A result of -1 means "High Confidence Negative"
+// - A result of 0 means "Low Confidence" -> Recursively deliberate.
+//
+// This prevents "Hallucination" in AI agents. If the internal
+// representation of a fact is '0', the agent should not invent
+// a binary True/False, but rather report the '0' or look it up.
+//
+// This program simulates a threshold check.
+
+fn check_confidence(raw_signal: trit) -> trit {
+    return raw_signal;
+}
+
+let raw: trit = 0;
+let confidence: trit = check_confidence(raw);
+
+match confidence {
+    -1 => {
+        // Confident No
+    }
+     0 => {
+        // Below threshold - need more data
+    }
+     1 => {
+        // Confident Yes
+    }
+}

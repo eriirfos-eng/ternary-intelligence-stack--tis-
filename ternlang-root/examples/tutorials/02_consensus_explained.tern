@@ -1,0 +1,45 @@
+// The 'consensus' function is the heart of Ternary Intelligence.
+// It takes two trits and returns a single trit that represents their agreement.
+//
+// Truth Table for consensus(a, b):
+// a | b | consensus(a, b)
+// --|---|----------------
+// -1| -1| -1 (Agreement on negative)
+// -1|  0| -1 (Negative overrides neutral)
+// -1|  1|  0 (Conflict! Negative vs Positive = Hold/Indecision)
+//  0| -1| -1
+//  0|  0|  0 (Neutral agreement)
+//  0|  1|  1
+//  1| -1|  0 (Conflict! Positive vs Negative = Hold/Indecision)
+//  1|  0|  1 (Positive overrides neutral)
+//  1|  1|  1 (Agreement on positive)
+//
+// Key Intuition:
+// - Consensus favors the "decisive" signal (1 or -1) over the neutral signal (0).
+// - If two decisive signals disagree (1 and -1), the result is 0 (Hold).
+// - This allows systems to aggregate evidence. If someone says "Yes" and
+//   someone says "I don't know", the consensus is "Yes".
+// - If someone says "Yes" and someone says "No", we must "Hold" and wait
+//   for more information or resolve the conflict.
+//
+// This program shows how consensus resolves different inputs.
+
+fn resolve_opinions(op1: trit, op2: trit) -> trit {
+    return consensus(op1, op2);
+}
+
+let opinion_a: trit = 1;
+let opinion_b: trit = -1;
+let result: trit = resolve_opinions(opinion_a, opinion_b);
+
+match result {
+    -1 => {
+        // Agreement on negative
+    }
+     0 => {
+        // Conflict or neutral
+    }
+     1 => {
+        // Agreement on positive
+    }
+}

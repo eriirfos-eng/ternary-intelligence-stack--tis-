@@ -1,0 +1,42 @@
+// Consensus is not limited to two inputs. By chaining consensus
+// calls, we can aggregate signals from many sources.
+//
+// cascading_consensus(a, b, c) = consensus(a, consensus(b, c))
+//
+// This is associative: consensus(a, consensus(b, c)) = consensus(consensus(a, b), c).
+//
+// Cascading properties:
+// - A single -1 (Veto) will "knock out" a single 1 (Consent), resulting in 0.
+// - Multiple 1s can overcome a single -1 if they are aggregated in a way
+//   that preserves the majority. However, in pure Ternary consensus:
+//   consensus(1, -1) is ALWAYS 0.
+// - To have "voting" where 2 vs 1 wins, you need more complex logic.
+//   Pure consensus is about *lack of disagreement*.
+//
+// Cascading consensus is the foundation of multi-layer ternary networks.
+// Each layer reduces the entropy of the signal until a final decision
+// is reached at the top level match block.
+//
+// This program demonstrates cascading three signals into one.
+
+fn triple_consensus(s1: trit, s2: trit, s3: trit) -> trit {
+    let temp: trit = consensus(s1, s2);
+    return consensus(temp, s3);
+}
+
+let sig1: trit = 1;
+let sig2: trit = 1;
+let sig3: trit = 0;
+let final_signal: trit = triple_consensus(sig1, sig2, sig3);
+
+match final_signal {
+    -1 => {
+        // Combined negative
+    }
+     0 => {
+        // Conflict or neutral
+    }
+     1 => {
+        // Combined positive
+    }
+}

@@ -1,0 +1,55 @@
+// Mixture of Experts (MoE) routing in Ternary logic uses "Dual-Key"
+// synergistic routing.
+//
+// An input is processed by two keys:
+// 1. Selector Key: Identifies the domain.
+// 2. Intensity Key: Identifies the urgency.
+//
+// If the Selector Key returns 0, the input is unrouted (Generalist handles it).
+// If the Selector Key returns 1 or -1, it routes to Specialist A or B.
+//
+// Synergistic Routing means the specialist only activates if the
+// consensus of the keys is decisive.
+//
+// This prevents specialized logic from firing on generic noise.
+//
+// This program demonstrates routing based on a selector trit.
+
+fn specialist_alpha() -> trit {
+    return 1;
+}
+
+fn specialist_beta() -> trit {
+    return -1;
+}
+
+fn route_logic(sel: trit) -> trit {
+    let final_res: trit = 0;
+    match sel {
+        -1 => {
+            final_res = specialist_beta();
+        }
+         0 => {
+            final_res = 0;
+        }
+         1 => {
+            final_res = specialist_alpha();
+        }
+    }
+    return final_res;
+}
+
+let selector: trit = 1;
+let result: trit = route_logic(selector);
+
+match result {
+    -1 => {
+        // Beta specialist result
+    }
+     0 => {
+        // No specialist or neutral result
+    }
+     1 => {
+        // Alpha specialist result
+    }
+}

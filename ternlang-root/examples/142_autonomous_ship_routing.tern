@@ -1,0 +1,37 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 142_autonomous_ship_routing.tern — Autonomous Ship Routing
+//
+// Binary approach vs Ternary approach.
+// Ternary allows for uncertainty (0) in complex decision systems.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn check_weather(x: trit) -> trit { return x; }
+fn check_traffic(x: trit) -> trit { return x; }
+fn check_hull(x: trit) -> trit { return x; }
+
+fn main_decision(w: trit, t: trit, h: trit) -> trit {
+    match h {
+        -1 => { return -1; }
+         0 => { return 0; }
+         1 => {
+             match w {
+                 -1 => { return 0; }
+                  0 => { return 0; }
+                  1 => { return consensus(w, t); }
+             }
+         }
+    }
+}
+
+// ── Scenario Execution ──
+let s_0: trit = 1;
+let s_1: trit = 0;
+let s_2: trit = -1;
+
+let outcome: trit = main_decision(s_0, s_1, s_2);
+
+match outcome {
+    -1 => { return -1; }
+     0 => { return 0;  }
+     1 => { return 1;  }
+}

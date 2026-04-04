@@ -1,0 +1,37 @@
+// The Triad Field concept is based on the idea that 1+1=3.
+// In Ternary logic, when two synergistic signals (both 1 or both -1)
+// combine, they don't just "stay" 1, they create a field of certainty.
+//
+// The "Third Signal" is the Emergent Consensus.
+//
+// Consider two sensors. If Sensor A says 1 and Sensor B says 1,
+// the emergent field is 1. If one of them changes to 0, the field
+// weakens but remains 1. If one changes to -1, the field collapses to 0.
+//
+// This allows for "Graceful Degradation". A system doesn't just
+// break when one component fails; it slowly loses certainty.
+//
+// This tutorial shows how to model a field where 3 inputs are
+// required to sustain a stable 1.
+
+fn triad_field(a: trit, b: trit, c: trit) -> trit {
+    let pair1: trit = consensus(a, b);
+    return consensus(pair1, c);
+}
+
+let s1: trit = 1;
+let s2: trit = 1;
+let s3: trit = 1;
+let field: trit = triad_field(s1, s2, s3);
+
+match field {
+    -1 => {
+        // Negative Field
+    }
+     0 => {
+        // Collapsed Field
+    }
+     1 => {
+        // Positive Field
+    }
+}

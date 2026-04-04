@@ -1,0 +1,45 @@
+// Before taking a high-stakes action, we may want to check the "Density"
+// of our decisive signals. Density is a measure of how much information
+// we have (how many non-zero trits).
+//
+// In .tern, we can check density by observing if consensus results in '0'.
+// If consensus(a, b) = 0, and neither a nor b were 0, we have a conflict.
+// If consensus(a, b) = 0, and both were 0, we have no data.
+//
+// A "Density Check" ensures that we aren't acting on sparse or
+// contradictory evidence.
+//
+// This pattern is used in "Decisive Acting":
+// 1. Gather signals.
+// 2. If signal is 1 or -1, increment confidence (modeled via trits).
+// 3. Only act if the aggregate signal is non-zero.
+//
+// This program simulates a density check by requiring two experts to
+// reach the same non-zero conclusion.
+
+fn expert_one() -> trit {
+    return 1;
+}
+
+fn expert_two() -> trit {
+    return 1;
+}
+
+let e1: trit = expert_one();
+let e2: trit = expert_two();
+
+// If they agree on 1, result is 1. If they agree on -1, result is -1.
+// If they disagree or both are 0, result is 0.
+let combined: trit = consensus(e1, e2);
+
+match combined {
+    -1 => {
+        // Strong negative consensus
+    }
+     0 => {
+        // Insufficient or conflicting data
+    }
+     1 => {
+        // Strong positive consensus
+    }
+}

@@ -1,0 +1,56 @@
+// This tutorial provides a side-by-side intuition of Binary vs Ternary.
+//
+// Binary Logic (0, 1):
+// - AND(1, 0) = 0
+// - OR(1, 0) = 1
+// - NOT(1) = 0
+//
+// Ternary Logic (-1, 0, 1):
+// - consensus(1, 0) = 1 (Positive prevails over neutral)
+// - consensus(1, -1) = 0 (Conflict leads to hold)
+// - invert(1) = -1 (Opposition)
+//
+// Key Differences:
+// 1. Ternary represents the *neutral* state explicitly.
+// 2. Binary logic collapses "I don't know" into "False" or "True".
+// 3. Ternary consensus is more robust for evidence aggregation.
+//
+// In binary, if a sensor is disconnected (0), it might look like a
+// negative signal. In ternary, a disconnected sensor (0) is
+// distinguishable from a negative signal (-1).
+//
+// This program compares a mock binary AND with ternary consensus.
+
+fn binary_and_style(a: trit, b: trit) -> trit {
+    // In binary, if either is 0, result is 0.
+    // In Ternary, we use match to simulate this.
+    let res: trit = 0;
+    match a {
+        -1 => {
+            res = -1;
+        }
+         0 => {
+            res = 0;
+        }
+         1 => {
+            res = b;
+        }
+    }
+    return res;
+}
+
+let t1: trit = 1;
+let t2: trit = 0;
+let res: trit = binary_and_style(t1, t2);
+
+match res {
+    -1 => {
+        // Negative
+    }
+     0 => {
+        // Neutral
+    }
+     1 => {
+        // Positive
+    }
+}

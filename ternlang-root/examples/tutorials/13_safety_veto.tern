@@ -1,0 +1,43 @@
+// MetaSafety is the practice of having a "Master Veto" that
+// overrides ALL other logic, regardless of its complexity or certainty.
+//
+// In .tern, this is done by placing the Safety Consensus at the
+// absolute end of the pipeline.
+//
+// pipeline_output = ... lots of logic ...
+// safe_output = consensus(pipeline_output, safety_override)
+//
+// If safety_override is -1, then safe_output can NEVER be 1.
+// consensus(1, -1) = 0.
+// consensus(0, -1) = -1.
+// consensus(-1, -1) = -1.
+//
+// Notice that the Master Veto doesn't just stop the system (0),
+// it can also force it into a safe negative state (-1) if the
+// override itself is decisive.
+//
+// This program demonstrates the absolute safety override.
+
+fn complex_logic() -> trit {
+    return 1; // Logic wants to act
+}
+
+fn safety_monitor() -> trit {
+    return -1; // Monitor says DANGER
+}
+
+let proposal: trit = complex_logic();
+let monitor: trit = safety_monitor();
+let action: trit = consensus(proposal, monitor);
+
+match action {
+    -1 => {
+        // Safe Shutdown
+    }
+     0 => {
+        // Vetoed / Halt
+    }
+     1 => {
+        // Proceed (Only if monitor is 0 or 1)
+    }
+}

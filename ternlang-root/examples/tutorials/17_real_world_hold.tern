@@ -1,0 +1,35 @@
+// The 'Hold' (0) state is critical in safety-critical domains.
+// Here are five real domains where 'Hold' saves lives:
+//
+// 1. Autonomous Vehicles: If lidar and camera disagree, HOLD (Brake).
+// 2. Medical Diagnosis: If symptoms are ambiguous, HOLD (Request tests).
+// 3. Finance: If market signals are conflicting, HOLD (Don't trade).
+// 4. Power Grids: If frequency is unstable, HOLD (Don't switch).
+// 5. Legal AI: If evidence is balanced, HOLD (Defer to judge).
+//
+// In all these cases, forcing a binary choice (Go/No-Go) when
+// information is insufficient leads to catastrophe.
+//
+// Ternary systems allow the machine to safely "Wait" or "Ask".
+//
+// This program demonstrates a simple medical diagnostic hold.
+
+fn diagnose(symptom_a: trit, symptom_b: trit) -> trit {
+    return consensus(symptom_a, symptom_b);
+}
+
+let fever: trit = 1;
+let chills: trit = -1;
+let treatment: trit = diagnose(fever, chills);
+
+match treatment {
+    -1 => {
+        // Treat for Cold
+    }
+     0 => {
+        // Ambiguous - Consult Doctor
+    }
+     1 => {
+        // Treat for Flu
+    }
+}

@@ -1,0 +1,41 @@
+// This tutorial explains the core unit of Ternary Intelligence: the Trit.
+// In binary logic, we use bits: 0 and 1. This represents a boolean world
+// of "False" or "True". However, reality often contains more nuance.
+// Ternary logic introduces a third state, allowing for:
+// -1: Conflict, Negative, or Strong Disagreement
+//  0: Hold, Neutral, or Undecided (Information is missing)
+//  1: Truth, Positive, or Agreement
+//
+// Why use -1/0/1 instead of 0/1?
+// 1. Balance: -1 and 1 are balanced around 0. Inverting 1 gives -1.
+// 2. Information Density: A trit carries log2(3) ~ 1.58 bits of information.
+// 3. Explicit Ignorance: The '0' state allows a system to say "I don't know"
+//    without being forced into a False (0) or True (1) bucket.
+// 4. Veto Power: A -1 can act as a veto in consensus logic.
+// 5. Consensus: We can combine multiple signals using the consensus builtin.
+//
+// In .tern, every variable is a trit. We don't have booleans.
+// We use the 'trit' keyword for types.
+// Literal values are -1, 0, and 1.
+// Match blocks must cover all three cases.
+//
+// This program demonstrates basic trit assignment and matching.
+
+fn get_starting_trit() -> trit {
+    let initial: trit = 1;
+    return initial;
+}
+
+let t: trit = get_starting_trit();
+
+match t {
+    -1 => {
+        // This won't execute in this example
+    }
+     0 => {
+        // This won't execute either
+    }
+     1 => {
+        // This is the truth state
+    }
+}

@@ -1,0 +1,35 @@
+// Evidence Aggregation is the "Wisdom of Crowds" in Ternary logic.
+// When we have many weak signals, we can aggregate them.
+//
+// Unlike binary where "Majority Rules" (51% wins), Ternary Consensus
+// requires "Non-Disagreement".
+//
+// If you have 100 signals saying 1, and 1 signal saying -1,
+// the consensus is 0. This is a very conservative approach to intelligence.
+//
+// To allow for noise, you can group evidence into "Buckets" and
+// take the consensus of the buckets.
+//
+// This tutorial shows simple aggregation of three evidence sources.
+
+fn aggregate(e1: trit, e2: trit, e3: trit) -> trit {
+    let a: trit = consensus(e1, e2);
+    return consensus(a, e3);
+}
+
+let obs1: trit = 1;
+let obs2: trit = 0;
+let obs3: trit = 1;
+let result: trit = aggregate(obs1, obs2, obs3);
+
+match result {
+    -1 => {
+        // Majority Negative
+    }
+     0 => {
+        // Conflict or No Evidence
+    }
+     1 => {
+        // Majority Positive
+    }
+}

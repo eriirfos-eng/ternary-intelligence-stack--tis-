@@ -1,0 +1,37 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 170_cern_beam_abort.tern — CERN Beam Abort
+//
+// Binary approach vs Ternary approach.
+// Ternary allows for uncertainty (0) in complex decision systems.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn beam_position(x: trit) -> trit { return x; }
+fn magnet_quench_risk(x: trit) -> trit { return x; }
+fn vacuum_integrity(x: trit) -> trit { return x; }
+
+fn main_decision(p: trit, q: trit, v: trit) -> trit {
+    match p {
+        -1 => { return 1; }
+         0 => { return 0; }
+         1 => {
+             match q {
+                 -1 => { return 1; }
+                  0 => { return 0; }
+                  1 => { return consensus(q, invert(v)); }
+             }
+         }
+    }
+}
+
+// ── Scenario Execution ──
+let s_0: trit = 1;
+let s_1: trit = 0;
+let s_2: trit = -1;
+
+let outcome: trit = main_decision(s_0, s_1, s_2);
+
+match outcome {
+    -1 => { return -1; }
+     0 => { return 0;  }
+     1 => { return 1;  }
+}

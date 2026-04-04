@@ -1,0 +1,36 @@
+// Deliberation is the process of repeatedly applying consensus
+// until a stable state is reached. This is similar to an
+// Exponential Moving Average (EMA) in signal processing.
+//
+// In .tern, we model this by passing the "State" back into the
+// consensus function along with the "New Information".
+//
+// state = consensus(state, new_info)
+//
+// Over time, if new_info is consistently 1, the state will stay 1.
+// If new_info starts flickering between 1 and -1, the state will
+// trend towards 0, reflecting the uncertainty.
+//
+// This prevents "Jitter" in decision making.
+//
+// This program simulates one step of a deliberation loop.
+
+fn deliberate(current_state: trit, new_data: trit) -> trit {
+    return consensus(current_state, new_data);
+}
+
+let state: trit = 0;
+let incoming: trit = 1;
+let next_state: trit = deliberate(state, incoming);
+
+match next_state {
+    -1 => {
+        // Trend Negative
+    }
+     0 => {
+        // Trend Neutral
+    }
+     1 => {
+        // Trend Positive
+    }
+}
