@@ -21,8 +21,7 @@ from .transcript import TranscriptStore
 # ─────────────────────────────────────────────
 #  PATHS & CONSTANTS (Sync with tools.py)
 # ─────────────────────────────────────────────
-ALBERT_DIR = Path("/home/eri-irfos/Desktop/albert")
-DB_PATH    = str(ALBERT_DIR / "albert_os.db")
+from .config import DB_PATH
 
 @dataclass(frozen=True)
 class QueryEngineConfig:
@@ -194,48 +193,17 @@ class QueryEnginePort:
         
         override_count = 0
         final_output = ""
-        # Hardware options — use available CPU cores and GPU layers
-        import os as _os
-        _cpu = _os.cpu_count() or 8
-        _hw_opts = {"num_thread": max(1, _cpu - 2), "num_gpu": 10}
-
+from .api_client import AlbertApiClient
+client = AlbertApiClient()
+...
+        # ...
         for iteration in range(self.config.max_turns):
             try:
-                if self.config.lite_mode and on_stream is not None:
-                    # Streaming path — lite mode only (no tool calls to juggle)
-                    chunks = ollama.chat(
-                        model=self.config.model,
-                        messages=full_history,
-                        stream=True,
-                        options=_hw_opts,
-                    )
-                    content = ""
-                    for chunk in chunks:
-                        piece = (chunk.get('message') or {}).get('content') or ''
-                        if piece:
-                            content += piece
-                            on_stream(piece)
-                    tool_calls = []
-                    message = {"role": "assistant", "content": content}
-                else:
-                    # Non-streaming path — agent mode or lite without a stream callback
-                    try:
-                        response = ollama.chat(
-                            model=self.config.model,
-                            messages=full_history,
-                            tools=TOOLS_DEF if not self.config.lite_mode else None,
-                            options=_hw_opts,
-                        )
-                    except Exception as e:
-                        if "support tools" in str(e).lower():
-                            if full_history[0]['role'] == 'system':
-                                full_history[0]['content'] += "\n\nTOOL CALL SYNTAX: tool_name(arg='val') or tool_name: val"
-                            response = ollama.chat(model=self.config.model, messages=full_history, options=_hw_opts)
-                        else:
-                            raise e
-                    message = response['message']
-                    content = message.get('content') or ""
-                    tool_calls = message.get('tool_calls') or []
+                # Use client for inference
+                response = client.chat(messages=full_history, tools=TOOLS_DEF if not self.config.lite_mode else None)
+                message = response['message']
+                content = message.get('content') or ""
+                tool_calls = message.get('tool_calls') or []
             except Exception as e:
                 final_output = f"⚠ Inference error: {e}"
                 break

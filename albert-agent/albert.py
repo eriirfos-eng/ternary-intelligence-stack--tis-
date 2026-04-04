@@ -49,7 +49,7 @@ except ImportError:
 # ─────────────────────────────────────────────
 #  PATHS & CONSTANTS
 # ─────────────────────────────────────────────
-DB_PATH        = "albert_os.db"
+DB_PATH = str(Path(__file__).resolve().parent / "albert_os.db")
 
 # Module-level background executor — reused across reruns, no leaks
 _bg_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="albert-bg")

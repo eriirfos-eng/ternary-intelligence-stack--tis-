@@ -52,17 +52,15 @@ except ImportError:
 from .models import PortingBacklog, PortingModule
 from .permissions import ToolPermissionContext
 
+from .config import DB_PATH
+
 # ─────────────────────────────────────────────
 #  PATHS & CONSTANTS
 # ─────────────────────────────────────────────
-# Set ALBERT_DIR relative to this file's location in the TIS repository.
-# fallback to the Desktop path if not found.
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 ALBERT_DIR = REPO_ROOT / "albert-agent"
-if not ALBERT_DIR.exists():
-    ALBERT_DIR = Path("/home/eri-irfos/Desktop/albert")
+# DB_PATH is imported from config.py
 
-DB_PATH         = str(ALBERT_DIR / "albert_os.db")
 LIB_DIR         = str(ALBERT_DIR / "library")
 AGENT_FILES_DIR = str(ALBERT_DIR / "agent files")
 TERN_CLI_PATH   = str(REPO_ROOT / "ternlang-root" / "target" / "release" / "ternlang-cli")
@@ -426,49 +424,28 @@ def find_tools(query: str, limit: int = 20) -> list[PortingModule]:
     return matches[:limit]
 
 
+from .api_client import AlbertApiClient
+client = AlbertApiClient()
+...
 def execute_tool(name: str, payload: str | dict = '') -> ToolExecution:
-    if name in TOOL_MAP:
-        try:
-            args = payload
-            if isinstance(payload, str) and payload.strip():
-                try:
-                    args = json.loads(payload)
-                except:
-                    # Fallback for simple string payload
-                    args = {'query': payload} if 'query' in name else {'command': payload}
-            
-            if not isinstance(args, dict):
-                args = {}
-                
-            result = TOOL_MAP[name](**args)
-            return ToolExecution(
-                name=name,
-                source_hint="src/tools.py",
-                payload=str(payload),
-                handled=True,
-                message=f"Executed functional tool '{name}'",
-                result=result
-            )
-        except Exception as e:
-            return ToolExecution(
-                name=name,
-                source_hint="src/tools.py",
-                payload=str(payload),
-                handled=True,
-                message=f"Error executing tool '{name}': {e}"
-            )
-
-    module = get_tool(name)
-    if module is None:
-        return ToolExecution(name=name, source_hint='', payload=str(payload), handled=False, message=f'Unknown tool: {name}')
-    
-    return ToolExecution(
-        name=module.name,
-        source_hint=module.source_hint,
-        payload=str(payload),
-        handled=True,
-        message=f"Mirrored tool '{module.name}' from {module.source_hint} would handle payload {payload!r}."
-    )
+    try:
+        result = client.run_tool(name, payload)
+        return ToolExecution(
+            name=name,
+            source_hint="Remote API",
+            payload=str(payload),
+            handled=True,
+            message=f"Executed remote tool '{name}'",
+            result=result
+        )
+    except Exception as e:
+        return ToolExecution(
+            name=name,
+            source_hint="Remote API",
+            payload=str(payload),
+            handled=True,
+            message=f"Error executing tool '{name}': {e}"
+        )
 
 
 def render_tool_index(limit: int = 20, query: str | None = None) -> str:
