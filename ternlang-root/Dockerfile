@@ -34,6 +34,7 @@ RUN cargo fetch
 
 # Now copy the real source
 COPY ternlang-core/src      ternlang-core/src
+COPY ternlang-core/stdlib   ternlang-core/stdlib
 COPY ternlang-codegen/src   ternlang-codegen/src
 COPY ternlang-ml/src        ternlang-ml/src
 COPY ternlang-cli/src       ternlang-cli/src
