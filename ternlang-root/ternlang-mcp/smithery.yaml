@@ -34,17 +34,17 @@ author:
   name: "RFI-IRFOS"
   email: "rfi.irfos@gmail.com"
 
-# How to run the server
-runtime: binary
+# How to connect
+# HTTP transport: POST https://ternlang.com/mcp
+# Stdio transport: cargo install ternlang-mcp
+
+runtime: http
 config:
-  command: "ternlang-mcp"
-  args: []
-  # Binary available via: cargo install ternlang-mcp
-  # Or build from source: cargo build --release -p ternlang-mcp
+  url: "https://ternlang.com/mcp"
 
 # MCP protocol
 protocol: "2024-11-05"
-transport: stdio
+transport: http
 
 tools:
   - name: trit_decide

@@ -10,6 +10,10 @@ authors.workspace   = true
 keywords.workspace  = true
 categories.workspace = true
 
+[lib]
+name = "ternlang_mcp"
+path = "src/lib.rs"
+
 [[bin]]
 name = "ternlang-mcp"
 path = "src/main.rs"

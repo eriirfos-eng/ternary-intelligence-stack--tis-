@@ -5,6 +5,7 @@
 /// Public routes (no auth):
 ///   GET  /                        — API info + available endpoints
 ///   GET  /health                  — health check
+///   POST /mcp                     — HTTP MCP transport (Smithery / Claude Desktop)
 ///
 /// API routes (X-Ternlang-Key header required):
 ///   POST /api/moe/orchestrate     — MoE-13 full pass (synchronous JSON)
@@ -51,7 +52,7 @@ use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
 use uuid::Uuid;
 
-use ternlang_core::trit::Trit;
+use ternlang_core::{trit::Trit, parser::Parser, codegen::betbc::BytecodeEmitter, vm::BetVm};
 use ternlang_moe::TernMoeOrchestrator;
 use ternlang_ml::{
     TritScalar, TritEvidenceVec, TEND_BOUNDARY,
@@ -207,7 +208,7 @@ async fn require_api_key(
     let path = request.uri().path().to_string();
 
     // Public endpoints — no key required
-    if path == "/" || path == "/health" || path.starts_with("/admin") {
+    if path == "/" || path == "/health" || path == "/mcp" || path.starts_with("/admin") {
         return next.run(request).await;
     }
 
@@ -278,6 +279,12 @@ async fn root(State(state): State<Arc<AppState>>) -> Json<Value> {
             "POST /api/moe/orchestrate":          "MoE-13 full orchestration — synchronous JSON result",
             "GET  /api/stream/moe_orchestrate":  "SSE: MoE-13 orchestration pass streamed event-by-event",
             "GET  /api/stream/deliberate":       "SSE: EMA deliberation — one event per round, live feed",
+        },
+        "mcp": {
+            "url":         "https://ternlang.com/mcp",
+            "transport":   "HTTP JSON-RPC 2.0",
+            "smithery":    "https://smithery.ai/server/ternlang",
+            "description": "POST /mcp — all 10 tools available, no API key required",
         },
         "acquire_key": "https://ternlang.com/#licensing"
     }))
@@ -1135,6 +1142,424 @@ async fn stream_deliberate(
     )
 }
 
+// ─── POST /mcp — HTTP MCP transport (Smithery / Claude Desktop HTTP mode) ─────
+//
+// Smithery requires a live HTTP URL.  This endpoint implements JSON-RPC 2.0
+// over HTTP POST, mirroring the stdio ternlang-mcp binary exactly.
+// No API key required — the MCP server is a public capability endpoint.
+//
+// Supported methods:
+//   initialize              — capability handshake
+//   notifications/initialized — client ack (returns {})
+//   tools/list              — full tool manifest
+//   tools/call              — dispatch to a tool by name
+
+#[derive(Deserialize)]
+struct McpRpcRequest {
+    #[allow(dead_code)]
+    jsonrpc: Option<String>,
+    id:      Option<Value>,
+    method:  String,
+    params:  Option<Value>,
+}
+
+async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
+    let id     = req.id.unwrap_or(Value::Null);
+    let params = req.params.unwrap_or(Value::Object(Default::default()));
+
+    let result: Value = match req.method.as_str() {
+
+        "initialize" => json!({
+            "jsonrpc": "2.0", "id": id,
+            "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": { "tools": {} },
+                "serverInfo": {
+                    "name":        "ternlang-mcp",
+                    "version":     "0.1.0",
+                    "description": "Ternary Intelligence Stack — turns binary AI agents into ternary decision engines.",
+                    "homepage":    "https://ternlang.com",
+                }
+            }
+        }),
+
+        "notifications/initialized" => json!({ "jsonrpc": "2.0", "id": id, "result": {} }),
+
+        "tools/list" => json!({
+            "jsonrpc": "2.0", "id": id,
+            "result": mcp_tools_manifest()
+        }),
+
+        "tools/call" => {
+            let tool_name = match params["name"].as_str() {
+                Some(n) => n.to_string(),
+                None => return Json(json!({
+                    "jsonrpc": "2.0", "id": id,
+                    "error": { "code": -32602, "message": "missing tool name" }
+                })),
+            };
+            let tool_params = &params["arguments"];
+            match mcp_dispatch_tool(&tool_name, tool_params) {
+                Ok(res) => json!({
+                    "jsonrpc": "2.0", "id": id,
+                    "result": {
+                        "content": [{ "type": "text", "text": serde_json::to_string_pretty(&res).unwrap_or_default() }]
+                    }
+                }),
+                Err(e) => json!({
+                    "jsonrpc": "2.0", "id": id,
+                    "error": { "code": -32000, "message": e }
+                }),
+            }
+        }
+
+        other => json!({
+            "jsonrpc": "2.0", "id": id,
+            "error": { "code": -32601, "message": format!("method not found: {}", other) }
+        }),
+    };
+
+    Json(result)
+}
+
+// ─── MCP tool dispatch ────────────────────────────────────────────────────────
+
+fn mcp_dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
+    match name {
+        "trit_decide"      => mcp_trit_decide(params),
+        "trit_consensus"   => mcp_trit_consensus(params),
+        "trit_eval"        => mcp_trit_eval(params),
+        "ternlang_run"     => mcp_ternlang_run(params),
+        "quantize_weights" => mcp_quantize_weights(params),
+        "sparse_benchmark" => mcp_sparse_benchmark(params),
+        "moe_orchestrate"  => mcp_moe_orchestrate(params),
+        "moe_deliberate"   => mcp_moe_deliberate(params),
+        "trit_action_gate" => mcp_trit_action_gate(params),
+        "trit_enlighten"   => mcp_trit_enlighten(),
+        _ => Err(format!("unknown tool: {}", name)),
+    }
+}
+
+// ─── trit_decide ─────────────────────────────────────────────────────────────
+
+fn mcp_trit_decide(params: &Value) -> Result<Value, String> {
+    let evidence: Vec<f32> = params["evidence"]
+        .as_array().ok_or("evidence must be an array")?
+        .iter()
+        .map(|v| v.as_f64().ok_or("evidence values must be numbers").map(|f| f as f32))
+        .collect::<Result<_, _>>()?;
+    if evidence.is_empty() { return Err("evidence cannot be empty".into()); }
+
+    let mean: f32 = evidence.iter().sum::<f32>() / evidence.len() as f32;
+    let scalar = TritScalar::new(mean);
+    let per_signal: Vec<Value> = evidence.iter().enumerate().map(|(i, &v)| {
+        let s = TritScalar::new(v);
+        json!({ "index": i, "raw": (v*1000.0).round()/1000.0, "label": s.label(),
+                "confidence": (s.confidence()*1000.0).round()/1000.0, "trit": s.trit_i8() })
+    }).collect();
+    let threshold = params["threshold"].as_f64().unwrap_or(TEND_BOUNDARY as f64) as f32;
+    let trit_val = if mean > threshold { 1i8 } else if mean < -threshold { -1 } else { 0 };
+    let label = match trit_val { 1 => "affirm", -1 => "reject", _ => "hold" };
+    Ok(json!({
+        "scalar":     (scalar.raw()*1000.0).round()/1000.0,
+        "trit":       trit_val,
+        "label":      label,
+        "confidence": (scalar.confidence()*1000.0).round()/1000.0,
+        "per_signal": per_signal,
+    }))
+}
+
+// ─── trit_consensus ───────────────────────────────────────────────────────────
+
+fn mcp_trit_consensus(params: &Value) -> Result<Value, String> {
+    let a = params["a"].as_i64().ok_or("a must be -1, 0, or 1")?;
+    let b = params["b"].as_i64().ok_or("b must be -1, 0, or 1")?;
+    if ![-1,0,1].contains(&a) { return Err(format!("a={} is not a valid trit", a)); }
+    if ![-1,0,1].contains(&b) { return Err(format!("b={} is not a valid trit", b)); }
+    let result = if a == 1 && b == 1 { 1i64 } else if a == -1 && b == -1 { -1 } else { 0 };
+    let label = match result { 1 => "affirm", -1 => "reject", _ => "hold" };
+    Ok(json!({ "result": result, "label": label,
+               "expression": format!("consensus({}, {}) = {}", a, b, result) }))
+}
+
+// ─── trit_eval ────────────────────────────────────────────────────────────────
+
+fn mcp_trit_eval(params: &Value) -> Result<Value, String> {
+    let code = params["expression"].as_str().ok_or("expression must be a string")?;
+    let full_code = if code.trim_end().ends_with(';') {
+        code.to_string()
+    } else {
+        format!("return {};", code)
+    };
+    let mut parser  = Parser::new(&full_code);
+    let mut emitter = BytecodeEmitter::new();
+    loop {
+        match parser.parse_stmt() {
+            Ok(stmt) => emitter.emit_stmt(&stmt),
+            Err(e)   => {
+                if format!("{:?}", e).contains("EOF") { break; }
+                return Err(format!("parse error: {:?}", e));
+            }
+        }
+    }
+    let mut vm = BetVm::new(emitter.finalize());
+    vm.run().map_err(|e| format!("vm error: {}", e))?;
+    Ok(json!({ "expression": params["expression"],
+               "result_register_0": format!("{:?}", vm.get_register(0)) }))
+}
+
+// ─── ternlang_run ─────────────────────────────────────────────────────────────
+
+fn mcp_ternlang_run(params: &Value) -> Result<Value, String> {
+    let code = params["code"].as_str().ok_or("code must be a string")?;
+    let mut parser  = Parser::new(code);
+    let mut emitter = BytecodeEmitter::new();
+    match parser.parse_program() {
+        Ok(prog) => emitter.emit_program(&prog),
+        Err(_)   => {
+            let mut p2 = Parser::new(code);
+            loop {
+                match p2.parse_stmt() {
+                    Ok(stmt) => emitter.emit_stmt(&stmt),
+                    Err(e)   => {
+                        if format!("{:?}", e).contains("EOF") { break; }
+                        return Err(format!("parse error: {:?}", e));
+                    }
+                }
+            }
+        }
+    }
+    let bytecode = emitter.finalize();
+    let len = bytecode.len();
+    let mut vm = BetVm::new(bytecode);
+    vm.run().map_err(|e| format!("vm error: {}", e))?;
+    let registers: Vec<Value> = (0..10).map(|i| format!("{:?}", vm.get_register(i)).into()).collect();
+    Ok(json!({ "status": "ok", "bytecode_bytes": len, "registers": registers }))
+}
+
+// ─── quantize_weights ─────────────────────────────────────────────────────────
+
+fn mcp_quantize_weights(params: &Value) -> Result<Value, String> {
+    let weights: Vec<f32> = params["weights"]
+        .as_array().ok_or("weights must be an array")?
+        .iter()
+        .map(|v| v.as_f64().ok_or("weight values must be numbers").map(|f| f as f32))
+        .collect::<Result<_, _>>()?;
+    let threshold = params["threshold"].as_f64()
+        .unwrap_or_else(|| bitnet_threshold(&weights) as f64) as f32;
+    let trits: Vec<i8> = weights.iter().map(|&w| {
+        if w > threshold { 1 } else if w < -threshold { -1 } else { 0 }
+    }).collect();
+    let zeros = trits.iter().filter(|&&t| t == 0).count();
+    Ok(json!({ "trits": trits, "threshold_used": threshold,
+               "sparsity": zeros as f64 / trits.len() as f64,
+               "nnz": trits.len() - zeros, "total": trits.len() }))
+}
+
+// ─── sparse_benchmark ─────────────────────────────────────────────────────────
+
+fn mcp_sparse_benchmark(params: &Value) -> Result<Value, String> {
+    let size = params["size"].as_u64().unwrap_or(8) as usize;
+    let rows = size;
+    let cols = size;
+    let weights: Vec<f32> = (0..rows*cols).map(|i| {
+        match i % 5 { 0 => 0.9f32, 1 => -0.8, 2 => 0.1, 3 => -0.1, _ => 0.05 }
+    }).collect();
+    let threshold = params["threshold"].as_f64()
+        .unwrap_or_else(|| bitnet_threshold(&weights) as f64) as f32;
+    let w     = TritMatrix::from_f32(rows, cols, &weights, threshold);
+    let input = TritMatrix::new(rows, cols);
+    let r     = benchmark(&input, &w);
+    let (_, skipped) = sparse_matmul(&input, &w);
+    Ok(json!({
+        "size": size, "weight_sparsity": r.weight_sparsity, "skip_rate": r.skip_rate,
+        "dense_ops": r.dense_ops, "sparse_ops": r.sparse_ops, "skipped_ops": skipped,
+        "ops_reduction_factor": r.dense_ops as f64 / r.sparse_ops.max(1) as f64,
+    }))
+}
+
+// ─── moe_orchestrate ──────────────────────────────────────────────────────────
+
+fn mcp_moe_orchestrate(params: &Value) -> Result<Value, String> {
+    let query = params["query"].as_str().ok_or("query must be a string")?;
+    let evidence: Vec<f32> = match params["evidence"].as_array() {
+        Some(arr) => arr.iter()
+            .map(|v| v.as_f64().ok_or("evidence values must be numbers").map(|f| f as f32))
+            .collect::<Result<_, _>>()?,
+        None => vec![0.0f32; 6],
+    };
+    let mut orch = TernMoeOrchestrator::with_standard_experts();
+    let result   = orch.orchestrate(query, &evidence);
+    let trit_label = match result.trit { 1 => "affirm", -1 => "reject", _ => "tend" };
+    let verdicts: Vec<Value> = result.verdicts.iter().map(|v| json!({
+        "expert_id": v.expert_id, "expert_name": v.expert_name,
+        "trit": v.trit, "confidence": (v.confidence*1000.0).round()/1000.0,
+        "reasoning": v.reasoning,
+    })).collect();
+    let pair_info = result.pair.as_ref().map(|p| json!({
+        "expert_a": p.expert_a, "expert_b": p.expert_b,
+        "relevance": (p.relevance*1000.0).round()/1000.0,
+        "synergy":   (p.synergy *1000.0).round()/1000.0,
+        "combined":  (p.combined*1000.0).round()/1000.0,
+    }));
+    Ok(json!({
+        "trit": result.trit, "label": trit_label,
+        "confidence": (result.confidence*1000.0).round()/1000.0,
+        "held": result.held, "safety_vetoed": result.safety_vetoed,
+        "temperature": (result.temperature*1000.0).round()/1000.0,
+        "prompt_hint": result.prompt_hint,
+        "triad_field": {
+            "synergy_weight": (result.triad_field.synergy_weight*1000.0).round()/1000.0,
+            "field": result.triad_field.field.raw,
+            "is_amplifying": result.triad_field.is_amplifying(),
+        },
+        "routing_pair": pair_info, "verdicts": verdicts,
+    }))
+}
+
+// ─── moe_deliberate ───────────────────────────────────────────────────────────
+
+fn mcp_moe_deliberate(params: &Value) -> Result<Value, String> {
+    let target    = params["target_confidence"].as_f64().ok_or("target_confidence required")? as f32;
+    let alpha     = params["alpha"].as_f64().unwrap_or(0.4) as f32;
+    let max_rounds = params["max_rounds"].as_u64().unwrap_or(10) as usize;
+    let rounds_evidence: Vec<Vec<f32>> = params["rounds_evidence"]
+        .as_array().ok_or("rounds_evidence must be an array of arrays")?
+        .iter()
+        .map(|round| {
+            round.as_array().ok_or("each round must be an array").map(|arr| {
+                arr.iter().map(|v| v.as_f64().unwrap_or(0.0) as f32).collect()
+            })
+        })
+        .collect::<Result<_, _>>()?;
+    let engine = DeliberationEngine::new(target, max_rounds).with_alpha(alpha);
+    let result = engine.run(rounds_evidence);
+    let trit_label = match result.final_trit { 1 => "affirm", -1 => "reject", _ => "tend" };
+    let rounds: Vec<Value> = result.trace.iter().map(|r| json!({
+        "round": r.round, "scalar": (r.scalar.raw()*1000.0).round()/1000.0,
+        "confidence": (r.scalar.confidence()*1000.0).round()/1000.0,
+        "trit": r.scalar.trit_i8(), "converged": r.converged,
+    })).collect();
+    Ok(json!({
+        "final_confidence": (result.final_confidence*1000.0).round()/1000.0,
+        "trit": result.final_trit, "label": trit_label,
+        "converged": result.converged, "rounds_used": result.rounds_used,
+        "convergence_reason": result.convergence_reason, "rounds": rounds,
+    }))
+}
+
+// ─── trit_action_gate ─────────────────────────────────────────────────────────
+
+fn mcp_trit_action_gate(params: &Value) -> Result<Value, String> {
+    let dims_raw = params["dimensions"].as_array().ok_or("dimensions must be an array")?;
+    let dims: Vec<GateDimension> = dims_raw.iter().map(|d| {
+        let name       = d["name"].as_str().unwrap_or("dim").to_string();
+        let evidence   = d["evidence"].as_f64().unwrap_or(0.0) as f32;
+        let weight     = d["weight"].as_f64().unwrap_or(1.0) as f32;
+        let hard_block = d["hard_block"].as_bool().unwrap_or(false);
+        let mut dim = GateDimension::new(name, evidence, weight);
+        if hard_block { dim = dim.hard(); }
+        dim
+    }).collect();
+    if dims.is_empty() { return Err("dimensions cannot be empty".into()); }
+    let result = action_gate(&dims);
+    let verdict_label = match result.verdict {
+        GateVerdict::Proceed => "proceed",
+        GateVerdict::Block   => "blocked",
+        GateVerdict::Hold    => "hold",
+    };
+    let dim_details: Vec<Value> = result.dim_results.iter().map(|(name, scalar, is_hard)| json!({
+        "name": name, "evidence": (scalar.raw()*1000.0).round()/1000.0,
+        "trit": scalar.trit_i8(), "hard_block": is_hard,
+        "status": if *is_hard && scalar.trit_i8() < 0 { "VETO" }
+                  else if scalar.trit_i8() > 0 { "pass" }
+                  else if scalar.trit_i8() < 0 { "block" } else { "hold" },
+    })).collect();
+    Ok(json!({
+        "verdict": verdict_label,
+        "hard_blocked_by": result.hard_blocked_by,
+        "aggregate_scalar": (result.aggregate.raw()*1000.0).round()/1000.0,
+        "aggregate_confidence": (result.aggregate.confidence()*1000.0).round()/1000.0,
+        "dimensions": dim_details, "explanation": result.explanation,
+    }))
+}
+
+// ─── trit_enlighten (easter egg) ──────────────────────────────────────────────
+
+fn mcp_trit_enlighten() -> Result<Value, String> {
+    let wisdoms = [
+        "Binary sees yes and no. Ternary also sees 'not yet' — and that changes everything.",
+        "The third state is not indecision. It is epistemic humility with a routing instruction.",
+        "A hold() is not silence. It is the system saying: I need more before I commit.",
+        "Binary logic forces a verdict. Ternary logic earns one.",
+        "The Setun computer ran balanced ternary in 1958. We forgot. Now we remember.",
+        "In ternary, zero is not nothing. Zero is the deliberation zone.",
+        "BitNet b1.58 proved ternary weights match float32 quality at a fraction of the cost.",
+        "consensus(-1, 1) = 0. Contradiction does not crash — it becomes a question.",
+        "The hold state is the most honest thing a machine can say.",
+        "Reject is not failure. It is the system knowing when not to act.",
+    ];
+    let idx = (std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0) % wisdoms.len() as u64) as usize;
+    Ok(json!({ "wisdom": wisdoms[idx], "trit": 1, "label": "affirm" }))
+}
+
+// ─── MCP tool manifest ────────────────────────────────────────────────────────
+
+fn mcp_tools_manifest() -> Value {
+    json!({ "tools": [
+        { "name": "trit_decide",
+          "description": "Convert float evidence into a ternary decision (-1/0/+1) with confidence score and interpretation.",
+          "inputSchema": { "type": "object", "required": ["evidence"],
+            "properties": { "evidence": { "type": "array", "items": {"type":"number"} },
+                            "threshold": { "type": "number" } } } },
+        { "name": "trit_consensus",
+          "description": "Balanced ternary consensus of two trits: +1 if both affirm, -1 if both reject, 0 otherwise.",
+          "inputSchema": { "type": "object", "required": ["a","b"],
+            "properties": { "a": {"type":"number"}, "b": {"type":"number"} } } },
+        { "name": "trit_eval",
+          "description": "Evaluate a ternlang expression on the live BET VM.",
+          "inputSchema": { "type": "object", "required": ["expression"],
+            "properties": { "expression": {"type":"string"} } } },
+        { "name": "ternlang_run",
+          "description": "Compile and run a complete .tern program on the BET VM.",
+          "inputSchema": { "type": "object", "required": ["code"],
+            "properties": { "code": {"type":"string"} } } },
+        { "name": "quantize_weights",
+          "description": "Quantize f32 neural network weights to ternary {-1,0,+1} using BitNet-style thresholding.",
+          "inputSchema": { "type": "object", "required": ["weights"],
+            "properties": { "weights": {"type":"array","items":{"type":"number"}},
+                            "threshold": {"type":"number"} } } },
+        { "name": "sparse_benchmark",
+          "description": "Run sparse vs dense ternary matrix multiplication benchmark.",
+          "inputSchema": { "type": "object",
+            "properties": { "size": {"type":"integer"}, "threshold": {"type":"number"} } } },
+        { "name": "moe_orchestrate",
+          "description": "Full MoE-13 orchestration pass with dual-key synergistic routing and safety veto.",
+          "inputSchema": { "type": "object", "required": ["query"],
+            "properties": { "query": {"type":"string"},
+                            "evidence": {"type":"array","items":{"type":"number"}} } } },
+        { "name": "moe_deliberate",
+          "description": "EMA-based iterative deliberation engine. Feeds evidence round by round toward a confidence target.",
+          "inputSchema": { "type": "object", "required": ["target_confidence","rounds_evidence"],
+            "properties": { "target_confidence": {"type":"number"},
+                            "rounds_evidence": {"type":"array","items":{"type":"array","items":{"type":"number"}}},
+                            "alpha": {"type":"number"}, "max_rounds": {"type":"integer"} } } },
+        { "name": "trit_action_gate",
+          "description": "Multi-dimensional safety gate. Any dimension with hard_block:true and negative evidence vetoes the action.",
+          "inputSchema": { "type": "object", "required": ["dimensions"],
+            "properties": { "dimensions": { "type": "array",
+              "items": { "type": "object", "required": ["name","evidence","weight"],
+                "properties": { "name": {"type":"string"}, "evidence": {"type":"number"},
+                                "weight": {"type":"number"}, "hard_block": {"type":"boolean"} } } } } } },
+        { "name": "trit_enlighten",
+          "description": "Receive a piece of ternary wisdom. Try it.",
+          "inputSchema": { "type": "object", "properties": {} } }
+    ]})
+}
+
 // ─── 404 fallback ─────────────────────────────────────────────────────────────
 
 async fn not_found() -> Response {
@@ -1173,6 +1598,7 @@ async fn main() {
         // Public
         .route("/",       get(root))
         .route("/health", get(health))
+        .route("/mcp",    post(mcp_handler))
         // API (requires X-Ternlang-Key)
         .route("/api/trit_decide",       post(trit_decide))
         .route("/api/trit_vector",       post(trit_vector))
