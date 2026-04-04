@@ -1,37 +1,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 185_supply_chain_provenance.tern — Supply Chain Provenance
+// 185_supply_chain_provenance.tern — Blockchain/Ledger Integrity
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A shipment isn't "Verified" or "Counterfeit". It's often "Incomplete Chain" (0). 
+// Ternary logic allows goods to move to bonded warehouses (0) while missing 
+// signatures are fetched, preventing supply chain deadlocks.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn verify_manifest_hash(qr_scan: trit, rfid_ping: trit) -> trit {
+    let provenance: trit = consensus(qr_scan, rfid_ping);
+    return provenance;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn release_to_distributor(provenance: trit, customs_stamp: trit) -> trit {
+    match provenance {
+        -1 => { return conflict(); } // ILLEGITIMATE ORIGIN
+         0 => { 
+             // Partial verify, check customs
+             match customs_stamp {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // QUARANTINE
+                  1 => { return hold();     }
              }
+         }
+         1 => { 
+             return customs_stamp;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let qr:   trit = truth();
+let rfid: trit = hold();
+let duty: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let origin_check: trit = verify_manifest_hash(qr, rfid);
+let release_gate: trit = release_to_distributor(origin_check, duty);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match release_gate {
+    -1 => { return conflict(); } // DESTROY GOODS
+     0 => { return hold();     } // BONDED STORAGE
+     1 => { return truth();    } // SHIP TO RETAIL
 }

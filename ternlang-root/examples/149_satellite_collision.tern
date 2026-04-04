@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 149_satellite_collision.tern — Satellite Collision Avoidance
+// 149_satellite_collision.tern — Orbital Conjunction Assessment
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Calculating satellite orbits involves large error ellipses (Covariance). 
+// Binary logic for "Collision" often results in "False Positives" or
+// missing "Near Misses". Ternary (0) captures the "High Probability"
+// state, where a thruster burn is scheduled but not yet executed,
+// allowing for more radar passes to refine the data.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn orbit_certainty(x: trit) -> trit { return x; }
-fn proximity_alert(x: trit) -> trit { return x; }
-fn maneuver_fuel(x: trit) -> trit { return x; }
+fn calculate_conjunction(radar_1: trit, radar_2: trit) -> trit {
+    // Both ground stations must agree on a threat.
+    return consensus(radar_1, radar_2);
+}
 
-fn main_decision(o: trit, p: trit, m: trit) -> trit {
-    match p {
-        -1 => { return 1; }
-         0 => { return 0; }
-         1 => {
-             match o {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(o, m); }
-             }
-         }
+fn collision_avoidance(risk: trit, propellant: trit) -> trit {
+    match risk {
+        -1 => { 
+            // Clear path. No conjunction detected.
+            return conflict(); 
+        }
+        0 => {
+            // Error ellipses overlap. Monitor but do not burn yet.
+            return hold();
+        }
+        1 => {
+            // High probability collision. Check if we can move.
+            match propellant {
+                -1 => { return conflict(); } // CRITICAL FAILURE - CANNOT MANEUVER
+                 0 => { return hold();     } // LOW FUEL - EMERGENCY BURN ONLY
+                 1 => { return truth();    } // NOMINAL - EXECUTE EVASION
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let NORAD_track:  trit = truth(); // Conjunction predicted
+let SpaceX_track: trit = hold();  // Tracking is lost/intermittent
+let fuel_reserve: trit = truth(); // 5kg Hydrazine remaining
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let threat_level: trit = calculate_conjunction(NORAD_track, SpaceX_track);
+let maneuver:     trit = collision_avoidance(threat_level, fuel_reserve);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match maneuver {
+    -1 => { return conflict(); } // CLEAR OR DEAD SATELLITE
+     0 => { return hold();     } // ACTIVE MONITORING MODE
+     1 => { return truth();    } // IGNITE THRUSTERS
 }

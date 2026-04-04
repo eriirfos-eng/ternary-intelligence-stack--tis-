@@ -1,37 +1,46 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 241_carbon_capture_and_storage.tern — Carbon Capture and Storage
+// 241_carbon_capture_and_storage.tern — DAC Efficiency
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Direct Air Capture (DAC) systems oscillate based on humidity and sorbent 
+// saturation. Ternary (0) provides a "REGENERATION" state, allowing the 
+// system to switch between capturing (1) and purging (0) without a full 
+// system shutdown (-1).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn capture_efficiency(sorbent_saturation: trit, humidity_level: trit) -> trit {
+    let efficiency: trit = consensus(invert(sorbent_saturation), invert(humidity_level));
+    match efficiency {
+        -1 => { return conflict(); } // SYSTEM CLOGGED / SATURATED
+         0 => { return hold();     } // SUB-OPTIMAL
+         1 => { return truth();    } // PEAK CAPTURE
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn cycle_control(efficiency: trit, co2_purity: trit) -> trit {
+    match efficiency {
+        -1 => { return conflict(); } // PURGE IMMEDIATELY
+         0 => {
+             // Marginal efficiency: check purity
+             match co2_purity {
+                 -1 => { return conflict(); } // TOO MANY IMPURITIES
+                  0 => { return hold();     } // CONTINUE CAPTURE
+                  1 => { return hold();     } // START TRANSITION
+             }
+         }
+         1 => { return truth(); } // FULL OPERATION
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let sat: trit = hold();
+let hum: trit = truth();
+let pur: trit = hold();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let eff: trit = capture_efficiency(sat, hum);
+let op: trit = cycle_control(eff, pur);
+
+match op {
+    -1 => { return conflict(); } // PURGE
+     0 => { return hold();     } // SUSTAIN
+     1 => { return truth();    } // INTAKE
 }

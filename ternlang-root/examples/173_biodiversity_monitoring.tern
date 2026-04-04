@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 173_biodiversity_monitoring.tern — Biodiversity Monitoring
+// 173_biodiversity_monitoring.tern — Ecosystem Health Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Species aren't just "Extinct" or "Extant". The "vulnerable" (0) state is 
+// where conservation happens. Ternary allows automated drones to prioritize 
+// regions that are "SLIDING" (-1 to 0) rather than those already dead (-1).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn assess_habitat_viability(water_purity: trit, canopy_cover: trit) -> trit {
+    let viability: trit = consensus(water_purity, canopy_cover);
+    return viability;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn dispatch_ranger_drone(viability: trit, poaching_alert: trit) -> trit {
+    match poaching_alert {
+        -1 => { return truth(); } // IMMEDIATE DISPATCH
+         0 => { 
+             // Unconfirmed alert, check habitat health
+             match viability {
+                 -1 => { return truth();    } // CRITICAL ECOSYSTEM - PROTECT
+                  0 => { return hold();     } // MONITOR VIA SATELLITE
+                  1 => { return conflict(); } // SECURE - NO ACTION
              }
          }
+         1 => { return conflict(); }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let water: trit = hold();
+let canopy: trit = hold();
+let threat: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let health: trit = assess_habitat_viability(water, canopy);
+let action: trit = dispatch_ranger_drone(health, threat);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // STANDBY
+     0 => { return hold();     } // LOG DATA
+     1 => { return truth();    } // DEPLOY ASSETS
 }

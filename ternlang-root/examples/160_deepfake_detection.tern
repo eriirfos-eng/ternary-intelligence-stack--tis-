@@ -1,37 +1,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 160_deepfake_detection.tern — Deepfake Detection
+// 160_deepfake_detection.tern — Media Forensics Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary "Real/Fake" logic creates false positives that ruin careers and false 
+// negatives that undermine truth. Ternary (0) provides a "UNVERIFIED" state, 
+// allowing platforms to flag content for manual review while forensic models 
+// resolve ambiguous pixel noise.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn facial_consistency(x: trit) -> trit { return x; }
-fn audio_sync(x: trit) -> trit { return x; }
-fn metadata_valid(x: trit) -> trit { return x; }
+fn analyze_facial_jitter(signal: trit) -> trit {
+    // If the eyes are jumping (0), we flag it. If the skin is synthetic (-1), we block.
+    match signal {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
+         1 => { return truth(); }
+    }
+}
 
-fn main_decision(f: trit, a: trit, m: trit) -> trit {
-    match f {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn determine_media_authenticity(pixels: trit, audio: trit, sync: trit) -> trit {
+    // Hard gate: Sync is the giveaway. If it's -1, it's fake.
+    match sync {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
          1 => {
-             match a {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(a, m); }
-             }
+             // Sync ok, check physical artifacts
+             let forensics: trit = consensus(pixels, audio);
+             return forensics;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let pixel_val:      trit = truth();
+let audio_val:      trit = hold();
+let sync_val:       trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let authenticity: trit = determine_media_authenticity(pixel_val, audio_val, sync_val);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match authenticity {
+    -1 => { return conflict(); } // DEEPFAKE DETECTED
+     0 => { return hold();    } // UNVERIFIED - human forensic review needed
+     1 => { return truth();   } // AUTHENTIC
 }

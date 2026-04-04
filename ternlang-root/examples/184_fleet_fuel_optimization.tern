@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 184_fleet_fuel_optimization.tern — Fleet Fuel Optimization
+// 184_fleet_fuel_optimization.tern — Logistics Efficiency Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Trucks don't just "Need Fuel" or "Not Need Fuel". "Optimal Window" (0) is 
+// where a truck can refuel at a preferred partner station. Binary systems 
+// either wait for empty (risk) or fill too often (lost time).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn analyze_route_efficiency(telemetry_drag: trit, cargo_load_profile: trit) -> trit {
+    let efficiency: trit = consensus(telemetry_drag, cargo_load_profile);
+    return efficiency;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn suggest_pit_stop(efficiency: trit, gas_price_index: trit) -> trit {
+    match efficiency {
+        -1 => { return truth(); } // POOR EFFICIENCY - FILL UP NOW
+         0 => { 
+             // Average, check prices
+             match gas_price_index {
+                 -1 => { return truth();    } // CHEAP FUEL - BUY
+                  0 => { return hold();     } // WAIT FOR NEXT HUB
+                  1 => { return conflict(); } // TOO EXPENSIVE
              }
          }
+         1 => { return conflict(); } // MAX EFFICIENCY - KEEP DRIVING
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let drag:  trit = hold();
+let load:  trit = truth();
+let price: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let mpg_state: trit = analyze_route_efficiency(drag, load);
+let stop_req:  trit = suggest_pit_stop(mpg_state, price);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match stop_req {
+    -1 => { return conflict(); } // SKIP STATION
+     0 => { return hold();     } // TOP OFF ONLY
+     1 => { return truth();    } // FULL REFUEL
 }

@@ -219,116 +219,116 @@ Every example follows the same pattern: three states (`-1` / `0` / `+1`) map to 
 ### Extended Domain Examples (141-250)
 | # | File | Summary |
 |---|------|---------|
-| 141 | [141_space_mission_planning.tern](141_space_mission_planning.tern) | Space Mission Planning |
-| 142 | [142_autonomous_ship_routing.tern](142_autonomous_ship_routing.tern) | Autonomous Ship Routing |
-| 143 | [143_insurance_actuarial.tern](143_insurance_actuarial.tern) | Insurance Actuarial Tables |
-| 144 | [144_pandemic_tracing.tern](144_pandemic_tracing.tern) | Pandemic Contact Tracing |
-| 145 | [145_carbon_verification.tern](145_carbon_verification.tern) | Carbon Credit Verification |
-| 146 | [146_water_treatment.tern](146_water_treatment.tern) | Water Treatment Plant |
-| 147 | [147_warehouse_robot.tern](147_warehouse_robot.tern) | Autonomous Warehouse Robot |
-| 148 | [148_clinical_genomics.tern](148_clinical_genomics.tern) | Clinical Genomics |
-| 149 | [149_satellite_collision.tern](149_satellite_collision.tern) | Satellite Collision Avoidance |
-| 150 | [150_recidivism_risk.tern](150_recidivism_risk.tern) | Criminal Recidivism Risk |
-| 151 | [151_earthquake_warning.tern](151_earthquake_warning.tern) | Earthquake Early Warning |
-| 152 | [152_autonomous_submarine.tern](152_autonomous_submarine.tern) | Autonomous Submarine |
-| 153 | [153_supply_chain.tern](153_supply_chain.tern) | Supply Chain Disruption |
-| 154 | [154_nuclear_sub_reactor.tern](154_nuclear_sub_reactor.tern) | Nuclear Submarine Reactor |
-| 155 | [155_wildfire_evacuation.tern](155_wildfire_evacuation.tern) | Wildfire Evacuation Routing |
-| 156 | [156_hospital_bed.tern](156_hospital_bed.tern) | Hospital Bed Allocation |
-| 157 | [157_bridge_toll.tern](157_bridge_toll.tern) | Bridge Toll Pricing |
-| 158 | [158_food_recall.tern](158_food_recall.tern) | Food Safety Recall |
-| 159 | [159_vaccine_cold_chain.tern](159_vaccine_cold_chain.tern) | Vaccine Cold Chain |
-| 160 | [160_deepfake_detection.tern](160_deepfake_detection.tern) | Deepfake Detection |
-| 161 | [161_satellite_uplink.tern](161_satellite_uplink.tern) | Satellite Uplink Control |
-| 162 | [162_social_media_suspension.tern](162_social_media_suspension.tern) | Social Media Account Suspension |
-| 163 | [163_employee_review.tern](163_employee_review.tern) | Employee Performance Review |
-| 164 | [164_tax_fraud.tern](164_tax_fraud.tern) | Tax Fraud Flagging |
-| 165 | [165_drug_interdiction.tern](165_drug_interdiction.tern) | Customs Drug Interdiction |
-| 166 | [166_piracy_alert.tern](166_piracy_alert.tern) | Maritime Piracy Alert |
-| 167 | [167_avalanche_risk.tern](167_avalanche_risk.tern) | Avalanche Risk Assessment |
-| 168 | [168_tornado_intercept.tern](168_tornado_intercept.tern) | Tornado Intercept Strategy |
-| 169 | [169_black_hole_scheduling.tern](169_black_hole_scheduling.tern) | Black Hole Observation Scheduling |
-| 170 | [170_cern_beam_abort.tern](170_cern_beam_abort.tern) | CERN Beam Abort |
-| 171 | [171_quantum_processor_stability.tern](171_quantum_processor_stability.tern) | Quantum Processor Stability |
-| 172 | [172_cyber_physical_system_integrity.tern](172_cyber_physical_system_integrity.tern) | Cyber-Physical System Integrity |
-| 173 | [173_biodiversity_monitoring.tern](173_biodiversity_monitoring.tern) | Biodiversity Monitoring |
-| 174 | [174_microgrid_fault_detection.tern](174_microgrid_fault_detection.tern) | Microgrid Fault Detection |
-| 175 | [175_space_debris_tracking.tern](175_space_debris_tracking.tern) | Space Debris Tracking |
-| 176 | [176_geothermal_energy_extraction.tern](176_geothermal_energy_extraction.tern) | Geothermal Energy Extraction |
-| 177 | [177_precision_agriculture_spraying.tern](177_precision_agriculture_spraying.tern) | Precision Agriculture Spraying |
-| 178 | [178_smart_city_traffic_flow.tern](178_smart_city_traffic_flow.tern) | Smart City Traffic Flow |
-| 179 | [179_industrial_robot_safety.tern](179_industrial_robot_safety.tern) | Industrial Robot Safety |
-| 180 | [180_waste_sorting_automation.tern](180_waste_sorting_automation.tern) | Waste Sorting Automation |
-| 181 | [181_pipeline_corrosion_monitoring.tern](181_pipeline_corrosion_monitoring.tern) | Pipeline Corrosion Monitoring |
-| 182 | [182_air_traffic_flow_management.tern](182_air_traffic_flow_management.tern) | Air Traffic Flow Management |
-| 183 | [183_emergency_dispatch_prioritization.tern](183_emergency_dispatch_prioritization.tern) | Emergency Dispatch Prioritization |
-| 184 | [184_fleet_fuel_optimization.tern](184_fleet_fuel_optimization.tern) | Fleet Fuel Optimization |
-| 185 | [185_supply_chain_provenance.tern](185_supply_chain_provenance.tern) | Supply Chain Provenance |
-| 186 | [186_water_desalination_control.tern](186_water_desalination_control.tern) | Water Desalination Control |
-| 187 | [187_renewable_energy_integration.tern](187_renewable_energy_integration.tern) | Renewable Energy Integration |
-| 188 | [188_energy_storage_optimization.tern](188_energy_storage_optimization.tern) | Energy Storage Optimization |
-| 189 | [189_building_energy_management.tern](189_building_energy_management.tern) | Building Energy Management |
-| 190 | [190_smart_lighting_control.tern](190_smart_lighting_control.tern) | Smart Lighting Control |
-| 191 | [191_autonomous_lawn_mower.tern](191_autonomous_lawn_mower.tern) | Autonomous Lawn Mower |
-| 192 | [192_robotic_surgery_guidance.tern](192_robotic_surgery_guidance.tern) | Robotic Surgery Guidance |
-| 193 | [193_patient_vital_monitoring.tern](193_patient_vital_monitoring.tern) | Patient Vital Monitoring |
-| 194 | [194_elderly_fall_detection.tern](194_elderly_fall_detection.tern) | Elderly Fall Detection |
-| 195 | [195_drug_discovery_simulation.tern](195_drug_discovery_simulation.tern) | Drug Discovery Simulation |
-| 196 | [196_clinical_trial_recruitment.tern](196_clinical_trial_recruitment.tern) | Clinical Trial Recruitment |
-| 197 | [197_medical_imaging_analysis.tern](197_medical_imaging_analysis.tern) | Medical Imaging Analysis |
-| 198 | [198_public_health_surveillance.tern](198_public_health_surveillance.tern) | Public Health Surveillance |
-| 199 | [199_vaccine_distribution_logistics.tern](199_vaccine_distribution_logistics.tern) | Vaccine Distribution Logistics |
-| 200 | [200_health_insurance_fraud.tern](200_health_insurance_fraud.tern) | Health Insurance Fraud |
-| 201 | [201_financial_market_surveillance.tern](201_financial_market_surveillance.tern) | Financial Market Surveillance |
-| 202 | [202_algorithmic_trading_risk.tern](202_algorithmic_trading_risk.tern) | Algorithmic Trading Risk |
-| 203 | [203_credit_risk_assessment.tern](203_credit_risk_assessment.tern) | Credit Risk Assessment |
-| 204 | [204_anti_money_laundering.tern](204_anti_money_laundering.tern) | Anti-Money Laundering |
-| 205 | [205_insurance_policy_underwriting.tern](205_insurance_policy_underwriting.tern) | Insurance Policy Underwriting |
-| 206 | [206_claim_processing_automation.tern](206_claim_processing_automation.tern) | Claim Processing Automation |
-| 207 | [207_tax_compliance_monitoring.tern](207_tax_compliance_monitoring.tern) | Tax Compliance Monitoring |
-| 208 | [208_government_budget_allocation.tern](208_government_budget_allocation.tern) | Government Budget Allocation |
-| 209 | [209_public_procurement_integrity.tern](209_public_procurement_integrity.tern) | Public Procurement Integrity |
-| 210 | [210_e_voting_security_audit.tern](210_e_voting_security_audit.tern) | E-voting Security Audit |
-| 211 | [211_social_media_content_moderation.tern](211_social_media_content_moderation.tern) | Social Media Content Moderation |
-| 212 | [212_online_harassment_detection.tern](212_online_harassment_detection.tern) | Online Harassment Detection |
-| 213 | [213_recommendation_system_ethics.tern](213_recommendation_system_ethics.tern) | Recommendation System Ethics |
-| 214 | [214_digital_identity_verification.tern](214_digital_identity_verification.tern) | Digital Identity Verification |
-| 215 | [215_privacy_policy_compliance.tern](215_privacy_policy_compliance.tern) | Privacy Policy Compliance |
-| 216 | [216_data_breach_detection.tern](216_data_breach_detection.tern) | Data Breach Detection |
-| 217 | [217_cloud_resource_allocation.tern](217_cloud_resource_allocation.tern) | Cloud Resource Allocation |
-| 218 | [218_edge_computing_orchestration.tern](218_edge_computing_orchestration.tern) | Edge Computing Orchestration |
-| 219 | [219_5g_network_slicing.tern](219_5g_network_slicing.tern) | 5G Network Slicing |
-| 220 | [220_iot_device_security.tern](220_iot_device_security.tern) | IoT Device Security |
-| 221 | [221_satellite_communication_handover.tern](221_satellite_communication_handover.tern) | Satellite Communication Handover |
-| 222 | [222_autonomous_underwater_vehicle.tern](222_autonomous_underwater_vehicle.tern) | Autonomous Underwater Vehicle |
-| 223 | [223_lunar_rover_navigation.tern](223_lunar_rover_navigation.tern) | Lunar Rover Navigation |
-| 224 | [224_mars_habitat_life_support.tern](224_mars_habitat_life_support.tern) | Mars Habitat Life Support |
-| 225 | [225_asteroid_mining_feasibility.tern](225_asteroid_mining_feasibility.tern) | Asteroid Mining Feasibility |
-| 226 | [226_space_weather_forecasting.tern](226_space_weather_forecasting.tern) | Space Weather Forecasting |
-| 227 | [227_exoplanet_habitability_analysis.tern](227_exoplanet_habitability_analysis.tern) | Exoplanet Habitability Analysis |
-| 228 | [228_seismic_data_interpretation.tern](228_seismic_data_interpretation.tern) | Seismic Data Interpretation |
-| 229 | [229_volcano_eruption_prediction.tern](229_volcano_eruption_prediction.tern) | Volcano Eruption Prediction |
-| 230 | [230_ocean_current_modeling.tern](230_ocean_current_modeling.tern) | Ocean Current Modeling |
-| 231 | [231_glacier_retreat_monitoring.tern](231_glacier_retreat_monitoring.tern) | Glacier Retreat Monitoring |
-| 232 | [232_deforestation_detection.tern](232_deforestation_detection.tern) | Deforestation Detection |
-| 233 | [233_wildlife_poaching_prevention.tern](233_wildlife_poaching_prevention.tern) | Wildlife Poaching Prevention |
-| 234 | [234_air_pollution_source_apportionment.tern](234_air_pollution_source_apportionment.tern) | Air Pollution Source Apportionment |
-| 235 | [235_water_quality_monitoring.tern](235_water_quality_monitoring.tern) | Water Quality Monitoring |
-| 236 | [236_soil_health_assessment.tern](236_soil_health_assessment.tern) | Soil Health Assessment |
-| 237 | [237_urban_heat_island_mitigation.tern](237_urban_heat_island_mitigation.tern) | Urban Heat Island Mitigation |
-| 238 | [238_circular_economy_material_tracking.tern](238_circular_economy_material_tracking.tern) | Circular Economy Material Tracking |
-| 239 | [239_industrial_emission_control.tern](239_industrial_emission_control.tern) | Industrial Emission Control |
-| 240 | [240_nuclear_waste_disposal_safety.tern](240_nuclear_waste_disposal_safety.tern) | Nuclear Waste Disposal Safety |
-| 241 | [241_carbon_capture_and_storage.tern](241_carbon_capture_and_storage.tern) | Carbon Capture and Storage |
-| 242 | [242_hydrogen_fuel_production.tern](242_hydrogen_fuel_production.tern) | Hydrogen Fuel Production |
-| 243 | [243_biofuel_feedstock_optimization.tern](243_biofuel_feedstock_optimization.tern) | Biofuel Feedstock Optimization |
-| 244 | [244_geological_carbon_sequestration.tern](244_geological_carbon_sequestration.tern) | Geological Carbon Sequestration |
-| 245 | [245_methane_leak_detection.tern](245_methane_leak_detection.tern) | Methane Leak Detection |
-| 246 | [246_sustainable_forest_management.tern](246_sustainable_forest_management.tern) | Sustainable Forest Management |
-| 247 | [247_eco_label_certification.tern](247_eco_label_certification.tern) | Eco-label Certification |
-| 248 | [248_green_bond_verification.tern](248_green_bond_verification.tern) | Green Bond Verification |
-| 249 | [249_corporate_esg_reporting.tern](249_corporate_esg_reporting.tern) | Corporate ESG Reporting |
-| 250 | [250_supply_chain_human_rights.tern](250_supply_chain_human_rights.tern) | Supply Chain Human Rights |
+| 141 | [141_space_mission_planning.tern](141_space_mission_planning.tern) | Launch Readiness Logic with telemetry hold |
+| 142 | [142_autonomous_ship_routing.tern](142_autonomous_ship_routing.tern) | Maritime Collision Avoidance with wave clutter rejection |
+| 143 | [143_insurance_actuarial.tern](143_insurance_actuarial.tern) | Risk Scoring and Premium Adjustment with "Under Investigation" state |
+| 144 | [144_pandemic_tracing.tern](144_pandemic_tracing.tern) | Exposure and Isolation Triage with precautionary isolation for inconclusive tests |
+| 145 | [145_carbon_verification.tern](145_carbon_verification.tern) | Carbon Offset Authenticity with provisional credit state for secondary audits |
+| 146 | [146_water_treatment.tern](146_water_treatment.tern) | Water Purity and Filtration Triage with "Needs Recirculation" state |
+| 147 | [147_warehouse_robot.tern](147_warehouse_robot.tern) | Automated Logistics Dispatch with "Recalibrate/Wait" state for marginal sensors |
+| 148 | [148_clinical_genomics.tern](148_clinical_genomics.tern) | Genetic Variant Pathogenicity with native state for Variants of Uncertain Significance (VUS) |
+| 149 | [149_satellite_collision.tern](149_satellite_collision.tern) | Orbital Conjunction Assessment with "High Probability" state for refined radar passes |
+| 150 | [150_recidivism_risk.tern](150_recidivism_risk.tern) | Rehabilitative Justice Triage with intermediate risk state for personalized intervention |
+| 151 | [151_earthquake_warning.tern](151_earthquake_warning.tern) | Seismic Event Verification with "Evaluating" state for noise filtering |
+| 152 | [152_autonomous_submarine.tern](152_autonomous_submarine.tern) | Undersea Hull Integrity Gate with "Structural Concern" hold state |
+| 153 | [153_supply_chain.tern](153_supply_chain.tern) | Adaptive Inventory Replenishment with "Buffer Monitor" state |
+| 154 | [154_nuclear_sub_reactor.tern](154_nuclear_sub_reactor.tern) | Primary Coolant Loop Control with "Stable Observation" state |
+| 155 | [155_wildfire_evacuation.tern](155_wildfire_evacuation.tern) | Perimeter Defense Triage with "Wait for Change" state for shifting winds |
+| 156 | [156_hospital_bed.tern](156_hospital_bed.tern) | Critical Care Resource Allocation with "Observation" state for triage |
+| 157 | [157_bridge_toll.tern](157_bridge_toll.tern) | Dynamic Congestion Pricing with "Stagnant Traffic" state |
+| 158 | [158_food_recall.tern](158_food_recall.tern) | Perishable Safety Verification with "Sample Testing" hold state |
+| 159 | [159_vaccine_cold_chain.tern](159_vaccine_cold_chain.tern) | mRNA Thermal Stability Monitoring with "Caution/Recalibrate" state |
+| 160 | [160_deepfake_detection.tern](160_deepfake_detection.tern) | Media Forensics Logic with "Ambiguous Signal" state for expert review |
+| 161 | [161_satellite_uplink.tern](161_satellite_uplink.tern) | Orbital Communications Logic with "Handover" hold state |
+| 162 | [162_social_media_suspension.tern](162_social_media_suspension.tern) | Governance & Moderation Logic with "Temporary Restricted" state |
+| 163 | [163_employee_review.tern](163_employee_review.tern) | Human Capital Evaluation with "Improvement Plan" state |
+| 164 | [164_tax_fraud.tern](164_tax_fraud.tern) | Revenue Integrity Logic with "Audit Required" state |
+| 165 | [165_drug_interdiction.tern](165_drug_interdiction.tern) | Port Security Logic with "Secondary Inspection" hold state |
+| 166 | [166_piracy_alert.tern](166_piracy_alert.tern) | Maritime Security & Anti-Piracy with "Vigilance Mode" state |
+| 167 | [167_avalanche_risk.tern](167_avalanche_risk.tern) | Alpine Safety Logic with "Localized Risk" hold state |
+| 168 | [168_tornado_intercept.tern](168_tornado_intercept.tern) | Storm Chasing Logic with "Intercept Postponed" state for safety |
+| 169 | [169_black_hole_scheduling.tern](169_black_hole_scheduling.tern) | Astrophysics Observation Logic with "Event Horizon Wait" state |
+| 170 | [170_cern_beam_abort.tern](170_cern_beam_abort.tern) | Particle Accelerator Safety with "Beam Damping" state |
+| 171 | [171_quantum_processor_stability.tern](171_quantum_processor_stability.tern) | Qubit Coherence Management with "Recalibration Loop" state |
+| 172 | [172_cyber_physical_system_integrity.tern](172_cyber_physical_system_integrity.tern) | Cyber-Physical System Integrity with "Fail-Safe Hold" state |
+| 173 | [173_biodiversity_monitoring.tern](173_biodiversity_monitoring.tern) | Ecosystem Health Logic with "Species of Concern" hold state |
+| 174 | [174_microgrid_fault_detection.tern](174_microgrid_fault_detection.tern) | Distributed Energy Logic with "Island Mode Preparation" state |
+| 175 | [175_space_debris_tracking.tern](175_space_debris_tracking.tern) | Orbital Traffic Management with "Maneuver Assessment" state |
+| 176 | [176_geothermal_energy_extraction.tern](176_geothermal_energy_extraction.tern) | Subsurface Heat Control with "Pressure Stabilization" state |
+| 177 | [177_precision_agriculture_spraying.tern](177_precision_agriculture_spraying.tern) | Targeted Crop Care with "Drift Warning" hold state |
+| 178 | [178_smart_city_traffic_flow.tern](178_smart_city_traffic_flow.tern) | Urban Congestion Management with "Adaptive Smoothing" state |
+| 179 | [179_industrial_robot_safety.tern](179_industrial_robot_safety.tern) | Collaborative Robotics (Cobots) with "Proximity Slow" state |
+| 180 | [180_waste_sorting_automation.tern](180_waste_sorting_automation.tern) | Circular Economy Logic with "Manual Triage" hold state |
+| 181 | [181_pipeline_corrosion_monitoring.tern](181_pipeline_corrosion_monitoring.tern) | Midstream Asset Integrity with "Preventative Maintenance" state |
+| 182 | [182_air_traffic_flow_management.tern](182_air_traffic_flow_management.tern) | Regional Airspace Balancing with "Ground Delay" state |
+| 183 | [183_emergency_dispatch_prioritization.tern](183_emergency_dispatch_prioritization.tern) | 911/112 Triage Logic with "Escalation Check" state |
+| 184 | [184_fleet_fuel_optimization.tern](184_fleet_fuel_optimization.tern) | Logistics Efficiency Logic with "Dynamic Rerouting" state |
+| 185 | [185_supply_chain_provenance.tern](185_supply_chain_provenance.tern) | Blockchain/Ledger Integrity with "Dispute Resolution" state |
+| 186 | [186_water_desalination_control.tern](186_water_desalination_control.tern) | Reverse Osmosis Efficiency with "Membrane Cleaning" state |
+| 187 | [187_renewable_energy_integration.tern](187_renewable_energy_integration.tern) | Grid Stability Logic with "Ramping Reserve" state |
+| 188 | [188_energy_storage_optimization.tern](188_energy_storage_optimization.tern) | Battery Lifecycle Management with "Degradation Hold" state |
+| 189 | [189_building_energy_management.tern](189_building_energy_management.tern) | HVAC Intelligence with "Economizer Mode" state |
+| 190 | [190_smart_lighting_control.tern](190_smart_lighting_control.tern) | Urban Luminance Logic with "Twilight Dimming" state |
+| 191 | [191_autonomous_lawn_mower.tern](191_autonomous_lawn_mower.tern) | Garden Safety Logic with "Obstacle Identification" state |
+| 192 | [192_robotic_surgery_guidance.tern](192_robotic_surgery_guidance.tern) | Precision Motion Control with "Haptic Feedback Resistance" state |
+| 193 | [193_patient_vital_monitoring.tern](193_patient_vital_monitoring.tern) | Smart Triage Logic with "Watchful Waiting" state |
+| 194 | [194_elderly_fall_detection.tern](194_elderly_fall_detection.tern) | Non-Intrusive Care with "Verification Protocol" state |
+| 195 | [195_drug_discovery_simulation.tern](195_drug_discovery_simulation.tern) | Lead Compound Filtering with "Experimental Validation" state |
+| 196 | [196_clinical_trial_recruitment.tern](196_clinical_trial_recruitment.tern) | Patient Enrollment Gate with "Waitlisted" state |
+| 197 | [197_medical_imaging_analysis.tern](197_medical_imaging_analysis.tern) | Tumor Detection Logic with "Further Scan Recommended" state |
+| 198 | [198_public_health_surveillance.tern](198_public_health_surveillance.tern) | Pandemic Early Warning with "Heightened Monitoring" state |
+| 199 | [199_vaccine_distribution_logistics.tern](199_vaccine_distribution_logistics.tern) | Cold Chain Management with "Verification Hold" state |
+| 200 | [200_health_insurance_fraud.tern](200_health_insurance_fraud.tern) | Claims Integrity with "Manual Review" hold state |
+| 201 | [201_financial_market_surveillance.tern](201_financial_market_surveillance.tern) | Insider Trading Detection with "Enhanced Observation" state |
+| 202 | [202_algorithmic_trading_risk.tern](202_algorithmic_trading_risk.tern) | High-Frequency Kill Switch with "Circuit Breaker Pause" state |
+| 203 | [203_credit_risk_assessment.tern](203_credit_risk_assessment.tern) | Dynamic Lending Decision with "Conditional Approval" state |
+| 204 | [204_anti_money_laundering.tern](204_anti_money_laundering.tern) | KYC/AML Velocity Check with "Source Verification" hold state |
+| 205 | [205_insurance_policy_underwriting.tern](205_insurance_policy_underwriting.tern) | Adaptive Risk Coverage with "Medical Review" state |
+| 206 | [206_claim_processing_automation.tern](206_claim_processing_automation.tern) | Touchless Adjudication with "Information Requested" state |
+| 207 | [207_tax_compliance_monitoring.tern](207_tax_compliance_monitoring.tern) | Anomaly-Based Auditing with "Soft Audit" state |
+| 208 | [208_government_budget_allocation.tern](208_government_budget_allocation.tern) | Priority-Based Funding with "Project Review" state |
+| 209 | [209_public_procurement_integrity.tern](209_public_procurement_integrity.tern) | Transparent Bidding with "Qualification Hold" state |
+| 210 | [210_e_voting_security_audit.tern](210_e_voting_security_audit.tern) | Trustworthy Democracy with "Recount Trigger" state |
+| 211 | [211_social_media_content_moderation.tern](211_social_media_content_moderation.tern) | Nuanced Filtering with "Shadow-Ban Check" state |
+| 212 | [212_online_harassment_detection.tern](212_online_harassment_detection.tern) | Protective Cooling with "Time-Out" state |
+| 213 | [213_recommendation_system_ethics.tern](213_recommendation_system_ethics.tern) | Echo Chamber Dissolution with "Diversity Injector" state |
+| 214 | [214_digital_identity_verification.tern](214_digital_identity_verification.tern) | Multi-Factor Trust with "Proof of Life" state |
+| 215 | [215_privacy_policy_compliance.tern](215_privacy_policy_compliance.tern) | Data Minimization Engine with "Consent Requested" state |
+| 216 | [216_data_breach_detection.tern](216_data_breach_detection.tern) | Egress Anomaly Logic with "Connection Throttling" state |
+| 217 | [217_cloud_resource_allocation.tern](217_cloud_resource_allocation.tern) | Green Compute Scaling with "Low Carbon Deferred" state |
+| 218 | [218_edge_computing_orchestration.tern](218_edge_computing_orchestration.tern) | Latency-Aware Offloading with "Local Buffer" state |
+| 219 | [219_5g_network_slicing.tern](219_5g_network_slicing.tern) | QoS Slice Management with "Fair-Share Rebalancing" state |
+| 220 | [220_iot_device_security.tern](220_iot_device_security.tern) | Anomaly Isolation with "Quarantine VLAN" state |
+| 221 | [221_satellite_communication_handover.tern](221_satellite_communication_handover.tern) | Handover Logic with "Signal Buffer" state |
+| 222 | [222_autonomous_underwater_vehicle.tern](222_autonomous_underwater_vehicle.tern) | AUV Navigation with "Deep-Sea Recovery" state |
+| 223 | [223_lunar_rover_navigation.tern](223_lunar_rover_navigation.tern) | Lunar Terrain Analysis with "Obstacle Verification" state |
+| 224 | [224_mars_habitat_life_support.tern](224_mars_habitat_life_support.tern) | Life Support Balancing with "Conservation Mode" state |
+| 225 | [225_asteroid_mining_feasibility.tern](225_asteroid_mining_feasibility.tern) | Prospecting Logic with "Sample Analysis" hold state |
+| 226 | [226_space_weather_forecasting.tern](226_space_weather_forecasting.tern) | Geomagnetic Storm Alert with "Satellite Safing" state |
+| 227 | [227_exoplanet_habitability_analysis.tern](227_exoplanet_habitability_analysis.tern) | Habitable Zone Logic with "Atmospheric Verification" state |
+| 228 | [228_seismic_data_interpretation.tern](228_seismic_data_interpretation.tern) | Earthquake Early Warning with "Confirmation Pending" state |
+| 229 | [229_volcano_eruption_prediction.tern](229_volcano_eruption_prediction.tern) | Magmatic Activity Monitor with "Ground Deformation Hold" state |
+| 230 | [230_ocean_current_modeling.tern](230_ocean_current_modeling.tern) | Ocean Current Modeling with "Sensitivity Check" state |
+| 231 | [231_glacier_retreat_monitoring.tern](231_glacier_retreat_monitoring.tern) | Glaciological Balance with "Annual Accumulation" hold state |
+| 232 | [232_deforestation_detection.tern](232_deforestation_detection.tern) | Illegal Logging Sentry with "Canopy Disturbance" alert state |
+| 233 | [233_wildlife_poaching_prevention.tern](233_wildlife_poaching_prevention.tern) | Rhino Protection Logic with "Intrusion Verification" state |
+| 234 | [234_air_pollution_source_apportionment.tern](234_air_pollution_source_apportionment.tern) | Smog Attribution with "Cross-Border Influence" state |
+| 235 | [235_water_quality_monitoring.tern](235_water_quality_monitoring.tern) | Potability Logic with "Heavy Metal Warning" state |
+| 236 | [236_soil_health_assessment.tern](236_soil_health_assessment.tern) | Regenerative Agriculture with "Microbiome Restoration" state |
+| 237 | [237_urban_heat_island_mitigation.tern](237_urban_heat_island_mitigation.tern) | Cool City Logic with "Surface Albedo Analysis" state |
+| 238 | [238_circular_economy_material_tracking.tern](238_circular_economy_material_tracking.tern) | Material Lifecycle with "Remanufacturing" state |
+| 239 | [239_industrial_emission_control.tern](239_industrial_emission_control.tern) | Smart Scrubber Logic with "Particulate Saturation" state |
+| 240 | [240_nuclear_waste_disposal_safety.tern](240_nuclear_waste_disposal_safety.tern) | Containment Monitoring with "Leachate Verification" state |
+| 241 | [241_carbon_capture_and_storage.tern](241_carbon_capture_and_storage.tern) | DAC Efficiency with "Solvent Regeneration" state |
+| 242 | [242_hydrogen_fuel_production.tern](242_hydrogen_fuel_production.tern) | Electrolyzer Control with "Membrane Pressure" hold state |
+| 243 | [243_biofuel_feedstock_optimization.tern](243_biofuel_feedstock_optimization.tern) | Algae Cultivation with "Nutrient Starvation" state |
+| 244 | [244_geological_carbon_sequestration.tern](244_geological_carbon_sequestration.tern) | Sequestration Monitoring with "Pore Pressure" state |
+| 245 | [245_methane_leak_detection.tern](245_methane_leak_detection.tern) | Fugitive Emission Sentry with "Spectroscopic Verification" state |
+| 246 | [246_sustainable_forest_management.tern](246_sustainable_forest_management.tern) | Selective Logging Logic with "Ecosystem Recovery" state |
+| 247 | [247_eco_label_certification.tern](247_eco_label_certification.tern) | Product Scoring with "Supply Chain Disclosure" state |
+| 248 | [248_green_bond_verification.tern](248_green_bond_verification.tern) | Financial Impact Audit with "Sustainability Verification" state |
+| 249 | [249_corporate_esg_reporting.tern](249_corporate_esg_reporting.tern) | Governance & Social with "Materiality Assessment" state |
+| 250 | [250_supply_chain_human_rights.tern](250_supply_chain_human_rights.tern) | Ethical Sourcing with "Corrective Action" state |
 
 
 ## Patterns Demonstrated

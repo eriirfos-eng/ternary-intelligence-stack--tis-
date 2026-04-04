@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 203_credit_risk_assessment.tern — Credit Risk Assessment
+// 203_credit_risk_assessment.tern — Dynamic Lending Decision
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Many high-potential borrowers have "Thin" credit files (0). Binary "Yes/No" 
+// systems exclude them. Ternary (0) routes these applicants to "Secured 
+// Lending" or "Co-signer" paths, expanding market reach without taking 
+// on uncompensated risk.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_income(stability: trit, debt_ratio: trit) -> trit {
+    return consensus(stability, debt_ratio);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn loan_approval(income_score: trit, collateral_val: trit) -> trit {
+    match income_score {
+        -1 => {
+            match collateral_val {
+                -1 => { return conflict(); } 
+                 0 => { return conflict(); }
+                 1 => { return hold();     } // Bad income but GREAT collateral
+            }
+        }
+        0 => {
+            return hold(); // Borderline case
+        }
+        1 => {
+            match collateral_val {
+                -1 => { return hold();     } // Good income, no collateral
+                 0 => { return truth();    }
+                 1 => { return truth();    }
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let income: trit = hold();  // Freelancer, variable income
+let debt:   trit = truth(); // No debt
+let asset:  trit = truth(); // Strong collateral
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let score: trit = evaluate_income(income, debt);
+let result: trit = loan_approval(score, asset);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match result {
+    -1 => { return conflict(); } // DENY
+     0 => { return hold();     } // SECURED LOAN ONLY
+     1 => { return truth();    } // APPROVE UNSECURED
 }

@@ -1,37 +1,44 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 183_emergency_dispatch_prioritization.tern — Emergency Dispatch Prioritization
+// 183_emergency_dispatch_prioritization.tern — 911/112 Triage Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Not every call is "Life-Threatening" or "Prank". "Urgent but Stable" (0) 
+// is the most common state. Ternary ensures an ambulance isn't wasted on 
+// a broken toe when a cardiac arrest might be seconds away.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn classify_injury(conscious_state: trit, respiratory_effort: trit) -> trit {
+    let severity: trit = consensus(conscious_state, respiratory_effort);
+    return severity;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn allocate_resource(severity: trit, available_units: trit) -> trit {
+    match available_units {
+        -1 => { return conflict(); } // ZERO UNITS - MUTUAL AID REQUIRED
+         0 => { 
+             // Limited units, triage heavily
+             match severity {
+                 -1 => { return truth();    } // PRIORITY 1
+                  0 => { return hold();     } // QUEUE FOR PD
+                  1 => { return conflict(); } // DEFER
              }
+         }
+         1 => { 
+             // Plenty of units
+             return severity;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let brain: trit = hold();
+let lungs: trit = hold();
+let fleet: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let call_rank: trit = classify_injury(brain, lungs);
+let dispatch:  trit = allocate_resource(call_rank, fleet);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match dispatch {
+    -1 => { return conflict(); } // NO SERVICE
+     0 => { return hold();     } // TELE-HEALTH ADVICE
+     1 => { return truth();    } // DISPATCH ALS UNIT
 }

@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 205_insurance_policy_underwriting.tern — Insurance Policy Underwriting
+// 205_insurance_policy_underwriting.tern — Adaptive Risk Coverage
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Standard insurance is "One Size Fits All." Ternary (0) allows for 
+// "Conditional Underwriting"—policies that cover everything EXCEPT a 
+// specific pre-existing risk, or that require a higher deductible (0).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn medical_clearance(exam_results: trit, history: trit) -> trit {
+    return consensus(exam_results, history);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn underwriting_engine(med_score: trit, age_factor: trit) -> trit {
+    match med_score {
+        -1 => { return conflict(); } // Uninsurable
+         0 => {
+             match age_factor {
+                 -1 => { return conflict(); } // Borderline health + Old = No
+                  0 => { return hold();     } // Borderline health + Middle = Conditional
+                  1 => { return hold();     } // Borderline health + Young = Conditional
              }
+         }
+         1 => {
+             return age_factor;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let exams: trit = hold();  // Blood work slightly elevated
+let hist:  trit = truth(); // No family history
+let age:   trit = hold();  // Middle-aged
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let med: trit = medical_clearance(exams, hist);
+let policy: trit = underwriting_engine(med, age);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match policy {
+    -1 => { return conflict(); } // DECLINE
+     0 => { return hold();     } // CONDITIONAL OFFER (WITH EXCLUSIONS)
+     1 => { return truth();    } // STANDARD ISSUE
 }

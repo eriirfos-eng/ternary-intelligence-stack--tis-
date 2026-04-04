@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 232_deforestation_detection.tern — Deforestation Detection
+// 232_deforestation_detection.tern — Illegal Logging Sentry
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Satellite imagery is often obscured by clouds. Binary "Forest/No-Forest" 
+// creates false alarms or misses selective logging. Ternary (0) indicates 
+// "CANOPY_THINNING," triggering an acoustic sensor check for chainsaws.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn canopy_status(spectral_index: trit, cloud_cover: trit) -> trit {
+    match cloud_cover {
+        1 => { return hold(); } // OBSCURED - STATUS UNKNOWN
+        -1 => {
+            // Clear sky: direct reading
+            match spectral_index {
+                -1 => { return conflict(); } // DEFORESTED
+                 0 => { return hold();     } // THINNING
+                 1 => { return truth();    } // INTACT
+            }
+        }
+        0 => {
+            // Partial clouds: conservative reading
+            match spectral_index {
+                -1 => { return conflict(); }
+                 0 => { return hold();     }
+                 1 => { return hold();     }
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn enforcement_priority(canopy: trit, acoustic_alert: trit) -> trit {
+    let combined: trit = consensus(canopy, invert(acoustic_alert));
+    match combined {
+        -1 => { return conflict(); } // HIGH PRIORITY INTERCEPTION
+         0 => { return hold();     } // INVESTIGATE THINNING
+         1 => { return truth();    } // MONITORING ONLY
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let ndvi: trit = hold();
+let clouds: trit = conflict();
+let saws: trit = truth();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let forest: trit = canopy_status(ndvi, clouds);
+let priority: trit = enforcement_priority(forest, saws);
+
+match priority {
+    -1 => { return conflict(); } // DISPATCH RANGERS
+     0 => { return hold();     } // DEPLOY DRONE
+     1 => { return truth();    } // SECURE
 }

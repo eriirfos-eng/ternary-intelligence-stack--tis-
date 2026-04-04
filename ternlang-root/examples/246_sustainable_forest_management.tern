@@ -1,37 +1,53 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 246_sustainable_forest_management.tern — Sustainable Forest Management
+// 246_sustainable_forest_management.tern — Selective Logging Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Forest management is about long-term yield. Binary logic results in 
+// clear-cutting. Ternary (0) defines a "THINNING_NECESSARY" state, where 
+// only specific trees are removed to promote the health of the broader 
+// ecosystem while maintaining carbon sequestration.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn stand_health(growth_rate: trit, biodiversity_index: trit) -> trit {
+    let health: trit = consensus(growth_rate, biodiversity_index);
+    match health {
+        -1 => { return conflict(); } // STAGNANT / MONOCULTURE
+         0 => { return hold();     } // RECOVERING
+         1 => { return truth();    } // VIBRANT
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn logging_permit(health: trit, pest_infestation: trit) -> trit {
+    match pest_infestation {
+        1 => { return truth(); } // HIGH INFESTATION: LOG TO PREVENT SPREAD
+        0 => {
+            // Moderate pests: only log if forest is vibrant enough to recover
+            match health {
+                -1 => { return conflict(); }
+                 0 => { return hold();     } // SELECTIVE THINNING ONLY
+                 1 => { return truth();    } // SUSTAINABLE YIELD
+            }
+        }
+        -1 => {
+            // No pests: preserve the forest
+            match health {
+                -1 => { return hold();     } // NURSE BACK TO HEALTH
+                 0 => { return hold();     } // MONITOR
+                 1 => { return conflict(); } // PROTECT AS OLD-GROWTH
+            }
+        }
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let grow: trit = hold();
+let bio: trit = truth();
+let bugs: trit = conflict();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let forest: trit = stand_health(grow, bio);
+let permit: trit = logging_permit(forest, bugs);
+
+match permit {
+    -1 => { return conflict(); } // NO LOGGING
+     0 => { return hold();     } // SELECTIVE
+     1 => { return truth();    } // CLEARANCE
 }

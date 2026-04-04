@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 229_volcano_eruption_prediction.tern — Volcano Eruption Prediction
+// 229_volcano_eruption_prediction.tern — Magmatic Activity Monitor
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Volcanoes often display periods of unrest that don't lead to eruption. 
+// A binary system causes "Warning Fatigue." Ternary (0) represents "UNREST," 
+// signaling researchers to deploy more sensors without evacuating the city.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn magmatic_unrest(tremor_rate: trit, gas_emission: trit) -> trit {
+    let activity: trit = consensus(tremor_rate, gas_emission);
+    match activity {
+        -1 => { return conflict(); } // DORMANT
+         0 => { return hold();     } // REAWAKENING
+         1 => { return truth();    } // MAGMA RISING
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn hazard_status(unrest: trit, deformation: trit) -> trit {
+    match unrest {
+        -1 => { return conflict(); } // SAFE
+         0 => {
+             // Check if the ground is swelling
+             match deformation {
+                 -1 => { return conflict(); } // NO DEFORMATION
+                  0 => { return hold();     } // MILD SWELLING
+                  1 => { return hold();     } // SIGNIFICANT UPLIFT
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Magma is high, deformation is key for timing
+             match deformation {
+                 -1 => { return hold();  } // INTERNAL PRESSURE ONLY
+                  0 => { return truth(); } // CRITICAL UNREST
+                  1 => { return truth(); } // ERUPTION IMMINENT
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let tremors: trit = truth();
+let gas: trit = hold();
+let ground: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let state: trit = magmatic_unrest(tremors, gas);
+let status: trit = hazard_status(state, ground);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match status {
+    -1 => { return conflict(); } // QUIET
+     0 => { return hold();     } // WATCH
+     1 => { return truth();    } // ALERT
 }

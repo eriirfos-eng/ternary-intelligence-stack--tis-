@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 182_air_traffic_flow_management.tern — Air Traffic Flow Management
+// 182_air_traffic_flow_management.tern — Regional Airspace Balancing
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Airspace is rarely "Empty" or "Full". "Saturation" (0) is a fluid state. 
+// Ternary logic allows for "GROUND_HOLD" (0) where planes wait at the gate 
+// rather than circling in the air, saving massive amounts of jet fuel.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn calculate_sector_density(arrival_rate: trit, runway_visual_range: trit) -> trit {
+    let density: trit = consensus(arrival_rate, runway_visual_range);
+    return density;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn issue_flow_control(density: trit, fuel_reserves: trit) -> trit {
+    match density {
+        -1 => { return conflict(); } // SECTOR SATURATED - DIVERT
+         0 => { 
+             // Congested, prioritize by fuel
+             match fuel_reserves {
+                 -1 => { return truth();    } // EMERGENCY LANDING
+                  0 => { return hold();     } // LINEAR HOLD
+                  1 => { return hold();     }
              }
          }
+         1 => { return truth(); } // CLEAR FOR APPROACH
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let rate:   trit = hold();
+let visual: trit = truth();
+let fuel:   trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let density: trit = calculate_sector_density(rate, visual);
+let command: trit = issue_flow_control(density, fuel);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match command {
+    -1 => { return conflict(); } // STOP DEPARTURES
+     0 => { return hold();     } // SPEED ADJUSTMENT
+     1 => { return truth();    } // UNRESTRICTED FLOW
 }

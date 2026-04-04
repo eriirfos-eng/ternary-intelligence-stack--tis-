@@ -1,37 +1,50 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 155_wildfire_evacuation.tern — Wildfire Evacuation Routing
+// 155_wildfire_evacuation.tern — Perimeter Defense Triage
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Wildfire evacuation is a high-stakes decision. Binary "Stay/Go" models
+// often lead to fatal traffic jams during sudden wind shifts. Ternary (0)
+// captures the "READY" state (Level 2), where residents pack vehicles and
+// firefighters establish firebreaks, providing a buffer before a full
+// mandatory evacuation (1) is triggered by thermal sensors.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn fire_proximity(x: trit) -> trit { return x; }
-fn wind_direction(x: trit) -> trit { return x; }
-fn road_capacity(x: trit) -> trit { return x; }
+fn fire_spread_risk(wind_speed: trit, humidity: trit) -> trit {
+    // Fire risk is higher when wind is high (1) and humidity is low (-1).
+    let dry_wind: trit = consensus(wind_speed, invert(humidity));
+    return dry_wind;
+}
 
-fn main_decision(f: trit, w: trit, r: trit) -> trit {
-    match f {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match w {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(w, r); }
-             }
-         }
+fn evacuation_status(spread_risk: trit, distance: trit) -> trit {
+    match spread_risk {
+        -1 => { 
+            // Low risk or contained. Stay vigilant.
+            return conflict(); 
+        }
+        0 => {
+            // Unpredictable spread or spotting. 
+            match distance {
+                -1 => { return truth(); } // FAR BUT SPREADING - PREPARE
+                 0 => { return hold();  } // MEDIUM DISTANCE - SET
+                 1 => { return hold();  } // NEAR - READY
+            }
+        }
+        1 => {
+            // Rapid uncontrollable spread.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let Santa_Ana_wind: trit = truth(); // Strong winds
+let fuel_moisture:  trit = hold();  // Moderate dryness
+let fire_distance:  trit = hold();  // 5 miles away
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let risk_level: trit = fire_spread_risk(Santa_Ana_wind, fuel_moisture);
+let order:      trit = evacuation_status(risk_level, fire_distance);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match order {
+    -1 => { return conflict(); } // LEVEL 0 - NORMAL SITUATION
+     0 => { return hold();     } // LEVEL 2 - READY / SET / PREPARE
+     1 => { return truth();    } // LEVEL 3 - GO / MANDATORY EVACUATION
 }

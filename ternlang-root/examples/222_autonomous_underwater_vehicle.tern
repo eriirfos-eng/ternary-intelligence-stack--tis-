@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 222_autonomous_underwater_vehicle.tern — Autonomous Underwater Vehicle
+// 222_autonomous_underwater_vehicle.tern — AUV Navigation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In underwater environments, sensor data is often noisy (turbidity, echoes).
+// A binary "Object/No-Object" decision leads to jittery navigation. 
+// The (0) state represents "UNCERTAIN_OBSTACLE," triggering a slow-down or 
+// sonar ping increase rather than a full halt or blind advance.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn calculate_collision_risk(sonar_return: trit, pressure_delta: trit) -> trit {
+    // Consensus between sonar and pressure spikes
+    let risk: trit = consensus(sonar_return, pressure_delta);
+    match risk {
+        -1 => { return conflict(); } // CLEAR PATH
+         0 => { return hold();     } // POTENTIAL OBSTRUCTION
+         1 => { return truth();    } // COLLISION IMMINENT
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn propulsion_mode(risk: trit, battery_reserve: trit) -> trit {
+    match risk {
+        -1 => { 
+            // Path is clear, full thrust if battery permits
+            match battery_reserve {
+                -1 => { return hold();     } // LOW POWER - ECO MODE
+                 0 => { return hold();     } // MEDIUM POWER
+                 1 => { return truth();    } // FULL SPEED
+            }
+        }
+         0 => { return hold(); } // CAUTIONARY SPEED
+         1 => { return conflict(); } // FULL REVERSE / EMERGENCY STOP
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+// Scenario: Sonar sees something (0), pressure is stable (-1), battery is low (-1)
+let sonar: trit = hold();
+let pressure: trit = conflict();
+let battery: trit = conflict();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let risk_level: trit = calculate_collision_risk(sonar, pressure);
+let drive: trit = propulsion_mode(risk_level, battery);
+
+match drive {
+    -1 => { return conflict(); } // HALT
+     0 => { return hold();     } // CAUTION
+     1 => { return truth();    } // FULL THRUST
 }

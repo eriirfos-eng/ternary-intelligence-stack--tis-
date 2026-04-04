@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 190_smart_lighting_control.tern — Smart Lighting Control
+// 190_smart_lighting_control.tern — Urban Luminance Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Streetlights are either "Off" (-1) or "Blindly On" (1) in binary cities. 
+// Ternary (0) enables "MOONLIGHTING", where lights dim to 20% when no 
+// pedestrians are detected, reducing light pollution and saving millions 
+// in municipal electricity.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn sense_ambient_light(lux_sensor: trit, cloud_cover: trit) -> trit {
+    let light_level: trit = consensus(lux_sensor, cloud_cover);
+    return light_level;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn adjust_brightness(light_level: trit, motion_detected: trit) -> trit {
+    match light_level {
+        -1 => { 
+            // It is dark
+            match motion_detected {
+                -1 => { return truth();    } // PEDESTRIAN - FULL BRIGHT
+                 0 => { return hold();     } // AREA ACTIVE - DIM
+                 1 => { return hold();     }
+            }
+        }
+         0 => { return hold();     } // DUSK - LOW POWER
+         1 => { return conflict(); } // DAYLIGHT - OFF
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let lux:    trit = conflict();
+let clouds: trit = hold();
+let motion: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let ambient:    trit = sense_ambient_light(lux, clouds);
+let led_driver: trit = adjust_brightness(ambient, motion);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match led_driver {
+    -1 => { return conflict(); } // 0% POWER
+     0 => { return hold();     } // 20% POWER
+     1 => { return truth();    } // 100% POWER
 }

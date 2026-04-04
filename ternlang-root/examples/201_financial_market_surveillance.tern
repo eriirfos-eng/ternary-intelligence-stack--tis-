@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 201_financial_market_surveillance.tern — Financial Market Surveillance
+// 201_financial_market_surveillance.tern — Insider Trading Detection
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Most trading activity is "Noise" (1 or -1 depending on direction). Ternary (0)
+// flags "Non-Directional Anomalies"—volume spikes without price movement 
+// or sudden off-market coordination—that warrant a regulatory "Freeze" 
+// rather than a simple buy/sell signal.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn analyze_volume(vol_spike: trit, price_action: trit) -> trit {
+    // If volume is high (1) but price is flat (0), that's suspicious (0).
+    match vol_spike {
+        -1 => { return truth(); } // Low volume, no concern
+         0 => { return truth(); }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match price_action {
+                 -1 => { return truth(); } // Normal high-vol selling
+                  0 => { return hold();  } // HIGH VOL FLAT PRICE - SUSPICIOUS
+                  1 => { return truth(); } // Normal high-vol buying
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn regulator_alert(suspicion: trit, trader_history: trit) -> trit {
+    let combined_risk: trit = consensus(suspicion, trader_history);
+    return combined_risk;
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let volume_data: trit = truth();   // Extreme volume spike
+let price_data:  trit = hold();    // Price not moving
+let history:     trit = hold();    // First time trader
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let suspicion_level: trit = analyze_volume(volume_data, price_data);
+let alert:           trit = regulator_alert(suspicion_level, history);
+
+match alert {
+    -1 => { return conflict(); } // RED FLAG - HALT TRADING
+     0 => { return hold();     } // YELLOW FLAG - INVESTIGATE
+     1 => { return truth();    } // CLEAR
 }

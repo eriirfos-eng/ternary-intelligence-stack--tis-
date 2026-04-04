@@ -1,37 +1,46 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 144_pandemic_tracing.tern — Pandemic Contact Tracing
+// 144_pandemic_tracing.tern — Exposure and Isolation Triage
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In a pandemic, a binary "Positive/Negative" model ignores the "Inconclusive" 
+// (0) test result or the "Likely Exposure" period where viral load is low.
+// Ternary (0) allows for "Precautionary Isolation" without the severity of
+// a full "Confirmed Case" restriction or the danger of a "Clear" status.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn exposure_duration(x: trit) -> trit { return x; }
-fn proximity(x: trit) -> trit { return x; }
-fn vaccination_status(x: trit) -> trit { return x; }
+fn viral_load_status(swab: trit, rapid_test: trit) -> trit {
+    // Fusing two tests to determine diagnostic certainty.
+    return consensus(swab, rapid_test);
+}
 
-fn main_decision(e: trit, p: trit, v: trit) -> trit {
-    match e {
-        -1 => { return 1; }
-         0 => { return 0; }
-         1 => {
-             match p {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return invert(v); }
-             }
-         }
+fn quarantine_mandate(exposure: trit, diagnostic: trit) -> trit {
+    match diagnostic {
+        -1 => { 
+            // Negative test: Use exposure to determine if caution is still needed.
+            match exposure {
+                -1 => { return conflict(); } // CLEAR - No exposure, negative test.
+                 0 => { return hold();     } // WATCH - Possible exposure, negative test.
+                 1 => { return hold();     } // ISOLATE - High exposure, wait for more tests.
+            }
+        }
+        0 => {
+            // Inconclusive test result. Default to holding status.
+            return hold();
+        }
+        1 => {
+            // Positive test result. Mandatory isolation.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let contact_risk: trit = truth(); // Shared indoor space
+let lab_result:   trit = hold();  // Swab contaminated/unclear
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let mandate: trit = quarantine_mandate(contact_risk, lab_result);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match mandate {
+    -1 => { return conflict(); } // CLEAR - RESUME ACTIVITY
+     0 => { return hold();     } // PRECAUTIONARY SELF-ISOLATION
+     1 => { return truth();    } // MANDATORY CLINICAL QUARANTINE
 }

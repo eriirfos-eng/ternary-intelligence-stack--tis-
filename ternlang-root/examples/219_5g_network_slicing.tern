@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 219_5g_network_slicing.tern — 5G Network Slicing
+// 219_5g_network_slicing.tern — QoS Slice Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// 5G slices can be over-provisioned. Ternary (0) enables "Soft Slicing." 
+// Non-critical devices (IoT sensors) are moved to a "Best Effort" slice (0) 
+// when emergency services (1) require guaranteed low-latency bandwidth.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_congestion(user_density: trit, spectrum_noise: trit) -> trit {
+    return consensus(user_density, spectrum_noise);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn slice_assignment(congestion: trit, app_prio: trit) -> trit {
+    match congestion {
+        -1 => {
+            match app_prio {
+                -1 => { return conflict(); } // Too congested for low prio
+                 0 => { return conflict(); }
+                 1 => { return truth();    } // Only high prio gets through
+            }
+        }
+        0 => {
+            match app_prio {
+                -1 => { return conflict(); }
+                 0 => { return hold();     } // Mid prio gets Mid slice
+                 1 => { return truth();    }
+            }
+        }
+        1 => { return truth(); } // All slices available
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let dens: trit = hold();  // Stadium crowd gathering
+let nois: trit = truth(); // Clean signal
+let app:  trit = hold();  // Video streaming (Medium priority)
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cng: trit = evaluate_congestion(dens, nois);
+let slice: trit = slice_assignment(cng, app);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match slice {
+    -1 => { return conflict(); } // DISCONNECT / DEFER
+     0 => { return hold();     } // BEST EFFORT SLICE
+     1 => { return truth();    } // PREMIUM / ULTRA-LOW LATENCY
 }

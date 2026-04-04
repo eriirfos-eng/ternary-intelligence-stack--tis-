@@ -1,37 +1,53 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 248_green_bond_verification.tern — Green Bond Verification
+// 248_green_bond_verification.tern — Financial Impact Audit
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Green bonds must prove their proceeds go to "Green" projects. Binary logic 
+// ignores "Mixed-Use" projects. Ternary (0) allows for "QUALIFIED_PARTIAL" 
+// status, ensuring capital reaches projects that are significantly, if 
+// not entirely, sustainable.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn project_eligibility(taxonomy_alignment: trit, additionality: trit) -> trit {
+    let eligibility: trit = consensus(taxonomy_alignment, additionality);
+    match eligibility {
+        -1 => { return conflict(); } // BROWN PROJECT
+         0 => { return hold();     } // TRANSITION PROJECT
+         1 => { return truth();    } // DEEP GREEN
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn verification_status(eligibility: trit, reporting_reliability: trit) -> trit {
+    match reporting_reliability {
+        -1 => { return conflict(); } // UNRELIABLE DATA
+         0 => {
+             // Moderate reliability: proceed with caution
+             match eligibility {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // CONDITIONAL
+                  1 => { return hold();     } // CONDITIONAL
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // High reliability: direct match
+             match eligibility {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // VERIFIED TRANSITION
+                  1 => { return truth();    } // VERIFIED GREEN
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let align: trit = truth();
+let add:   trit = hold();
+let report: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let project: trit = project_eligibility(align, add);
+let status:  trit = verification_status(project, report);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match status {
+    -1 => { return conflict(); } // FAIL
+     0 => { return hold();     } // PENDING / CONDITIONAL
+     1 => { return truth();    } // VERIFIED
 }

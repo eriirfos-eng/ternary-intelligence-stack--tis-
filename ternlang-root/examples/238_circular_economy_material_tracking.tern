@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 238_circular_economy_material_tracking.tern — Circular Economy Material Tracking
+// 238_circular_economy_material_tracking.tern — Material Lifecycle
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In a circular economy, materials aren't just "New" or "Waste." Ternary (0) 
+// represents "SECONDARY_RAW_MATERIAL"—reclaimed content that requires 
+// purification but is higher value than landfill-bound trash.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn material_grade(purity_level: trit, contamination_risk: trit) -> trit {
+    let grade: trit = consensus(purity_level, invert(contamination_risk));
+    match grade {
+        -1 => { return conflict(); } // WASTE
+         0 => { return hold();     } // DOWN-CYCLE CANDIDATE
+         1 => { return truth();    } // VIRGIN-EQUIVALENT
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn routing_decision(grade: trit, market_demand: trit) -> trit {
+    match grade {
+        -1 => { return conflict(); } // LANDFILL / ENERGY RECOVERY
+         0 => {
+             // Secondary material: route based on demand
+             match market_demand {
+                 -1 => { return conflict(); } // NO MARKET - STORE
+                  0 => { return hold();     } // LOW DEMAND - DOWN-CYCLE
+                  1 => { return truth();    } // HIGH DEMAND - REFURBISH
+             }
+         }
+         1 => { return truth(); } // RETURN TO MANUFACTURING
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let purity: trit = hold();
+let risk: trit = hold();
+let demand: trit = truth();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let grade: trit = material_grade(purity, risk);
+let route: trit = routing_decision(grade, demand);
+
+match route {
+    -1 => { return conflict(); } // DISCARD
+     0 => { return hold();     } // REPROCESS
+     1 => { return truth();    } // REUSE
 }

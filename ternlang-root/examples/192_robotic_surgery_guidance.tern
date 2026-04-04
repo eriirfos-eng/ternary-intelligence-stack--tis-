@@ -1,37 +1,50 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 192_robotic_surgery_guidance.tern — Robotic Surgery Guidance
+// 192_robotic_surgery_guidance.tern — Precision Motion Control
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In robotic surgery, a binary "Move/Freeze" is dangerous. Ternary (0)
+// enables "Active Compensation" or "Stabilization" mode. When tremors are 
+// detected or nerve proximity is uncertain, the system doesn't just stop;
+// it dampens input to ensure surgeon intent is safely translated.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_nerve_safety(proximity: trit) -> trit {
+    match proximity {
+        -1 => { return conflict(); } // Critical proximity
+         0 => { return hold();     } // Warning zone - engage haptic feedback
+         1 => { return truth();    } // Safe distance
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn surgical_arm_mode(tremor_scale: trit, nerve_proximity: trit, tissue_density: trit) -> trit {
+    let safety: trit = evaluate_nerve_safety(nerve_proximity);
+    
+    match safety {
+        -1 => { return conflict(); } // Emergency Lock
+         0 => { 
+             // Cautionary mode: ignore high-frequency tremor trits
+             let stability: trit = consensus(tremor_scale, tissue_density);
+             match stability {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return hold();     } // Even if stable, keep in Caution due to nerve proximity
              }
+         }
+         1 => {
+             // Normal operation
+             return tremor_scale;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let tremor:  trit = truth();    // Low tremor
+let nerve:   trit = hold();     // Approaching nerve
+let density: trit = truth();    // Optimal tissue resistance
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let mode: trit = surgical_arm_mode(tremor, nerve, density);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match mode {
+    -1 => { return conflict(); } // ABORT/LOCK
+     0 => { return hold();     } // STABILIZE/DAMPEN
+     1 => { return truth();    } // ACTIVE STEER
 }

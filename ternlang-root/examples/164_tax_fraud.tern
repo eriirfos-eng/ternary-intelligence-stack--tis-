@@ -1,37 +1,34 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 164_tax_fraud.tern — Tax Fraud Flagging
+// 164_tax_fraud.tern — Revenue Integrity Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Tax returns are rarely perfectly clean or obviously criminal. "Grey Areas" (0) 
+// are where the most revenue is recovered. Ternary allows the system to flag 
+// "AUDIT_PENDING" without freezing legitimate accounts.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn income_mismatch(x: trit) -> trit { return x; }
-fn deduction_anomaly(x: trit) -> trit { return x; }
-fn offshore_assets(x: trit) -> trit { return x; }
-
-fn main_decision(i: trit, d: trit, o: trit) -> trit {
-    match i {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match d {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(d, o); }
+fn screen_for_anomalies(deductions: trit, income_source: trit) -> trit {
+    match deductions {
+        -1 => { return conflict(); } // Outrageous claims
+         0 => {
+             // Borderline deductions, check income source
+             match income_source {
+                -1 => { return conflict(); }
+                 0 => { return hold();     }
+                 1 => { return hold();     }
              }
          }
+         1 => { return truth(); }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let deduction_val: trit = hold();
+let income_val:    trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let fraud_risk: trit = screen_for_anomalies(deduction_val, income_val);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match fraud_risk {
+    -1 => { return conflict(); } // REJECT & INVESTIGATE
+     0 => { return hold();     } // SEND TO HUMAN AUDITOR
+     1 => { return truth();    } // PROCESS REFUND
 }

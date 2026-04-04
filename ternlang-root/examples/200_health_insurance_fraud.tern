@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 200_health_insurance_fraud.tern — Health Insurance Fraud
+// 200_health_insurance_fraud.tern — Claims Integrity
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Automated insurance denial is a PR nightmare and often illegal. Ternary (0)
+// filters "Low-Certainty Anomalies" into a "Peer Review" queue where medical 
+// experts, not algorithms, make the final determination on suspicious claims.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn calculate_anomaly_score(provider_rep: trit, code_consistency: trit) -> trit {
+    return consensus(provider_rep, code_consistency);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn claim_adjudication(anomaly: trit, claim_value: trit) -> trit {
+    match anomaly {
+        -1 => { return conflict(); } // Obvious fraud
+         0 => {
+             match claim_value {
+                 -1 => { return conflict(); } // High value anomaly -> Reject/Investigate
+                  0 => { return hold();     } // Mid value anomaly -> Expert Review
+                  1 => { return hold();     } // Low value anomaly -> Audit later
              }
+         }
+         1 => {
+             return truth(); // Clean claim
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let reputation: trit = hold();    // New provider, unknown
+let codes:      trit = truth();   // Billing codes match diagnosis
+let value:      trit = conflict(); // High-dollar claim
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let score:  trit = calculate_anomaly_score(reputation, codes);
+let status: trit = claim_adjudication(score, value);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match status {
+    -1 => { return conflict(); } // DENY / INVESTIGATE
+     0 => { return hold();     } // MANUAL CLINICAL REVIEW
+     1 => { return truth();    } // AUTO-APPROVE
 }

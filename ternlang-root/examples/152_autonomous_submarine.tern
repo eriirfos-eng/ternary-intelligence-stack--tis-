@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 152_autonomous_submarine.tern — Autonomous Submarine
+// 152_autonomous_submarine.tern — Undersea Hull Integrity Gate
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A submarine's hull integrity isn't just "Intact" or "Imploding".
+// Metal fatigue introduces a "Micro-Fracture" (0) state, which requires
+// immediate depth reduction to stabilize pressure. Binary logic might
+// ignore these warnings until they become catastrophic "No-Go" events.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn depth_limit(x: trit) -> trit { return x; }
-fn sonar_clear(x: trit) -> trit { return x; }
-fn ballast_system(x: trit) -> trit { return x; }
+fn stress_analysis(strain_gauge: trit, acoustic_sensor: trit) -> trit {
+    // Both sensors must be nominal for hull safety.
+    return consensus(strain_gauge, acoustic_sensor);
+}
 
-fn main_decision(d: trit, s: trit, b: trit) -> trit {
-    match d {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, b); }
-             }
-         }
+fn depth_management(hull_risk: trit, target_depth: trit) -> trit {
+    match hull_risk {
+        -1 => { 
+            // Severe hull breach or stress. Surface immediately.
+            return conflict(); 
+        }
+        0 => {
+            // Minor stress or noisy sensors. Hold depth and stabilize.
+            return hold();
+        }
+        1 => {
+            // Hull is perfect. Deep dive is safe.
+            match target_depth {
+                -1 => { return conflict(); } // SURFACE COMMAND
+                 0 => { return hold();     } // MAINTAIN DEPTH
+                 1 => { return truth();    } // DIVE DEEPER
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let strain_data:  trit = truth(); // No hull deformation
+let acoustic_qc:  trit = hold();  // Ultrasonic scan shows noise/bubbles
+let mission_goal: trit = truth(); // Dive to 4000m
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let hull_health: trit = stress_analysis(strain_data, acoustic_qc);
+let dive_command: trit = depth_management(hull_health, mission_goal);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match dive_command {
+    -1 => { return conflict(); } // EMERGENCY ASCENT
+     0 => { return hold();     } // MAINTAIN CURRENT DEPTH
+     1 => { return truth();    } // DESCEND TO TARGET
 }

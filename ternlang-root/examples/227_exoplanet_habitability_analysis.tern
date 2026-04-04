@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 227_exoplanet_habitability_analysis.tern — Exoplanet Habitability Analysis
+// 227_exoplanet_habitability_analysis.tern — Habitable Zone Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Determining habitability is a game of probabilities. A binary "Yes/No" 
+// overlooks planets with subsurface oceans or thick atmospheres. The (0) state 
+// marks a planet as a "CANDIDATE" for follow-up transit spectroscopy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn surface_conditions(stellar_flux: trit, albedo_estimate: trit) -> trit {
+    let temp_range: trit = consensus(stellar_flux, invert(albedo_estimate));
+    match temp_range {
+        -1 => { return conflict(); } // SNOWBALL
+         0 => { return hold();     } // TEMPERATE / POTENTIAL WATER
+         1 => { return truth();    } // VENUSIAN / DESERT
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn biosignature_potential(surface: trit, methane_level: trit) -> trit {
+    match surface {
+        -1 => { return conflict(); } // TOO COLD
+         1 => { return conflict(); } // TOO HOT
+         0 => {
+             // Surface is temperate: check chemistry
+             match methane_level {
+                 -1 => { return hold();  } // INERT
+                  0 => { return hold();  } // TRACE GAS
+                  1 => { return truth(); } // ANOMALOUS BIOGENIC SIGNATURE
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let flux: trit = hold();
+let albedo: trit = hold();
+let methane: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let surf: trit = surface_conditions(flux, albedo);
+let rank: trit = biosignature_potential(surf, methane);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match rank {
+    -1 => { return conflict(); } // UNINHABITABLE
+     0 => { return hold();     } // MARGINAL
+     1 => { return truth();    } // HIGH-PRIORITY TARGET
 }

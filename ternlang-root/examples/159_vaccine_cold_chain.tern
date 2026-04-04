@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 159_vaccine_cold_chain.tern — Vaccine Cold Chain
+// 159_vaccine_cold_chain.tern — mRNA Thermal Stability Monitoring
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// mRNA vaccines require strict cold chains (-80C to -20C). 
+// A binary "Cold/Hot" model ignores the "Thermal Excursion" (0) state,
+// where a vaccine has warmed slightly but is still viable if 
+// administered immediately. Ternary (0) captures this "Use Now" state,
+// preventing the massive waste caused by binary "Spoiled" flags.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn temp_log_ok(x: trit) -> trit { return x; }
-fn power_status(x: trit) -> trit { return x; }
-fn expiry_date_ok(x: trit) -> trit { return x; }
+fn thermal_log_fusion(logger_1: trit, logger_2: trit) -> trit {
+    // Both data loggers in the crate must agree on the temperature.
+    return consensus(logger_1, logger_2);
+}
 
-fn main_decision(t: trit, p: trit, e: trit) -> trit {
-    match t {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match p {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(p, e); }
-             }
-         }
+fn vaccine_viability(thermal_integrity: trit, transit_time: trit) -> trit {
+    match thermal_integrity {
+        -1 => { 
+            // Severe temperature spike. Denatured.
+            return conflict(); 
+        }
+        0 => {
+            // Minor excursion. Check if we have time to use it.
+            match transit_time {
+                -1 => { return hold();  } // SHORT TRANSIT - USE FAST
+                 0 => { return hold();  } // MODERATE - RE-FREEZE/TEST
+                 1 => { return conflict(); } // LONG TRANSIT - LIKELY SPOILED
+            }
+        }
+        1 => {
+            // Perfect cold chain maintained.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let primary_sensor: trit = truth(); // Stably at -70C
+let backup_sensor:  trit = hold();  // Sensor is glitching/warming
+let trip_duration: trit = hold();  // 24 hours in transit
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cold_chain_state: trit = thermal_log_fusion(primary_sensor, backup_sensor);
+let dose_status:      trit = vaccine_viability(cold_chain_state, trip_duration);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match dose_status {
+    -1 => { return conflict(); } // SPOILED - DISCARD BATCH
+     0 => { return hold();     } // EXPEDITE - USE WITHIN 4 HOURS
+     1 => { return truth();    } // STABLE - STORE IN DEPOT
 }

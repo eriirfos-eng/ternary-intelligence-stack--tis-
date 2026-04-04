@@ -1,37 +1,47 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 198_public_health_surveillance.tern — Public Health Surveillance
+// 198_public_health_surveillance.tern — Pandemic Early Warning
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Public health response is expensive. Binary "Lockdown/Open" causes chaos.
+// Ternary (0) enables "Yellow Phase" (Enhanced Surveillance/Masking) when 
+// waste-water signals rise but hospitalizations remain stable.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn threat_level(cases: trit, waste_water: trit) -> trit {
+    // If cases are up, or waste-water is up, the threat rises.
+    // consensus(1, -1) = 0.
+    return consensus(cases, waste_water);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn policy_recommendation(threat: trit, capacity: trit) -> trit {
+    match threat {
+        -1 => { return conflict(); } // High threat
+         0 => {
+             match capacity {
+                 -1 => { return conflict(); } // High threat, low capacity
+                  0 => { return hold();     } // Moderate threat, moderate capacity
+                  1 => { return hold();     } // Moderate threat, high capacity
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match capacity {
+                 -1 => { return hold();     } // Low threat, but hospital full!
+                  0 => { return truth();    } 
+                  1 => { return truth();    }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let case_trend:  trit = truth();    // Decreasing cases
+let viral_load:  trit = conflict(); // Spike in sewer data
+let bed_avail:   trit = hold();     // ICU at 80%
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let current_threat: trit = threat_level(case_trend, viral_load);
+let policy:         trit = policy_recommendation(current_threat, bed_avail);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match policy {
+    -1 => { return conflict(); } // RESTRICTIONS MANDATED
+     0 => { return hold();     } // ADVISORY / MASKING
+     1 => { return truth();    } // NORMAL OPERATIONS
 }

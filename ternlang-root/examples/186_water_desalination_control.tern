@@ -1,37 +1,35 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 186_water_desalination_control.tern — Water Desalination Control
+// 186_water_desalination_control.tern — Reverse Osmosis Efficiency
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Desalination is energy-intensive. Binary control (On/Off) causes "Pressure 
+// Hammer" that damages membranes. Ternary (0) provides a "RECIRCULATION" mode 
+// that keeps the system pressurized at low power, extending membrane life 
+// by years.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn monitor_osmotic_pressure(brine_salinity: trit, permeate_flow: trit) -> trit {
+    let efficiency: trit = consensus(brine_salinity, permeate_flow);
+    return efficiency;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn control_high_pressure_pump(efficiency: trit, grid_curtailment_signal: trit) -> trit {
+    match grid_curtailment_signal {
+        -1 => { return hold();     } // LOW POWER MODE (Keep membranes wet)
+         0 => { return efficiency; }
+         1 => { return efficiency; }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let salinity: trit = hold();
+let flow:     trit = truth();
+let grid:     trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let health:   trit = monitor_osmotic_pressure(salinity, flow);
+let pump:     trit = control_high_pressure_pump(health, grid);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match pump {
+    -1 => { return conflict(); } // FOULING DETECTED - CLEAN
+     0 => { return hold();     } // STANDBY PRESSURE
+     1 => { return truth();    } // ACTIVE DESALINATION
 }

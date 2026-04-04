@@ -1,37 +1,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 212_online_harassment_detection.tern — Online Harassment Detection
+// 212_online_harassment_detection.tern — Protective Cooling
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Stopping harassment requires more than a "Ban Hammer." Ternary (0) 
+// implements a "Cooling Off" period. If a user's toxicity spikes (0), 
+// their ability to comment is throttled, forcing a behavioral pause 
+// without a permanent account termination.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_toxicity(sentiment: trit, frequency: trit) -> trit {
+    // If sentiment is negative (-1) and frequency is high (1), it's toxic.
+    // We invert sentiment so -1 (bad) becomes 1 (risk).
+    let risk_sent: trit = invert(sentiment);
+    return consensus(risk_sent, frequency);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn user_gatekeeper(toxicity: trit, target_vulnerability: trit) -> trit {
+    match toxicity {
+        -1 => { return truth(); } // Low risk
+         0 => { return hold();  } // Warning / Slow mode
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match target_vulnerability {
+                 -1 => { return conflict(); } // High risk + Vulnerable target = Ban
+                  0 => { return conflict(); }
+                  1 => { return hold();     } // High risk but low target vulnerability = Warning
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let sent: trit = conflict(); // Highly negative
+let freq: trit = truth();    // Many messages
+let vuln: trit = hold();     // Public figure
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let tox: trit = evaluate_toxicity(sent, freq);
+let gate: trit = user_gatekeeper(tox, vuln);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match gate {
+    -1 => { return conflict(); } // PERMANENT BAN
+     0 => { return hold();     } // 24-HOUR COOL DOWN
+     1 => { return truth();    } // ACTIVE
 }

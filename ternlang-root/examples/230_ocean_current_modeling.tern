@@ -1,37 +1,53 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 230_ocean_current_modeling.tern — Ocean Current Modeling
+// 230_ocean_current_modeling.tern — Thermohaline Circulation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Ocean currents depend on the balance between salinity and temperature. 
+// Binary logic struggles with "Stagnation" zones. Ternary (0) provides a 
+// "NEUTRAL_BOUYANCY" state, essential for modeling deep-water formation.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn water_density(salinity: trit, temperature: trit) -> trit {
+    // High salinity (1) + Low temperature (-1 -> 1 via invert) = High density
+    let density: trit = consensus(salinity, invert(temperature));
+    match density {
+        -1 => { return conflict(); } // BUOYANT (UPWELLING)
+         0 => { return hold();     } // STABLE / STRATIFIED
+         1 => { return truth();    } // DENSE (DOWNWELLING)
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn current_velocity(density: trit, pressure_gradient: trit) -> trit {
+    match density {
+        -1 => { return pressure_gradient; } // LIGHT WATER FOLLOWS PRESSURE
+         0 => {
+             // Neutral water: only moves if pressure is high
+             match pressure_gradient {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return hold();     }
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Heavy water: sinks and moves strongly
+             match pressure_gradient {
+                 -1 => { return hold();  }
+                  0 => { return truth(); }
+                  1 => { return truth(); }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let salt: trit = truth();
+let temp: trit = truth(); // Warm water
+let grad: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let dens: trit = water_density(salt, temp);
+let flow: trit = current_velocity(dens, grad);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match flow {
+    -1 => { return conflict(); } // REVERSE FLOW
+     0 => { return hold();     } // SLOW DRIFT
+     1 => { return truth();    } // STRONG CURRENT
 }

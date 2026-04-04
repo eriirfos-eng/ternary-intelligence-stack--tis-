@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 171_quantum_processor_stability.tern — Quantum Processor Stability
+// 171_quantum_processor_stability.tern — Qubit Coherence Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Quantum states are the physical embodiment of ternary-plus logic. A qubit 
+// is not just "Up" or "Down"; it's in superposition (0) or decohered (-1). 
+// Ternary logic allows the controller to trigger "Error Correction" (0) or 
+// "Full Reset" (-1) based on environmental noise.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_coherence(phase_noise: trit, cryogenic_temp: trit) -> trit {
+    let stability: trit = consensus(phase_noise, cryogenic_temp);
+    return stability;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn execute_gate_cycle(coherence: trit, calibration_state: trit) -> trit {
+    match coherence {
+        -1 => { return conflict(); } // DECOHERENCE - DATA LOST
+         0 => { 
+             // Marginal coherence, check if we are calibrated
+             match calibration_state {
+                -1 => { return conflict(); }
+                 0 => { return hold();     } // PAUSE FOR RE-CALIBRATION
+                 1 => { return hold();     }
              }
          }
+         1 => { return truth(); } // STABLE EXECUTION
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let noise: trit = hold();
+let temp:  trit = truth();
+let calib: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let quantum_health: trit = check_coherence(noise, temp);
+let operation:      trit = execute_gate_cycle(quantum_health, calib);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match operation {
+    -1 => { return conflict(); } // COOLANT LEAK / SHUTDOWN
+     0 => { return hold();     } // ACTIVE ERROR CORRECTION
+     1 => { return truth();    } // LOGICAL QUBIT READY
 }

@@ -1,37 +1,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 209_public_procurement_integrity.tern — Public Procurement Integrity
+// 209_public_procurement_integrity.tern — Transparent Bidding
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Procurement fraud hides in binary approvals. Ternary (0) flags "Sole-Source"
+// justifications or "Single-Bidder" scenarios for independent ethics 
+// oversight before the contract can be legally awarded.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn verify_bidder_count(count: trit) -> trit {
+    match count {
+        -1 => { return conflict(); } // No bidders
+         0 => { return hold();     } // Single bidder - SUSPICIOUS
+         1 => { return truth();    } // Competitive
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn award_contract(bidder_score: trit, ethics_clearance: trit) -> trit {
+    let integrity: trit = consensus(bidder_score, ethics_clearance);
+    
+    match integrity {
+        -1 => { return conflict(); }
+         0 => { return hold();     } // Technical review needed
+         1 => { return truth();    }
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cnt: trit = hold();  // Only one company bid
+let scr: trit = truth(); // Price is fair
+let eth: trit = truth(); // No conflicts found
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let bidder_val: trit = verify_bidder_count(cnt);
+let award:      trit = award_contract(bidder_val, eth);
+
+match award {
+    -1 => { return conflict(); } // REJECT BID
+     0 => { return hold();     } // ETHICS OVERSIGHT REVIEW
+     1 => { return truth();    } // AWARD CONTRACT
 }

@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 148_clinical_genomics.tern — Clinical Genomics
+// 148_clinical_genomics.tern — Genetic Variant Pathogenicity
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In genomics, variants are rarely just "Benign" or "Pathogenic". The ACMG
+// classification relies heavily on "Variants of Uncertain Significance" (VUS).
+// Ternary (0) provides a native state for VUS, preventing binary logic from
+// either missing a risk or causing undue patient alarm.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn mutation_freq(x: trit) -> trit { return x; }
-fn clinical_relevance(x: trit) -> trit { return x; }
-fn evidence_quality(x: trit) -> trit { return x; }
+fn variant_classification(bioinformatics: trit, database_match: trit) -> trit {
+    // Determine the consensus on variant pathogenicity.
+    return consensus(bioinformatics, database_match);
+}
 
-fn main_decision(m: trit, c: trit, e: trit) -> trit {
-    match m {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match c {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(c, e); }
-             }
-         }
+fn diagnostic_report(classification: trit, read_quality: trit) -> trit {
+    match read_quality {
+        -1 => { 
+            // Sequencer failure or low coverage.
+            return conflict(); 
+        }
+        0 => {
+            // Noisy data. The classification is provisional.
+            return hold();
+        }
+        1 => {
+            // High-quality sequencing. Trust the classification.
+            match classification {
+                -1 => { return conflict(); } // CLEARLY BENIGN
+                 0 => { return hold();     } // VUS - NEEDS RESEARCH
+                 1 => { return truth();    } // PATHOGENIC VARIANT
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let pipeline_score: trit = truth(); // Algorithmic prediction of harm
+let ClinVar_match:  trit = hold();  // Database shows conflicting results
+let sequencer_qc:   trit = truth(); // 100x depth coverage
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let variant_risk: trit = variant_classification(pipeline_score, ClinVar_match);
+let final_report: trit = diagnostic_report(variant_risk, sequencer_qc);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match final_report {
+    -1 => { return conflict(); } // NEGATIVE - NORMAL FINDINGS
+     0 => { return hold();     } // VUS - FOLLOW-UP STUDY REQUIRED
+     1 => { return truth();    } // POSITIVE - CONFIRMED RISK
 }

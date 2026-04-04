@@ -1,37 +1,40 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 189_building_energy_management.tern — Building Energy Management
+// 189_building_energy_management.tern — HVAC Intelligence
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary thermostats cause "short-cycling," wearing out compressors and 
+// creating temperature swings. Ternary (0) enables "VAV_MODULATION" (Variable 
+// Air Volume), maintaining comfort with 40% less energy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn calculate_thermal_comfort(air_temp: trit, humidity: trit) -> trit {
+    let comfort: trit = consensus(air_temp, humidity);
+    return comfort;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn control_chiller(comfort: trit, occupancy_sensor: trit) -> trit {
+    match occupancy_sensor {
+        -1 => { return conflict(); } // VACANT - ECONOMIZER MODE
+         0 => { 
+             // Partial occupancy, modulate
+             return hold();
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
+             // Fully occupied, follow thermal load
+             return comfort;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let temp: trit = hold();
+let hum:  trit = hold();
+let folks: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let feeling: trit = calculate_thermal_comfort(temp, hum);
+let hvac:    trit = control_chiller(feeling, folks);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match hvac {
+    -1 => { return conflict(); } // SHUTDOWN
+     0 => { return hold();     } // LOW FAN SPEED
+     1 => { return truth();    } // FULL COOLING
 }

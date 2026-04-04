@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 176_geothermal_energy_extraction.tern — Geothermal Energy Extraction
+// 176_geothermal_energy_extraction.tern — Subsurface Heat Control
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Geothermal wells face "Induced Seismicity" risk. Binary logic (Run/Stop) is 
+// too blunt. Ternary (0) allows for "REDUCED_FLOW" injection, balancing 
+// energy production against the risk of triggering local micro-earthquakes.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn monitor_well_pressure(borehole_temp: trit, casing_stress: trit) -> trit {
+    let integrity: trit = consensus(borehole_temp, casing_stress);
+    return integrity;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn regulate_brine_injection(integrity: trit, tremor_sensor: trit) -> trit {
+    match tremor_sensor {
+        -1 => { return conflict(); } // SEISMIC EVENT DETECTED - SHUTDOWN
+         0 => { 
+             // Minor tremors, check well integrity
+             match integrity {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // BLEED PRESSURE
+                  1 => { return hold();     }
              }
          }
+         1 => { return integrity; } // FULL FLOW
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let temp:    trit = hold();
+let stress:  trit = truth();
+let tremors: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let well_status: trit = monitor_well_pressure(temp, stress);
+let pump_control: trit = regulate_brine_injection(well_status, tremors);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match pump_control {
+    -1 => { return conflict(); } // ISOLATE WELL
+     0 => { return hold();     } // LOW PRESSURE MODE
+     1 => { return truth();    } // PEAK GENERATION
 }

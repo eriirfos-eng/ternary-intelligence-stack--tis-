@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 170_cern_beam_abort.tern — CERN Beam Abort
+// 170_cern_beam_abort.tern — Particle Accelerator Safety
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A beam dump costs millions and days of downtime. Binary "Abort/Run" is too 
+// primitive. Ternary (0) allows for "SOFT_CLAMP" where magnets are adjusted 
+// to correct trajectory before a catastrophic quench forces a hard abort.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn beam_position(x: trit) -> trit { return x; }
-fn magnet_quench_risk(x: trit) -> trit { return x; }
-fn vacuum_integrity(x: trit) -> trit { return x; }
+fn check_quench_status(temp_sensors: trit, helium_pressure: trit) -> trit {
+    // If pressure drops (-1) or temp rises (-1), we have a problem.
+    let quench_risk: trit = consensus(temp_sensors, helium_pressure);
+    return quench_risk;
+}
 
-fn main_decision(p: trit, q: trit, v: trit) -> trit {
-    match p {
-        -1 => { return 1; }
-         0 => { return 0; }
+fn determine_abort_necessity(beam_intensity: trit, vacuum_pressure: trit, quench_status: trit) -> trit {
+    match quench_status {
+        -1 => { return conflict(); } // HARD ABORT - SUPERCONDUCTOR LOSS
+         0 => {
+             // Degraded magnets, check beam
+             match beam_intensity {
+                -1 => { return conflict(); } // TOO INTENSE FOR WEAK MAGNETS
+                 0 => { return hold();     } // SUSPEND INJECTION
+                 1 => { return hold();     }
+             }
+         }
          1 => {
-             match q {
-                 -1 => { return 1; }
-                  0 => { return 0; }
-                  1 => { return consensus(q, invert(v)); }
+             // Magnets ok, check vacuum
+             match vacuum_pressure {
+                -1 => { return conflict(); } // LEAK DETECTED
+                 0 => { return hold();     } // DEGRADED VACUUM
+                 1 => { return truth();    } // BEAM CLEAR
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let intensity: trit = hold();
+let vacuum:    trit = hold();
+let magnets:   trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let safety_gate: trit = determine_abort_necessity(intensity, vacuum, magnets);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match safety_gate {
+    -1 => { return conflict(); } // DUMP BEAM IMMEDIATELY
+     0 => { return hold();     } // COLLIMATOR ADJUSTMENT REQUIRED
+     1 => { return truth();    } // COLLISION RUN STABLE
 }

@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 167_avalanche_risk.tern — Avalanche Risk Assessment
+// 167_avalanche_risk.tern — Alpine Safety Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Snow packs are rarely just "Safe" or "Dangerous". The "Moderate" (0) state 
+// is where most accidents occur because skiers underestimate the nuance. 
+// Ternary logic forces a distinction between "Stable", "Volatile", and "Critical".
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn snow_stability(x: trit) -> trit { return x; }
-fn slope_angle(x: trit) -> trit { return x; }
-fn recent_weather(x: trit) -> trit { return x; }
+fn judge_snow_stability(shear_test: trit, temperature_gradient: trit) -> trit {
+    // Both tests must agree for a "Safe" rating.
+    let stability: trit = consensus(shear_test, temperature_gradient);
+    return stability;
+}
 
-fn main_decision(s: trit, a: trit, w: trit) -> trit {
-    match s {
-        -1 => { return 1; }
-         0 => { return 0; }
-         1 => {
-             match a {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(a, w); }
-             }
-         }
+fn define_access_level(stability: trit, slope_angle: trit) -> trit {
+    match slope_angle {
+        -1 => { 
+            // Steep slopes are dangerous unless snow is perfect.
+            match stability {
+                -1 => { return conflict(); }
+                 0 => { return conflict(); }
+                 1 => { return hold();     }
+            }
+        }
+         0 => { return stability; }
+         1 => { return truth();    }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let shear: trit = hold();
+let temp:  trit = hold();
+let slope: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let pack_stability: trit = judge_snow_stability(shear, temp);
+let permit_level:   trit = define_access_level(pack_stability, slope);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match permit_level {
+    -1 => { return conflict(); } // MOUNTAIN CLOSED
+     0 => { return hold();     } // EXPERTS ONLY
+     1 => { return truth();    } // OPEN TO PUBLIC
 }

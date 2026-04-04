@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 202_algorithmic_trading_risk.tern — Algorithmic Trading Risk
+// 202_algorithmic_trading_risk.tern — High-Frequency Kill Switch
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// HFT algorithms can "Hallucinate" in edge cases. Ternary (0) provides a 
+// "THROTTLE" state. If latency drifts (0) or slippage is high (0), the 
+// system reduces order size and frequency rather than fully disconnecting, 
+// maintaining liquidity while minimizing exposure.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn network_health(latency: trit, packet_loss: trit) -> trit {
+    return consensus(latency, packet_loss);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn risk_gate(health: trit, pnl_drawdown: trit) -> trit {
+    match health {
+        -1 => { return conflict(); } // Connection lost
+         0 => {
+             match pnl_drawdown {
+                 -1 => { return conflict(); } // Lag + Losing money = KILL
+                  0 => { return hold();     } // Lag + Flat = THROTTLE
+                  1 => { return hold();     } // Lag + Making money = THROTTLE
              }
+         }
+         1 => {
+             return pnl_drawdown;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let lat: trit = hold();     // Minor drift
+let loss: trit = truth();   // No loss
+let pnl: trit = truth();    // Profitable
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let conn: trit = network_health(lat, loss);
+let action: trit = risk_gate(conn, pnl);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // DISCONNECT
+     0 => { return hold();     } // REDUCE EXPOSURE / THROTTLE
+     1 => { return truth();    } // FULL SPEED
 }

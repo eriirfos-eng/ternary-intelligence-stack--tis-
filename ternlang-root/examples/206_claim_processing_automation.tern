@@ -1,37 +1,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 206_claim_processing_automation.tern — Claim Processing Automation
+// 206_claim_processing_automation.tern — Touchless Adjudication
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Total automation in claims processing leads to leaks or unfair denials. 
+// Ternary (0) identifies "Missing Documentation" or "Vague Descriptions" 
+// and triggers an automated request to the user before a human is needed.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn verify_docs(invoice: trit, photo: trit) -> trit {
+    return consensus(invoice, photo);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn process_flow(doc_status: trit, coverage_match: trit) -> trit {
+    match doc_status {
+        -1 => { return conflict(); } // Invalid docs
+         0 => { return hold();     } // Missing info - request more
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match coverage_match {
+                 -1 => { return conflict(); } // Docs ok but not covered
+                  0 => { return hold();     } // Docs ok but coverage ambiguous
+                  1 => { return truth();    } // All clear
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let inv: trit = truth();
+let pic: trit = hold();  // Photo is blurry
+let cov: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let docs: trit = verify_docs(inv, pic);
+let flow: trit = process_flow(docs, cov);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match flow {
+    -1 => { return conflict(); } // REJECT
+     0 => { return hold();     } // PENDING - REQUEST INFO
+     1 => { return truth();    } // PAY CLAIM
 }

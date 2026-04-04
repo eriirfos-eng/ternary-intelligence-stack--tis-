@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 181_pipeline_corrosion_monitoring.tern — Pipeline Corrosion Monitoring
+// 181_pipeline_corrosion_monitoring.tern — Midstream Asset Integrity
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Pipelines don't just "Leaking" or "Not Leaking". Most of the time they are 
+// "Pitting" (0). Binary sensors trigger expensive false alarms. Ternary logic 
+// allows for "ULTRASONIC_VERIFICATION" (0) before calling out a repair crew.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_wall_thickness(ultrasonic_pulse: trit, cathodic_protection: trit) -> trit {
+    let health: trit = consensus(ultrasonic_pulse, cathodic_protection);
+    return health;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn trigger_maintenance(health: trit, pressure_trend: trit) -> trit {
+    match health {
+        -1 => { return conflict(); } // STRUCTURAL FAILURE - SHUTDOWN
+         0 => { 
+             // Thinning detected, check pressure
+             match pressure_trend {
+                 -1 => { return conflict(); } // ANOMALOUS DROP
+                  0 => { return hold();     } // SCHEDULE SLEEVE
+                  1 => { return hold();     }
              }
          }
+         1 => { return truth(); } // NOMINAL
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let pulse:   trit = hold();
+let voltage: trit = hold();
+let trend:   trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let integrity: trit = check_wall_thickness(pulse, voltage);
+let action:    trit = trigger_maintenance(integrity, trend);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // EMERGENCY ISOLATION
+     0 => { return hold();     } // PIGGING RUN REQUIRED
+     1 => { return truth();    } // OPERATIONAL
 }

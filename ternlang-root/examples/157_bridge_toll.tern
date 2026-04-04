@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 157_bridge_toll.tern — Bridge Toll Pricing
+// 157_bridge_toll.tern — Dynamic Congestion Pricing
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Toll pricing should not just be "Off-Peak" or "Rush Hour". 
+// A binary switch causes sudden traffic surges at the price boundary. 
+// Ternary (0) provides a "Transition" pricing tier, which gradually 
+// increases during emerging congestion, smoothing traffic flow and 
+// preventing bridge gridlock before it starts.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn traffic_density(x: trit) -> trit { return x; }
-fn peak_hours(x: trit) -> trit { return x; }
-fn air_quality_impact(x: trit) -> trit { return x; }
+fn measure_congestion(flow_sensors: trit, visual_ai: trit) -> trit {
+    // Determine the consensus on traffic density.
+    return consensus(flow_sensors, visual_ai);
+}
 
-fn main_decision(t: trit, p: trit, a: trit) -> trit {
-    match t {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match p {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(p, a); }
-             }
-         }
+fn determine_toll_tier(congestion: trit, accident_report: trit) -> trit {
+    match accident_report {
+        1 => { 
+            // Accident detected. Raise toll to max to discourage entry.
+            return truth(); 
+        }
+        0 => {
+            // Unclear report or minor breakdown. 
+            match congestion {
+                -1 => { return hold();  } // LOW TRAFFIC - TRANSITION
+                 0 => { return hold();  } // MEDIUM TRAFFIC - STABLE
+                 1 => { return truth(); } // HIGH TRAFFIC - MAX RATE
+            }
+        }
+        -1 => {
+            // No accidents. Trust congestion flow.
+            return congestion;
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let inductive_loops: trit = truth(); // 100 cars/min detected
+let camera_ai:       trit = hold();  // Heavy rain blurring visual tracking
+let hazard_reports:  trit = hold();  // Driver reported a stall, unconfirmed
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let traffic_state: trit = measure_congestion(inductive_loops, camera_ai);
+let toll_tier:     trit = determine_toll_tier(traffic_state, hazard_reports);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match toll_tier {
+    -1 => { return conflict(); } // BASE TOLL - $2.00
+     0 => { return hold();     } // CONGESTION TRANSITION - $5.00
+     1 => { return truth();    } // PEAK RATE - $12.00
 }

@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 158_food_recall.tern — Food Safety Recall
+// 158_food_recall.tern — Perishable Safety Verification
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A food recall is a logistical nightmare. Binary logic forces a choice
+// between "Recall Everything" (expensive, wasteful) or "Do Nothing" (deadly).
+// Ternary (0) provides a "QUARANTINE" state, where a specific production 
+// batch is held at the warehouse for secondary testing without triggering
+// a national store-level recall alert.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn pathogen_detected(x: trit) -> trit { return x; }
-fn consumer_complaints(x: trit) -> trit { return x; }
-fn distribution_reach(x: trit) -> trit { return x; }
+fn batch_safety_check(lab_swab: trit, shelf_life: trit) -> trit {
+    // Both lab results and storage time determine batch integrity.
+    return consensus(lab_swab, shelf_life);
+}
 
-fn main_decision(p: trit, c: trit, d: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match c {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(c, d); }
-             }
-         }
+fn recall_directive(safety_score: trit, complaint_volume: trit) -> trit {
+    match safety_score {
+        -1 => { 
+            // Severe contamination or total spoil.
+            return conflict(); 
+        }
+        0 => {
+            // Marginal findings. Check consumer feedback.
+            match complaint_volume {
+                -1 => { return hold();  } // NO COMPLAINTS - WAREHOUSE HOLD
+                 0 => { return hold();  } // FEW COMPLAINTS - INVESTIGATE
+                 1 => { return truth(); } // HIGH COMPLAINTS - RECALL
+            }
+        }
+        1 => {
+            // Clear safety check.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let listeria_test:  trit = hold();  // Swab is inconclusive/borderline
+let product_age:   trit = truth(); // Well within expiration
+let social_reports: trit = hold();  // Two reports of upset stomach
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let safety_level: trit = batch_safety_check(listeria_test, product_age);
+let recall_order:  trit = recall_directive(safety_level, social_reports);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match recall_order {
+    -1 => { return conflict(); } // FULL RECALL - PULL FROM SHELVES
+     0 => { return hold();     } // WAREHOUSE QUARANTINE - RERUN TESTS
+     1 => { return truth();    } // SAFE FOR SALE - CONTINUE DISTRIB.
 }

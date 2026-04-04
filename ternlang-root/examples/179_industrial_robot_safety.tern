@@ -1,37 +1,40 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 179_industrial_robot_safety.tern — Industrial Robot Safety
+// 179_industrial_robot_safety.tern — Collaborative Robotics (Cobots)
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Robots shouldn't just "Run" or "E-Stop". Ternary (0) provides a "COLLABORATIVE" 
+// state where the robot slows down because a human is nearby, allowing 
+// productivity to continue safely without total shutdowns.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn detect_proximity(lidar_cloud: trit, torque_feedback: trit) -> trit {
+    let proximity_risk: trit = consensus(lidar_cloud, torque_feedback);
+    return proximity_risk;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
+fn regulate_robot_velocity(risk: trit, production_target: trit) -> trit {
+    match risk {
+        -1 => { return conflict(); } // HUMAN IN WORK CELL - STOP
+         0 => { 
+             // Human nearby, slow down
+             return hold(); 
+         }
+         1 => { 
+             // Clear, check if we need to catch up
+             return production_target;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let lidar:  trit = hold();
+let torque: trit = truth();
+let quota:  trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let safety_risk: trit = detect_proximity(lidar, torque);
+let motor_speed: trit = regulate_robot_velocity(safety_risk, quota);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match motor_speed {
+    -1 => { return conflict(); } // EMERGENCY BRAKE
+     0 => { return hold();     } // CREEP VELOCITY
+     1 => { return truth();    } // NOMINAL SPEED
 }

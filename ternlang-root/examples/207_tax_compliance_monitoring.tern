@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 207_tax_compliance_monitoring.tern — Tax Compliance Monitoring
+// 207_tax_compliance_monitoring.tern — Anomaly-Based Auditing
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary tax audits are intrusive and often yield nothing. Ternary (0) 
+// flags "Mathematical Discrepancies" where data doesn't match third-party 
+// reporting, triggering a "Soft Inquiry" letter instead of a full audit.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_consistency(reported: trit, bank_data: trit) -> trit {
+    return consensus(reported, bank_data);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn compliance_action(consistency: trit, history: trit) -> trit {
+    match consistency {
+        -1 => { return conflict(); } // Fraud suspected
+         0 => {
+             match history {
+                 -1 => { return conflict(); } // Discrepancy + repeat offender = Audit
+                  0 => { return hold();     } // Discrepancy + new = Letter
+                  1 => { return hold();     } // Discrepancy + good record = Letter
              }
+         }
+         1 => {
+             return truth(); // Compliant
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let rep: trit = hold();  // Some income categories blank
+let bnk: trit = truth(); // Bank data looks normal
+let hst: trit = truth(); // 10 years clean filing
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cons: trit = check_consistency(rep, bnk);
+let act:  trit = compliance_action(cons, hst);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match act {
+    -1 => { return conflict(); } // FULL AUDIT
+     0 => { return hold();     } // SOFT INQUIRY / CLARIFICATION
+     1 => { return truth();    } // NO ACTION
 }

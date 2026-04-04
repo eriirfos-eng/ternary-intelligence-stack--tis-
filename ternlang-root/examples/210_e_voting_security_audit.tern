@@ -1,37 +1,40 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 210_e_voting_security_audit.tern — E-voting Security Audit
+// 210_e_voting_security_audit.tern — Trustworthy Democracy
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Digital voting requires absolute trust. Ternary (0) handles "Tally 
+// Discrepancies" (paper vs digital) by triggering an automatic 100% 
+// hand-recount (0) of that specific precinct without invalidating the 
+// entire national election.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_ballot_integrity(hash_match: trit, physical_count: trit) -> trit {
+    return consensus(hash_match, physical_count);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn certify_precinct(integrity: trit, witness_signs: trit) -> trit {
+    match integrity {
+        -1 => { return conflict(); } // Fraud detected
+         0 => { return hold();     } // Recount required
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match witness_signs {
+                 -1 => { return hold(); } // Integrity good but witness refused!
+                  0 => { return hold(); } 
+                  1 => { return truth(); }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let hashes:  trit = truth();
+let physics: trit = hold(); // Minor discrepancy in paper pile
+let witness: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let core: trit = check_ballot_integrity(hashes, physics);
+let cert: trit = certify_precinct(core, witness);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match cert {
+    -1 => { return conflict(); } // INVALIDATE PRECINCT
+     0 => { return hold();     } // MANUAL RECOUNT MANDATED
+     1 => { return truth();    } // CERTIFIED RESULT
 }

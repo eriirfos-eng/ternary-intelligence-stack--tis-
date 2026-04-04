@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 199_vaccine_distribution_logistics.tern — Vaccine Distribution Logistics
+// 199_vaccine_distribution_logistics.tern — Cold Chain Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// mRNA vaccines expire if the "Cold Chain" is broken. Ternary (0) handles 
+// "Excursion Events" where temperature was marginal. Instead of wasting 
+// the batch (-1), it is flagged for "Potency Testing" (0).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_temp_history(sensor_min: trit, sensor_max: trit) -> trit {
+    return consensus(sensor_min, sensor_max);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn distribution_gate(temp_status: trit, demand_urgency: trit) -> trit {
+    match temp_status {
+        -1 => { return conflict(); } // Spoiled
+         0 => {
+             match demand_urgency {
+                 -1 => { return hold(); } // Urgent demand? Still must test first.
+                  0 => { return hold(); } 
+                  1 => { return hold(); }
              }
+         }
+         1 => {
+             return demand_urgency;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let t_min: trit = truth();
+let t_max: trit = hold();  // Temp touched upper limit briefly
+let demand: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let history: trit = check_temp_history(t_min, t_max);
+let dispatch: trit = distribution_gate(history, demand);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match dispatch {
+    -1 => { return conflict(); } // DISPOSE
+     0 => { return hold();     } // LAB VERIFICATION REQUIRED
+     1 => { return truth();    } // SHIP TO CLINIC
 }

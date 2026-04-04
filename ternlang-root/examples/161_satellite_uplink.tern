@@ -1,37 +1,44 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 161_satellite_uplink.tern — Satellite Uplink Control
+// 161_satellite_uplink.tern — Orbital Communications Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Space environments are rarely binary. Signal attenuation (0) is a constant 
+// reality between "Full Link" (1) and "Total Blackout" (-1). Ternary logic 
+// prevents the "thrashing" of packets when the ionosphere is unstable.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn signal_strength(x: trit) -> trit { return x; }
-fn jam_detection(x: trit) -> trit { return x; }
-fn bandwidth_available(x: trit) -> trit { return x; }
+fn check_link_stability(db_gain: trit, phase_lock: trit) -> trit {
+    // Consensus ensures we only commit if both are solid.
+    let link: trit = consensus(db_gain, phase_lock);
+    match link {
+        -1 => { return conflict(); } // HARD DROP
+         0 => { return hold();     } // DRIFTING - adjust tracking
+         1 => { return truth();    } // STABLE
+    }
+}
 
-fn main_decision(s: trit, j: trit, b: trit) -> trit {
-    match s {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn transmit_packet(stability: trit, buffer: trit) -> trit {
+    match stability {
+        -1 => { return conflict(); }
+         0 => { 
+            // In the gap, we hold the packet instead of dropping it
+            return hold(); 
+         }
          1 => {
-             match j {
-                 -1 => { return 1; }
-                  0 => { return 0; }
-                  1 => { return consensus(j, b); }
-             }
+             return buffer;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let signal_gain: trit = hold();
+let lock_status: trit = truth();
+let packet_data: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let orbital_link: trit = check_link_stability(signal_gain, lock_status);
+let tx_status:    trit = transmit_packet(orbital_link, packet_data);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match tx_status {
+    -1 => { return conflict(); } // SHUTDOWN
+     0 => { return hold();     } // BUFFERING
+     1 => { return truth();    } // UPLINK SUCCESSFUL
 }

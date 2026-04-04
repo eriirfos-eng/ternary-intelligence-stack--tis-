@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 221_satellite_communication_handover.tern — Satellite Communication Handover
+// 221_satellite_communication_handover.tern — Handover Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary "Switch/Stay" logic often causes dropped calls during transient 
+// signal fades. Ternary (0) provides a "STANDBY" state, allowing the system 
+// to prepare for a handover while the primary link remains in a marginal 
+// but usable condition.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_signal_strength(signal: trit) -> trit {
+    // If signal is weak (-1), we switch. If it's strong (1), we stay.
+    // If it's marginal (0), we standby.
+    match signal {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
+         1 => { return truth(); }
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn handover_command(primary: trit, secondary: trit, network: trit) -> trit {
+    // Hard gate: Primary signal is the key. If it's -1, we switch.
+    match primary {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
+             // Primary ok, check secondary and network
+             let status: trit = consensus(secondary, network);
+             return status;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+// Scenario: Primary signal is marginal (0), but secondary is strong (1) and network is ready (1).
+let primary_val:   trit = hold();
+let secondary_val: trit = truth();
+let network_val:   trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let command: trit = handover_command(primary_val, secondary_val, network_val);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match command {
+    -1 => { return conflict(); } // SWITCH
+     0 => { return hold();    } // STANDBY - prepare for handover
+     1 => { return truth();   } // STAY
 }

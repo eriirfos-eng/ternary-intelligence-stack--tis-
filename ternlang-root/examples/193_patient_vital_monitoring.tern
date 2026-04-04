@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 193_patient_vital_monitoring.tern — Patient Vital Monitoring
+// 193_patient_vital_monitoring.tern — Smart Triage Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Critical care monitors often suffer from "Alarm Fatigue" because of binary 
+// thresholds. Ternary logic introduces an "OBSERVE" state (0), which can
+// trigger increased logging or nursing notification without sounding the 
+// full "Code Blue" alarm for transient fluctuations.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_vitals(heart_rate: trit, oxygen: trit) -> trit {
+    // Consensus ensures that if both are stable (1), we are good.
+    // If one is critical (-1), the whole status drops.
+    // If one is borderline (0), the status becomes (0).
+    return consensus(heart_rate, oxygen);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn alarm_escalation(vitals: trit, trend: trit) -> trit {
+    match vitals {
+        -1 => { return conflict(); } // Immediate alarm
+         0 => {
+             match trend {
+                 -1 => { return conflict(); } // Borderline vitals but worsening
+                  0 => { return hold();     } // Borderline and stable - watch
+                  1 => { return truth();    } // Borderline but improving
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match trend {
+                 -1 => { return hold();     } // Good vitals but declining
+                  0 => { return truth();    }
+                  1 => { return truth();    }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let hr_stability: trit = truth();
+let o2_level:     trit = hold();
+let patient_trend: trit = conflict(); // Worsening condition
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let status: trit = check_vitals(hr_stability, o2_level);
+let alarm:  trit = alarm_escalation(status, patient_trend);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match alarm {
+    -1 => { return conflict(); } // EMERGENCY
+     0 => { return hold();     } // NOTIFY/INCREASE FREQUENCY
+     1 => { return truth();    } // STABLE
 }

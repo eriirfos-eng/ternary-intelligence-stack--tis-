@@ -1,37 +1,40 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 214_digital_identity_verification.tern — Digital Identity Verification
+// 214_digital_identity_verification.tern — Multi-Factor Trust
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary ID checks fail on bad lighting or expired documents. Ternary (0)
+// handles "Inconclusive Matches" by triggering a live video call with 
+// a human agent, preventing legitimate users from being locked out 
+// due to sensor errors.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn scan_document(ocr_match: trit, security_features: trit) -> trit {
+    return consensus(ocr_match, security_features);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn verify_identity(doc_status: trit, face_match: trit) -> trit {
+    match doc_status {
+        -1 => { return conflict(); } // Forgery detected
+         0 => { return hold();     } // Blurry scan - manual review
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match face_match {
+                 -1 => { return conflict(); } // Not the same person
+                  0 => { return hold();     } // Face match uncertain
+                  1 => { return truth();    } // Valid
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let ocr:  trit = truth();
+let sec:  trit = hold();  // Hologram not visible in photo
+let face: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let docs: trit = scan_document(ocr, sec);
+let id:   trit = verify_identity(docs, face);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match id {
+    -1 => { return conflict(); } // DENY ACCESS
+     0 => { return hold();     } // SCHEDULE VIDEO VERIFICATION
+     1 => { return truth();    } // ACCESS GRANTED
 }

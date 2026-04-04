@@ -1,37 +1,40 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 197_medical_imaging_analysis.tern — Medical Imaging Analysis
+// 197_medical_imaging_analysis.tern — Tumor Detection Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// AI imaging shouldn't just say "Cancer/No Cancer." Ternary (0) handles 
+// "Artifact-Compromised" images or "Indeterminate Findings," forcing 
+// a rescan or manual specialist audit to avoid missed diagnoses.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_image_quality(noise: trit, contrast: trit) -> trit {
+    // Both must be good for a high-quality (1) result.
+    return consensus(noise, contrast);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn detect_lesion(quality: trit, confidence: trit) -> trit {
+    match quality {
+        -1 => { return hold(); } // Poor image: result is always "Uncertain"
+         0 => { return hold(); } // Mediocre image: result is always "Uncertain"
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match confidence {
+                 -1 => { return conflict(); } // Confident no lesion
+                  0 => { return hold();     } // Indeterminate
+                  1 => { return truth();    } // Confident lesion detected
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let image_noise: trit = truth();    // Low noise
+let image_contrast: trit = hold();  // Marginal contrast
+let ai_confidence: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let quality: trit = evaluate_image_quality(image_noise, image_contrast);
+let finding: trit = detect_lesion(quality, ai_confidence);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match finding {
+    -1 => { return conflict(); } // CLEAR
+     0 => { return hold();     } // MANUAL AUDIT / RESCAN
+     1 => { return truth();    } // MALIGNANT SUSPECTED
 }

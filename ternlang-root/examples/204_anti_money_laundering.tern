@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 204_anti_money_laundering.tern — Anti-Money Laundering
+// 204_anti_money_laundering.tern — KYC/AML Velocity Check
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Money laundering involves complex "Layering." Binary checks only catch 
+// the simple stuff. Ternary (0) detects "Velocity Anomalies" where total 
+// volume is low but frequency is high, triggering "Enhanced Due Diligence."
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_jurisdiction(origin: trit, destination: trit) -> trit {
+    return consensus(origin, destination);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn transaction_risk(location_risk: trit, velocity: trit) -> trit {
+    match location_risk {
+        -1 => { return conflict(); } // Sanctioned country
+         0 => {
+             match velocity {
+                 -1 => { return hold(); } // Suspect country + high freq
+                  0 => { return hold(); }
+                  1 => { return hold(); }
              }
+         }
+         1 => {
+             return velocity; // Follow velocity trend
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let src: trit = truth();   // Safe country
+let dst: trit = hold();    // Tax haven (Uncertain)
+let vel: trit = conflict(); // High frequency "smurfing" pattern
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let loc: trit = check_jurisdiction(src, dst);
+let risk: trit = transaction_risk(loc, vel);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match risk {
+    -1 => { return conflict(); } // BLOCK & REPORT (SAR)
+     0 => { return hold();     } // ENHANCED DUE DILIGENCE
+     1 => { return truth();    } // PASS
 }

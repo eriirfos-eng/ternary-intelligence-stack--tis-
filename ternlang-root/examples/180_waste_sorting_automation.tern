@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 180_waste_sorting_automation.tern — Waste Sorting Automation
+// 180_waste_sorting_automation.tern — Circular Economy Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Recycling is messy. A bottle isn't just "Plastic" or "Not Plastic". It might 
+// be "Contaminated Plastic" (0). Binary sorters throw it in the landfill (-1). 
+// Ternary sorters send it to a "WASH_STATION" (0) for recovery.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn analyze_material(spectrometer: trit, weight_sensor: trit) -> trit {
+    let material_type: trit = consensus(spectrometer, weight_sensor);
+    return material_type;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn determine_sorting_bin(material: trit, contamination_level: trit) -> trit {
+    match material {
+        -1 => { return conflict(); } // NON-RECYCLABLE
+         0 => { 
+             // Mixed/Paper
+             match contamination_level {
+                 -1 => { return conflict(); } // TOO SOILED
+                  0 => { return hold();     } // NEEDS CLEANING
+                  1 => { return hold();     }
+             }
+         }
+         1 => { 
+             // Pure Plastic/Metal
+             match contamination_level {
+                 -1 => { return hold();     } // CLEAN FIRST
+                  0 => { return truth();    } // SORT DIRECT
+                  1 => { return truth();    }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let spec:  trit = truth();
+let weight: trit = hold();
+let grime: trit = conflict();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let item_type: trit = analyze_material(spec, weight);
+let sort_gate: trit = determine_sorting_bin(item_type, grime);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match sort_gate {
+    -1 => { return conflict(); } // LANDFILL
+     0 => { return hold();     } // SECONDARY PROCESSING
+     1 => { return truth();    } // RECYCLING BIN
 }

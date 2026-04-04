@@ -1,37 +1,51 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 228_seismic_data_interpretation.tern — Seismic Data Interpretation
+// 228_seismic_data_interpretation.tern — Earthquake Early Warning
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Seismic P-waves arrive before destructive S-waves. Ternary (0) provides a 
+// "PRELIMINARY_DETECTION" state, allowing for automated valve shutdowns 
+// before a full public alert (1) is issued upon confirmation.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn p_wave_analysis(amplitude: trit, freq_shift: trit) -> trit {
+    let signal: trit = consensus(amplitude, freq_shift);
+    match signal {
+        -1 => { return conflict(); } // BACKGROUND NOISE
+         0 => { return hold();     } // MICROSEISMIC ACTIVITY
+         1 => { return truth();    } // P-WAVE TRIGGERED
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn warning_level(trigger: trit, regional_network: trit) -> trit {
+    match trigger {
+        -1 => { return conflict(); } // ALL CLEAR
+         0 => {
+             // Local sensor trigger, check regional consensus
+             match regional_network {
+                 -1 => { return conflict(); } // FALSE POSITIVE
+                  0 => { return hold();     } // LOCAL ANOMALY
+                  1 => { return hold();     } // CONFIRMING - ALERT STANDBY
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Strong local P-wave: confirm with regional
+             match regional_network {
+                 -1 => { return hold();  } // CONFLICTING DATA
+                  0 => { return truth(); } // LIKELY EVENT
+                  1 => { return truth(); } // MAJOR EVENT - FULL ALERT
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let local_p: trit = truth();
+let regional: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let trigger: trit = p_wave_analysis(local_p, hold());
+let alert: trit = warning_level(trigger, regional);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match alert {
+    -1 => { return conflict(); } // NORMAL
+     0 => { return hold();     } // CAUTION - AUTO-ISOLATE
+     1 => { return truth();    } // EVACUATE
 }

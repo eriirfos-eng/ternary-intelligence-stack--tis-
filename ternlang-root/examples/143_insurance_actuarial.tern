@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 143_insurance_actuarial.tern — Insurance Actuarial Tables
+// 143_insurance_actuarial.tern — Risk Scoring and Premium Adjustment
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In insurance, some claims are neither "Clean" (1) nor "Fraudulent" (-1). 
+// Ternary (0) captures the "Under Investigation" state, allowing the system
+// to defer payment or premium adjustments while analysts gather more evidence.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn risk_history(x: trit) -> trit { return x; }
-fn demographic_risk(x: trit) -> trit { return x; }
-fn asset_value(x: trit) -> trit { return x; }
-
-fn main_decision(r: trit, d: trit, a: trit) -> trit {
-    match r {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match d {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(d, a); }
-             }
-         }
+fn evaluate_claim(evidence: trit, history: trit) -> trit {
+    // If evidence is weak (0), history can sway the decision.
+    match evidence {
+        -1 => { return conflict(); } // Suspicious patterns
+         0 => { return history;    } // Defer to customer loyalty
+         1 => { return truth();    } // Clear-cut claim
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn determine_premium_tier(risk: trit, solvency: trit) -> trit {
+    // Premiums depend on the customer's risk and the company's financial state.
+    let combined_risk: trit = consensus(risk, solvency);
+    
+    match combined_risk {
+        -1 => { return conflict(); } // High risk / Low reserves: REJECT
+         0 => { return hold();     } // STABLE / NO CHANGE
+         1 => { return truth();    } // LOW RISK / HIGH RESERVES: DISCOUNT
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let claim_evidence: trit = hold();  // Missing receipts
+let customer_history: trit = truth(); // 10-year clean record
+let company_solvency: trit = truth(); // Strong reserves
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let current_risk: trit = evaluate_claim(claim_evidence, customer_history);
+let tier: trit = determine_premium_tier(current_risk, company_solvency);
+
+match tier {
+    -1 => { return conflict(); } // RATE HIKE / REJECT
+     0 => { return hold();     } // STANDARD RATE
+     1 => { return truth();    } // PREFERRED RATE
 }

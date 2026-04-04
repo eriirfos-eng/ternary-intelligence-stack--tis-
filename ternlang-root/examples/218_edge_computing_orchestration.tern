@@ -1,37 +1,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 218_edge_computing_orchestration.tern — Edge Computing Orchestration
+// 218_edge_computing_orchestration.tern — Latency-Aware Offloading
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In AR/VR, latency is the killer. Ternary (0) handles "Network Jitter." 
+// Instead of waiting for a slow cloud response (-1) or failing locally, 
+// the system uses a "Reduced Fidelity" local model (0) to maintain frame rate.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn network_performance(latency: trit, jitter: trit) -> trit {
+    return consensus(latency, jitter);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn execution_target(net_score: trit, local_battery: trit) -> trit {
+    match net_score {
+        -1 => { return conflict(); } // Local only
+         0 => { return hold();     } // Hybrid / Low fidelity
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             match local_battery {
+                 -1 => { return truth(); } // Network is good, use cloud to save battery
+                  0 => { return truth(); }
+                  1 => { return truth(); }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let lat:  trit = hold();  // 50ms (Marginal)
+let jit:  trit = hold();  // Variable
+let batt: trit = truth(); // Full charge
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let net:  trit = network_performance(lat, jit);
+let target: trit = execution_target(net, batt);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match target {
+    -1 => { return conflict(); } // FULL LOCAL RENDER
+     0 => { return hold();     } // HYBRID / INTERPOLATED
+     1 => { return truth();    } // CLOUD RENDER
 }

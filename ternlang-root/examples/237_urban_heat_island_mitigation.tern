@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 237_urban_heat_island_mitigation.tern — Urban Heat Island Mitigation
+// 237_urban_heat_island_mitigation.tern — Cool City Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Urban surfaces aren't just "Hot" or "Cold." Ternary (0) identifies 
+// "THERMAL_STORAGE" zones—areas that absorb heat during the day and release 
+// it at night. This allows for targeted deployment of evaporative cooling.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn surface_reflectivity(albedo: trit, shade_index: trit) -> trit {
+    let cool_potential: trit = consensus(albedo, shade_index);
+    match cool_potential {
+        -1 => { return conflict(); } // HEAT TRAP (ASPHALT)
+         0 => { return hold();     } // NEUTRAL (BRICK/CONCRETE)
+         1 => { return truth();    } // COOL SURFACE (GREEN ROOF)
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn misting_control(reflectivity: trit, ambient_temp: trit) -> trit {
+    match ambient_temp {
+        -1 => { return conflict(); } // COOL DAY: NO MISTING
+         0 => {
+             // Warm day: only mist the heat traps
+             match reflectivity {
+                 -1 => { return hold();     } // MIST ON
+                  0 => { return conflict(); } // OFF
+                  1 => { return conflict(); } // OFF
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Hot day: mist everything except green zones
+             match reflectivity {
+                 -1 => { return truth();    } // MAX MIST
+                  0 => { return hold();     } // MEDIUM MIST
+                  1 => { return conflict(); } // OFF
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let alb: trit = conflict();
+let shad: trit = hold();
+let temp: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let surf: trit = surface_reflectivity(alb, shad);
+let mist: trit = misting_control(surf, temp);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match mist {
+    -1 => { return conflict(); } // IDLE
+     0 => { return hold();     } // LOW FLOW
+     1 => { return truth();    } // FULL EVAPORATION
 }

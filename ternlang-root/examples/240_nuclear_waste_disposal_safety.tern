@@ -1,37 +1,54 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 240_nuclear_waste_disposal_safety.tern — Nuclear Waste Disposal Safety
+// 240_nuclear_waste_disposal_safety.tern — Containment Monitoring
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Nuclear safety requires "Defense in Depth." Binary "Leaking/Not-Leaking" 
+// is too late. Ternary (0) provides a "DEGRADATION_WATCH" state, where 
+// micro-fractures in concrete casks are detected via acoustic emission 
+// before radiation escapes.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn cask_integrity(acoustic_emission: trit, thermal_gradient: trit) -> trit {
+    // High noise and high heat = failure
+    let integrity: trit = consensus(invert(acoustic_emission), invert(thermal_gradient));
+    match integrity {
+        -1 => { return conflict(); } // BREACHED
+         0 => { return hold();     } // STRESS DETECTED
+         1 => { return truth();    } // SECURE
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn containment_action(integrity: trit, external_radiation: trit) -> trit {
+    match external_radiation {
+        1 => { return truth(); } // RADIATION DETECTED - SEAL AREA
+        0 => {
+            // No radiation yet, check physical integrity
+            match integrity {
+                -1 => { return truth(); } // PHYSICAL BREACH IMMINENT
+                 0 => { return hold();  } // SCHEDULE MAINTENANCE
+                 1 => { return hold();  } // MONITOR
+            }
+        }
+        -1 => {
+            // Radiation background levels
+            match integrity {
+                -1 => { return hold();     } // CHECK SENSOR ERROR
+                 0 => { return hold();     } // LOG STRESS
+                 1 => { return conflict(); } // NOMINAL
+            }
+        }
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let noise: trit = hold();
+let heat: trit = truth();
+let rad: trit = conflict();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let cask: trit = cask_integrity(noise, heat);
+let action: trit = containment_action(cask, rad);
+
+match action {
+    -1 => { return conflict(); } // NORMAL
+     0 => { return hold();     } // INSPECT
+     1 => { return truth();    } // EMERGENCY
 }

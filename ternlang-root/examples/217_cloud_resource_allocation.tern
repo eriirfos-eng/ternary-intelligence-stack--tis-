@@ -1,37 +1,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 217_cloud_resource_allocation.tern — Cloud Resource Allocation
+// 217_cloud_resource_allocation.tern — Green Compute Scaling
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Cloud scaling is usually just "On/Off." Ternary (0) enables "Eco-Mode." 
+// When power is expensive or renewable supply is low (0), workloads are 
+// migrated to low-priority, slower cores rather than being killed.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn energy_availability(grid_load: trit, solar_output: trit) -> trit {
+    return consensus(grid_load, solar_output);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn scheduler_mode(energy: trit, workload_priority: trit) -> trit {
+    match energy {
+        -1 => {
+            match workload_priority {
+                -1 => { return conflict(); } // Critical energy shortage
+                 0 => { return conflict(); }
+                 1 => { return hold();     } // High priority only on ECO
+            }
+        }
+        0 => { return hold(); } // ECO Mode
+        1 => { return workload_priority; }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let load: trit = hold();  // Grid is busy
+let sun:  trit = truth(); // Solar is peaking
+let prio: trit = hold();  // Batch processing task
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let pwr: trit = energy_availability(load, sun);
+let mode: trit = scheduler_mode(pwr, prio);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match mode {
+    -1 => { return conflict(); } // SHUTDOWN
+     0 => { return hold();     } // LOW-POWER / ECO CORES
+     1 => { return truth();    } // PERFORMANCE MODE
 }

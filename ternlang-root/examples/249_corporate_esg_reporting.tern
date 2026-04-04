@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 249_corporate_esg_reporting.tern — Corporate ESG Reporting
+// 249_corporate_esg_reporting.tern — Governance & Social
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// ESG reporting often lacks nuance. Binary "Compliant/Not" hides corporate 
+// culture. Ternary (0) captures the "DEVELOPING" state of governance, where 
+// policies are in place but yet to be fully tested by real-world events.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn social_impact_score(diversity_metric: trit, labor_practices: trit) -> trit {
+    let score: trit = consensus(diversity_metric, labor_practices);
+    match score {
+        -1 => { return conflict(); } // EXPLOITATIVE
+         0 => { return hold();     } // AVERAGE
+         1 => { return truth();    } // EQUITABLE
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn esg_rating(social: trit, governance_board: trit) -> trit {
+    match governance_board {
+        -1 => { return conflict(); } // WEAK GOVERNANCE
+         0 => {
+             // Average governance: Social score determines if they pass
+             match social {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // BB RATING
+                  1 => { return hold();     } // BBB RATING
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Strong governance
+             match social {
+                 -1 => { return hold();  } // A RATING
+                  0 => { return truth(); } // AA RATING
+                  1 => { return truth(); } // AAA RATING
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let div: trit = hold();
+let lab: trit = truth();
+let gov: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let soc: trit = social_impact_score(div, lab);
+let rat: trit = esg_rating(soc, gov);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match rat {
+    -1 => { return conflict(); } // LAGGARD
+     0 => { return hold();     } // AVERAGE
+     1 => { return truth();    } // LEADER
 }

@@ -1,37 +1,38 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 243_biofuel_feedstock_optimization.tern — Biofuel Feedstock Optimization
+// 243_biofuel_feedstock_optimization.tern — Algae Cultivation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Algae growth depends on a delicate balance of light and nutrients. 
+// Binary logic misses the "PHOTO-INHIBITION" state (too much light). 
+// Ternary (0) provides an "OPTIMIZING" state where shade covers are adjusted.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn growth_potential(photon_flux: trit, nutrient_density: trit) -> trit {
+    match photon_flux {
+        -1 => { return conflict(); } // TOO DARK
+         0 => { return nutrient_density; } // IDEAL LIGHT
+         1 => { return hold(); } // PHOTO-INHIBITION RISK
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn harvest_readiness(growth: trit, density_sensor: trit) -> trit {
+    let status: trit = consensus(growth, density_sensor);
+    match status {
+        -1 => { return conflict(); } // IMMATURE / STRESSED
+         0 => { return hold();     } // GROWING
+         1 => { return truth();    } // READY FOR HARVEST
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let light: trit = hold();
+let nut: trit = truth();
+let den: trit = hold();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let grow: trit = growth_potential(light, nut);
+let ready: trit = harvest_readiness(grow, den);
+
+match ready {
+    -1 => { return conflict(); } // WAIT
+     0 => { return hold();     } // NURTURE
+     1 => { return truth();    } // HARVEST
 }

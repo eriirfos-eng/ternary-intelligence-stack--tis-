@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 156_hospital_bed.tern — Hospital Bed Allocation
+// 156_hospital_bed.tern — Critical Care Resource Allocation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Hospital bed management isn't just "Full" or "Empty". A bed can be
+// "Reserved/Cleaning" (0), meaning it's unavailable for a walk-in but
+// assigned for an incoming transfer. Ternary (0) prevents binary systems
+// from over-allocating beds during peak surgery hours.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn bed_availability(x: trit) -> trit { return x; }
-fn staff_ratio(x: trit) -> trit { return x; }
-fn patient_urgency(x: trit) -> trit { return x; }
+fn calculate_ward_capacity(physical_beds: trit, staff_availability: trit) -> trit {
+    // A bed is only usable if there is a nurse to staff it.
+    return consensus(physical_beds, staff_availability);
+}
 
-fn main_decision(b: trit, s: trit, p: trit) -> trit {
-    match b {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, p); }
-             }
-         }
+fn patient_admission_triage(ward_state: trit, patient_acuity: trit) -> trit {
+    match patient_acuity {
+        -1 => { 
+            // Low acuity (Stable). Discharging or outpatient.
+            return conflict(); 
+        }
+        0 => {
+            // Moderate acuity. Observation needed.
+            match ward_state {
+                -1 => { return hold();  } // NO BEDS - WAIT IN ER
+                 0 => { return hold();  } // MARGINAL - RE-ROUTE
+                 1 => { return truth(); } // CAPACITY OK - ADMIT
+            }
+        }
+        1 => {
+            // High acuity (Critical). Mandatory admission.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let ICU_beds:     trit = hold();  // Many beds in maintenance/cleaning
+let nurse_shift:  trit = truth(); // Full staffing available
+let trauma_score: trit = truth(); // Incoming critical patient
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let capacity:  trit = calculate_ward_capacity(ICU_beds, nurse_shift);
+let admission: trit = patient_admission_triage(capacity, trauma_score);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match admission {
+    -1 => { return conflict(); } // REDIRECT TO CLINIC
+     0 => { return hold();     } // HOLD IN EMERGENCY ROOM
+     1 => { return truth();    } // ADMIT TO INTENSIVE CARE
 }

@@ -1,37 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 220_iot_device_security.tern — IoT Device Security
+// 220_iot_device_security.tern — Anomaly Isolation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A hacked toaster shouldn't take down the smart home. Ternary (0) 
+// implements "Quarantine." A device with a weird power signature (0) 
+// is isolated to a local-only VLAN, retaining its core function while 
+// blocking its access to the wider internet.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn detect_anomaly(traffic_pattern: trit, power_usage: trit) -> trit {
+    return consensus(traffic_pattern, power_usage);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn security_state(anomaly_score: trit, firmware_status: trit) -> trit {
+    match anomaly_score {
+        -1 => { return conflict(); } // Confirmed compromise
+         0 => {
+             match firmware_status {
+                 -1 => { return conflict(); } // Anomaly + Outdated = Isolation
+                  0 => { return hold();     } // Anomaly + Unknown = Isolation
+                  1 => { return hold();     } // Anomaly + Updated = Monitor
              }
+         }
+         1 => {
+             return firmware_status;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let tra: trit = hold();  // Port scanning detected
+let pwr: trit = truth(); // Normal power draw
+let frm: trit = truth(); // Firmware is up to date
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let score: trit = detect_anomaly(tra, pwr);
+let state: trit = security_state(score, frm);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match state {
+    -1 => { return conflict(); } // HARD DISABLE
+     0 => { return hold();     } // VIRTUAL QUARANTINE / LOCAL ONLY
+     1 => { return truth();    } // FULL TRUST
 }

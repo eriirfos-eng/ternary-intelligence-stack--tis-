@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 151_earthquake_warning.tern — Earthquake Early Warning
+// 151_earthquake_warning.tern — Seismic Event Verification
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A binary "Warning/Clear" system can trigger mass panic for non-destructive 
+// seismic noise (e.g., heavy trucks or minor shifts). Ternary (0) provides a 
+// "CAUTION" state, alerting emergency services to stand by while data 
+// stabilizes, without triggering city-wide sirens prematurely.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn seismic_amplitude(x: trit) -> trit { return x; }
-fn station_count(x: trit) -> trit { return x; }
-fn depth_confidence(x: trit) -> trit { return x; }
+fn filter_seismic_noise(p_wave: trit, s_wave: trit) -> trit {
+    // Both waves must be detected for a confirmed event.
+    return consensus(p_wave, s_wave);
+}
 
-fn main_decision(a: trit, s: trit, d: trit) -> trit {
-    match a {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, d); }
-             }
-         }
+fn earthquake_alert(event_certainty: trit, pop_density: trit) -> trit {
+    match event_certainty {
+        -1 => { 
+            // Clear or very low magnitude. No alert.
+            return conflict(); 
+        }
+        0 => {
+            // Unclear or low-level shaking. Pre-alert for services.
+            return hold();
+        }
+        1 => {
+            // Confirmed destructive event. Check area risk.
+            match pop_density {
+                -1 => { return hold();  } // LOW POP - TARGETED ALERT
+                 0 => { return truth(); } // MEDIUM POP - PUBLIC ALERT
+                 1 => { return truth(); } // HIGH POP - IMMEDIATE EVACUATION
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let station_A: trit = truth(); // Strong P-wave detected
+let station_B: trit = hold();  // S-wave data is noisy
+let city_zone: trit = truth(); // High density downtown
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let seismic_state: trit = filter_seismic_noise(station_A, station_B);
+let alert_status:  trit = earthquake_alert(seismic_state, city_zone);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match alert_status {
+    -1 => { return conflict(); } // ALL CLEAR
+     0 => { return hold();     } // ADVISORY - STAND BY
+     1 => { return truth();    } // ACTIVE WARNING - SEEK SHELTER
 }

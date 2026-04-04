@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 177_precision_agriculture_spraying.tern — Precision Agriculture Spraying
+// 177_precision_agriculture_spraying.tern — Targeted Crop Care
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Blanketing fields in pesticide (-1) is toxic; doing nothing (1) loses crops. 
+// Ternary (0) enables "SPOT_TREATMENT" where only specific leaves are sprayed, 
+// saving money and protecting the local bee population.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn identify_pest_presence(leaf_reflectance: trit, local_humidity: trit) -> trit {
+    // High humidity and specific reflectance indicates fungus risk.
+    let risk: trit = consensus(leaf_reflectance, local_humidity);
+    return risk;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn control_nozzle(risk: trit, wind_drift: trit) -> trit {
+    match wind_drift {
+        -1 => { return conflict(); } // TOO WINDY - STOP SPRAYING
+         0 => { 
+             // Moderate wind, only spot treat
+             match risk {
+                 -1 => { return hold();     } 
+                  0 => { return hold();     }
+                  1 => { return conflict(); }
              }
+         }
+         1 => { 
+             // Calm, follow risk map
+             return risk; 
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let leaf: trit = hold();
+let hum:  trit = hold();
+let wind: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let pest_risk: trit = identify_pest_presence(leaf, hum);
+let nozzle:    trit = control_nozzle(pest_risk, wind);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match nozzle {
+    -1 => { return conflict(); } // CLOSED
+     0 => { return hold();     } // LOW DOSAGE
+     1 => { return truth();    } // FULL APPLICATION
 }

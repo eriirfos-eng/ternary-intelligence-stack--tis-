@@ -1,37 +1,47 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 234_air_pollution_source_apportionment.tern — Air Pollution Source Apportionment
+// 234_air_pollution_source_apportionment.tern — Smog Attribution
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Pollution doesn't always come from the nearest factory. Wind direction 
+// and chemical ratios determine source. Ternary (0) captures "MIXED_ORIGIN," 
+// where regional transport contributes as much as local industry.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn chemical_fingerprint(no2_ratio: trit, so2_ratio: trit) -> trit {
+    let profile: trit = consensus(no2_ratio, so2_ratio);
+    match profile {
+        -1 => { return conflict(); } // URBAN TRAFFIC
+         0 => { return hold();     } // MIXED INDUSTRIAL/VEHICLE
+         1 => { return truth();    } // HEAVY COAL/SHIPPING
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn source_location(wind_alignment: trit, sensor_delta: trit) -> trit {
+    // Is the spike coming from upwind (1) or downwind (-1)?
+    match wind_alignment {
+        -1 => { return conflict(); } // EXTERNAL / REGIONAL transport
+         0 => { return hold();     } // STAGNANT / LOCAL ACCUMULATION
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Upwind source: check concentration gradient
+             match sensor_delta {
+                 -1 => { return hold();  } // DIFFUSE
+                  0 => { return hold();  } // INCREASING
+                  1 => { return truth(); } // POINT-SOURCE IDENTIFIED
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let no2: trit = hold();
+let so2: trit = truth();
+let wind: trit = truth();
+let delta: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let type: trit = chemical_fingerprint(no2, so2);
+let loc: trit = source_location(wind, delta);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match loc {
+    -1 => { return conflict(); } // BACKGROUND
+     0 => { return hold();     } // REGIONAL
+     1 => { return truth();    } // FACTORY ALERT
 }

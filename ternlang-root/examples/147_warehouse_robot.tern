@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 147_warehouse_robot.tern — Autonomous Warehouse Robot
+// 147_warehouse_robot.tern — Automated Logistics Dispatch
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// A warehouse robot must decide between "Pick Item" (1), "Return to Base" (-1), 
+// and "Recalibrate/Wait" (0). Binary systems struggle when a robot's 
+// location is slightly off or a battery level is marginal. 
+// Ternary (0) allows a robot to pause and fix its orientation without 
+// triggering a full "System Error" or continuing on a dangerous path.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn battery_ok(x: trit) -> trit { return x; }
-fn path_clear(x: trit) -> trit { return x; }
-fn load_secure(x: trit) -> trit { return x; }
+fn path_integrity(gps: trit, imu_sensor: trit) -> trit {
+    // Fusing location data. If they disagree, the robot is lost (0).
+    return consensus(gps, imu_sensor);
+}
 
-fn main_decision(b: trit, p: trit, l: trit) -> trit {
-    match b {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match p {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(p, l); }
-             }
-         }
+fn dispatch_command(path_status: trit, battery: trit) -> trit {
+    match path_status {
+        -1 => { 
+            // Path is blocked or sensors are failing critically.
+            return conflict(); 
+        }
+        0 => {
+            // Unsure of exact position. Halt and recalibrate.
+            return hold();
+        }
+        1 => {
+            // Path is clear. Check if we have energy to execute.
+            match battery {
+                -1 => { return conflict(); } // CRITICAL LOW - RETURN NOW
+                 0 => { return hold();     } // MARGINAL - WAIT FOR TASKS
+                 1 => { return truth();    } // FULL CHARGE - PROCEED
+            }
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let warehouse_gps:  trit = truth(); // GPS signal strong
+let imu_heading:    trit = hold();  // IMU is drifting slightly
+let battery_level:  trit = truth(); // Energy is at 95%
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let alignment: trit = path_integrity(warehouse_gps, imu_heading);
+let action:    trit = dispatch_command(alignment, battery_level);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // ABORT TASK - RETURN TO DOCK
+     0 => { return hold();     } // HALT AND RE-CENTER CAMERA
+     1 => { return truth();    } // EXECUTE PICK ORDER
 }

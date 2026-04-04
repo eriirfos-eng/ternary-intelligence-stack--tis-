@@ -1,37 +1,44 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 188_energy_storage_optimization.tern — Energy Storage Optimization
+// 188_energy_storage_optimization.tern — Battery Lifecycle Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Batteries are destroyed by deep cycles (-1 to 1). The "Sweet Spot" (0) 
+// is 40-60% State of Charge. Ternary logic prioritizes keeping the battery 
+// in this "HOLD" state, only using full capacity during grid emergencies.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn assess_cell_health(internal_resistance: trit, temperature_delta: trit) -> trit {
+    let health: trit = consensus(internal_resistance, temperature_delta);
+    return health;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn decide_charge_strategy(health: trit, soc_level: trit) -> trit {
+    match health {
+        -1 => { return conflict(); } // THERMAL RUNAWAY RISK
+         0 => { 
+             // Degraded cell, trickle charge only
+             return hold(); 
+         }
+         1 => { 
+             // Healthy cell, follow SOC logic
+             match soc_level {
+                 -1 => { return truth();    } // EMPTY - FAST CHARGE
+                  0 => { return hold();     } // OPTIMAL - FLOAT
+                  1 => { return conflict(); } // FULL - STOP
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let ohm:  trit = truth();
+let temp: trit = hold();
+let soc:  trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cell_state: trit = assess_cell_health(ohm, temp);
+let bms_action: trit = decide_charge_strategy(cell_state, soc);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match bms_action {
+    -1 => { return conflict(); } // DISCONNECT PACK
+     0 => { return hold();     } // BALANCING MODE
+     1 => { return truth();    } // ACTIVE CHARGING
 }

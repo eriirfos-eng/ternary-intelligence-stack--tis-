@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 208_government_budget_allocation.tern — Government Budget Allocation
+// 208_government_budget_allocation.tern — Priority-Based Funding
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Governments often face "All or Nothing" budget battles. Ternary (0) 
+// enables "Phased Funding"—approving the design and feasibility stage (0)
+// of a project while deferring full construction (1) until metrics are met.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn analyze_project(urgency: trit, viability: trit) -> trit {
+    return consensus(urgency, viability);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn funding_decision(project_score: trit, available_funds: trit) -> trit {
+    match available_funds {
+        -1 => { return conflict(); } // No money
+         0 => {
+             match project_score {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // Limited money + Mid project = Phase 1
+                  1 => { return hold();     } // Limited money + Good project = Phase 1
              }
+         }
+         1 => {
+             return project_score; // Full funding if project is good
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let urg: trit = truth();    // Bridge is collapsing
+let via: trit = hold();     // Planning only 50% done
+let bud: trit = hold();     // General fund is tight
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let score: trit = analyze_project(urg, via);
+let fund:  trit = funding_decision(score, bud);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match fund {
+    -1 => { return conflict(); } // DEFUND/CANCEL
+     0 => { return hold();     } // PHASED / PLANNING ONLY
+     1 => { return truth();    } // FULL ALLOCATION
 }

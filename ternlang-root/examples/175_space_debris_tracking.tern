@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 175_space_debris_tracking.tern — Space Debris Tracking
+// 175_space_debris_tracking.tern — Orbital Traffic Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Collision probability is a spectrum. Binary "Hit/Miss" leads to "Sat-Panic" 
+// (wasting fuel on maneuvers). Ternary (0) defines a "Conjunction" state where 
+// operators wait for more refined tracking data before moving.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn calculate_collision_risk(radar_cross_section: trit, velocity_uncertainty: trit) -> trit {
+    let risk: trit = consensus(radar_cross_section, velocity_uncertainty);
+    return risk;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn determine_maneuver(risk: trit, fuel_reserves: trit) -> trit {
+    match risk {
+        -1 => { 
+            // High risk collision imminent
+            match fuel_reserves {
+                -1 => { return conflict(); } // KESSLER SYNDROME RISK
+                 0 => { return truth();    } // EMERGENCY BURN
+                 1 => { return truth();    }
+            }
+        }
+         0 => { return hold();     } // PREPARE THRUSTERS
+         1 => { return conflict(); } // PATH CLEAR
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let rcs:  trit = conflict();
+let vel:  trit = hold();
+let fuel: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let risk_level: trit = calculate_collision_risk(rcs, vel);
+let maneuver:   trit = determine_maneuver(risk_level, fuel);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match maneuver {
+    -1 => { return conflict(); } // ABANDON SATELLITE
+     0 => { return hold();     } // RE-OBSERVE
+     1 => { return truth();    } // EXECUTE EVASION
 }

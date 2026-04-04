@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 165_drug_interdiction.tern — Customs Drug Interdiction
+// 165_drug_interdiction.tern — Port Security Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Searching every container (1) kills trade; searching none (-1) lets drugs in. 
+// Ternary (0) enables "X-RAY_SCAN" vs "PHYSICAL_SEARCH" logic, optimizing 
+// throughput while maintaining security.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn scanner_hit(x: trit) -> trit { return x; }
-fn canine_alert(x: trit) -> trit { return x; }
-fn manifest_discrepancy(x: trit) -> trit { return x; }
-
-fn main_decision(s: trit, c: trit, m: trit) -> trit {
-    match s {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match c {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(c, m); }
-             }
-         }
+fn assess_cargo_risk(manifest: trit, origin_port: trit) -> trit {
+    let risk_profile: trit = consensus(manifest, origin_port);
+    match risk_profile {
+        -1 => { return conflict(); } // HIGH RISK
+         0 => { return hold();     } // MEDIUM RISK
+         1 => { return truth();    } // LOW RISK
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn execute_security_protocol(risk: trit, sniffer_dog: trit) -> trit {
+    match risk {
+        -1 => { return conflict(); } // IMMEDIATE SEIZURE
+         0 => {
+             // If medium risk, wait for dog feedback
+             return sniffer_dog;
+         }
+         1 => { return truth(); } // GREEN LANE
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let cargo_manifest: trit = hold();
+let origin_profile: trit = hold();
+let canine_feedback: trit = conflict();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let risk_level: trit = assess_cargo_risk(cargo_manifest, origin_profile);
+let final_gate: trit = execute_security_protocol(risk_level, canine_feedback);
+
+match final_gate {
+    -1 => { return conflict(); } // STOP SHIPMENT
+     0 => { return hold();     } // X-RAY REQUIRED
+     1 => { return truth();    } // CLEAR FOR TRANSPORT
 }

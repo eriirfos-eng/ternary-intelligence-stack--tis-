@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 245_methane_leak_detection.tern — Methane Leak Detection
+// 245_methane_leak_detection.tern — Fugitive Emission Sentry
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Methane sensors have high sensitivity but can be fooled by cross-interference. 
+// Binary logic causes expensive manual inspections for false alarms. 
+// Ternary (0) flags a "POTENTIAL_HOTSPOT," triggering a drone flyover.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn concentration_spike(ir_sensor: trit, laser_spectrometer: trit) -> trit {
+    let detection: trit = consensus(ir_sensor, laser_spectrometer);
+    match detection {
+        -1 => { return conflict(); } // BACKGROUND LEVELS
+         0 => { return hold();     } // ELEVATED CH4
+         1 => { return truth();    } // CRITICAL CONCENTRATION
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn response_strategy(spike: trit, wind_speed: trit) -> trit {
+    match spike {
+        -1 => { return conflict(); } // ALL CLEAR
+         0 => {
+             // Elevated: check wind for dissipation
+             match wind_speed {
+                 -1 => { return hold();  } // STAGNANT - HIGH RISK
+                  0 => { return hold();  } // MODERATE WIND
+                  1 => { return hold();  } // HIGH WIND - DISSIPATING
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Critical: immediate action
+             match wind_speed {
+                 -1 => { return truth(); } // IMMINENT EXPLOSION RISK
+                  0 => { return truth(); } // MAJOR LEAK
+                  1 => { return hold();  } // DILUTED BUT URGENT
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let ir: trit = hold();
+let laser: trit = hold();
+let wind: trit = conflict();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let spike: trit = concentration_spike(ir, laser);
+let action: trit = response_strategy(spike, wind);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // LOG
+     0 => { return hold();     } // INSPECT
+     1 => { return truth();    } // ISOLATE
 }

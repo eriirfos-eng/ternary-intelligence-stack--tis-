@@ -1,37 +1,44 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 187_renewable_energy_integration.tern — Renewable Energy Integration
+// 187_renewable_energy_integration.tern — Grid Stability Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Renewables are "Intermittent" (0). Binary "Connected/Disconnected" grid 
+// logic causes blackouts when a cloud passes over a solar farm. Ternary (0) 
+// allows the grid to signal "FREQUENCY_SUPPORT", where assets slightly 
+// throttle to maintain 50/60Hz stability.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_grid_frequency(hz_deviation: trit, voltage_stability: trit) -> trit {
+    let status: trit = consensus(hz_deviation, voltage_stability);
+    return status;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn modulate_inverter_output(grid_status: trit, solar_irradiance: trit) -> trit {
+    match grid_status {
+        -1 => { return conflict(); } // GRID INSTABILITY - DISCONNECT
+         0 => { 
+             // Marginal grid, throttle output to stabilize
+             match solar_irradiance {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // DROOP CONTROL
+                  1 => { return hold();     }
              }
+         }
+         1 => { 
+             return solar_irradiance; 
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let freq:  trit = hold();
+let volt:  trit = truth();
+let sun:   trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let grid_health: trit = check_grid_frequency(freq, volt);
+let inverter:    trit = modulate_inverter_output(grid_health, sun);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match inverter {
+    -1 => { return conflict(); } // SAFE SHUTDOWN
+     0 => { return hold();     } // REACTIVE POWER ONLY
+     1 => { return truth();    } // ACTIVE EXPORT
 }

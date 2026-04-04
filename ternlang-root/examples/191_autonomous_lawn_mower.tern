@@ -1,37 +1,45 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 191_autonomous_lawn_mower.tern — Autonomous Lawn Mower
+// 191_autonomous_lawn_mower.tern — Garden Safety Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary "Mow/Stop" logic is too blunt for complex environments. Ternary (0) 
+// provides a "CAUTION" state, allowing the mower to reduce speed or wait 
+// for transient obstacles (like a cat or a child's toy) to clear without 
+// needing a full manual restart.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn check_obstacle_proximity(status: trit) -> trit {
+    // If the path is clear (1), we mow. If it's blocked (-1), we stop.
+    // If we're uncertain (0), we slow down and wait.
+    match status {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
+         1 => { return truth(); }
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn mower_command(obstacle: trit, battery: trit, blade: trit) -> trit {
+    // Hard gate: Obstacle detection is paramount. If it's -1, we stop.
+    match obstacle {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
+             // Obstacle ok, check physical systems
+             let health: trit = consensus(battery, blade);
+             return health;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+// Scenario: Sensors show a distant obstacle (0), but battery is full (1) and blade is sharp (1).
+let obs_val:      trit = hold();
+let batt_val:     trit = truth();
+let blade_val:    trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let command: trit = mower_command(obs_val, batt_val, blade_val);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match command {
+    -1 => { return conflict(); } // STOP
+     0 => { return hold();    } // CAUTION - slow speed, wait and see
+     1 => { return truth();   } // MOW
 }

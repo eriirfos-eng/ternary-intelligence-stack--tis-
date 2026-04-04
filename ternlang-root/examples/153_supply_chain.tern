@@ -1,37 +1,48 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 153_supply_chain.tern — Supply Chain Disruption
+// 153_supply_chain.tern — Adaptive Inventory Replenishment
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Supply chains often suffer from "Bullwhip Effects" caused by binary "Out of
+// Stock/In Stock" flags. Ternary (0) provides a "Low Stock/Buffer" state,
+// allowing for "Partial Fulfillment" or "Slow Shipping" modes to bridge
+// gaps between major shipments without collapsing the logistics network.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn supplier_status(x: trit) -> trit { return x; }
-fn logistics_flow(x: trit) -> trit { return x; }
-fn demand_forecast(x: trit) -> trit { return x; }
+fn calculate_demand(sales_velocity: trit, lead_time: trit) -> trit {
+    // Determine the urgency of replenishment.
+    return consensus(sales_velocity, lead_time);
+}
 
-fn main_decision(s: trit, l: trit, d: trit) -> trit {
-    match s {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match l {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(l, d); }
-             }
-         }
+fn replenishment_order(demand_urgency: trit, current_inventory: trit) -> trit {
+    match demand_urgency {
+        -1 => { 
+            // Low demand. No replenishment needed.
+            return conflict(); 
+        }
+        0 => {
+            // Stable demand. Replenish if stock is low.
+            match current_inventory {
+                -1 => { return truth(); } // LOW STOCK - ORDER
+                 0 => { return hold();  } // BUFFER - WAIT
+                 1 => { return hold();  } // PLENTY - HOLD
+            }
+        }
+        1 => {
+            // High demand. Order immediately.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let sales_trend:    trit = hold();  // Moderate sales
+let delivery_delay: trit = truth(); // Suppliers are slow
+let warehouse_qty:  trit = hold();  // 50% capacity
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let urgency: trit = calculate_demand(sales_trend, delivery_delay);
+let restock: trit = replenishment_order(urgency, warehouse_qty);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match restock {
+    -1 => { return conflict(); } // REDUCE ORDERS - SURPLUS
+     0 => { return hold();     } // MAINTAIN BUFFER - MONITOR
+     1 => { return truth();    } // EXPEDITE SHIPMENT - URGENT
 }

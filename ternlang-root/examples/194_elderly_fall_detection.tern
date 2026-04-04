@@ -1,37 +1,51 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 194_elderly_fall_detection.tern — Elderly Fall Detection
+// 194_elderly_fall_detection.tern — Non-Intrusive Care
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Fall detectors are notoriously prone to false positives (dropping a phone) 
+// or false negatives. Ternary (0) represents an "AMBIGUOUS IMPACT," 
+// triggering a voice prompt to the user ("Are you okay?") before 
+// automatically calling emergency services.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn process_impact(accel: trit, position: trit) -> trit {
+    // If accel spike (-1) and position is prone (-1) -> Fall
+    // If accel is 0 and position is 0 -> Check-in
+    let detection: trit = consensus(accel, position);
+    return detection;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn dispatch_logic(impact_val: trit, heart_rate: trit) -> trit {
+    match impact_val {
+        -1 => {
+            match heart_rate {
+                -1 => { return conflict(); } // No movement/critical HR -> Dispatch
+                 0 => { return conflict(); } // Dispatch anyway
+                 1 => { return conflict(); } // Dispatch
+            }
+        }
+        0 => {
+            match heart_rate {
+                -1 => { return conflict(); } // Ambiguous impact but HR is bad
+                 0 => { return hold();     } // Ask user/wait for response
+                 1 => { return hold();     } // Ask user
+            }
+        }
+        1 => {
+            return truth(); // No fall
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let accelerometer: trit = hold(); // Moderate jolt
+let body_pos:      trit = hold(); // Uncertain orientation
+let heart_status:  trit = truth(); // Heart rate normal
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let impact: trit = process_impact(accelerometer, body_pos);
+let action: trit = dispatch_logic(impact, heart_status);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match action {
+    -1 => { return conflict(); } // CALL AMBULANCE
+     0 => { return hold();     } // VOICE PROMPT / FAMILY NOTIFY
+     1 => { return truth();    } // ALL CLEAR
 }

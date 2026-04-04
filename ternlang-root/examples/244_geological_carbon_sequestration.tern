@@ -1,37 +1,53 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 244_geological_carbon_sequestration.tern — Geological Carbon Sequestration
+// 244_geological_carbon_sequestration.tern — Sequestration Monitoring
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Pumping CO2 underground requires monitoring caprock integrity. Binary logic 
+// only alerts when a leak happens. Ternary (0) detects "MICRO-SEISMIC_SLIP," 
+// allowing the operator to reduce injection pressure before a breach occurs.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn caprock_integrity(micro_seismic: trit, pressure_delta: trit) -> trit {
+    // High seismic noise and high pressure = bad
+    let status: trit = consensus(invert(micro_seismic), invert(pressure_delta));
+    match status {
+        -1 => { return conflict(); } // BREACHED
+         0 => { return hold();     } // DEFORMING
+         1 => { return truth();    } // STABLE
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn injection_rate(integrity: trit, reservoir_capacity: trit) -> trit {
+    match integrity {
+        -1 => { return conflict(); } // EMERGENCY SHUT-OFF
+         0 => {
+             // Deforming: slow down injection
+             match reservoir_capacity {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return hold();     }
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Stable: proceed based on capacity
+             match reservoir_capacity {
+                 -1 => { return hold();  } // REDUCE (RESERVOIR FULL)
+                  0 => { return truth(); } // NOMINAL
+                  1 => { return truth(); } // INCREASE
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let seismic: trit = hold();
+let press: trit = hold();
+let cap: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let integrity: trit = caprock_integrity(seismic, press);
+let rate: trit = injection_rate(integrity, cap);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match rate {
+    -1 => { return conflict(); } // STOP
+     0 => { return hold();     } // SLOW
+     1 => { return truth();    } // PUMP
 }

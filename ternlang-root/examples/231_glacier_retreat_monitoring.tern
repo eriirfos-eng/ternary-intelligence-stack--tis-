@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 231_glacier_retreat_monitoring.tern — Glacier Retreat Monitoring
+// 231_glacier_retreat_monitoring.tern — Glaciological Balance
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Glaciers don't just "Melt" or "Freeze." They exist in a state of dynamic 
+// equilibrium. Ternary (0) captures the "STEADY_STATE," where accumulation 
+// matches ablation—a critical metric for long-term climate modeling.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn accumulation_zone_health(snowfall: trit, albedo: trit) -> trit {
+    let health: trit = consensus(snowfall, albedo);
+    match health {
+        -1 => { return conflict(); } // ABLATION DOMINANT
+         0 => { return hold();     } // EQUILIBRIUM
+         1 => { return truth();    } // POSITIVE MASS BALANCE
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn calving_risk(meltwater_lubrication: trit, terminus_stability: trit) -> trit {
+    match meltwater_lubrication {
+        -1 => { return terminus_stability; } // DRY BASE, STABILITY RULES
+         0 => {
+             match terminus_stability {
+                 -1 => { return conflict(); } // UNSTABLE
+                  0 => { return hold();     } // CREEPING
+                  1 => { return hold();     } // SECURE
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // High lubrication: risk is high regardless of stability
+             match terminus_stability {
+                 -1 => { return conflict(); } 
+                  0 => { return conflict(); }
+                  1 => { return hold();     }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let snow: trit = hold();
+let ice_albedo: trit = conflict();
+let melt: trit = truth();
+let stability: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let health: trit = accumulation_zone_health(snow, ice_albedo);
+let risk: trit = calving_risk(melt, stability);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match risk {
+    -1 => { return conflict(); } // CRITICAL CALVING
+     0 => { return hold();     } // ACCELERATING
+     1 => { return truth();    } // STABLE
 }

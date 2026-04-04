@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 174_microgrid_fault_detection.tern — Microgrid Fault Detection
+// 174_microgrid_fault_detection.tern — Distributed Energy Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Microgrids deal with "Islanded" (0) states where they are disconnected from 
+// the main grid but still powered. Binary "On/Off" fails to manage the 
+// delicate balance of local frequency in islanded mode.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn monitor_grid_sync(utility_voltage: trit, phase_angle: trit) -> trit {
+    let sync: trit = consensus(utility_voltage, phase_angle);
+    return sync;
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn switch_power_source(sync: trit, local_battery_soc: trit) -> trit {
+    match sync {
+        -1 => { 
+            // Utility grid is down
+            match local_battery_soc {
+                -1 => { return conflict(); } // BLACKOUT
+                 0 => { return hold();     } // LOAD SHEDDING
+                 1 => { return truth();    } // ISLANDED OPERATION
+            }
+        }
+         0 => { return hold();  } // BROWNOUT - STABILIZING
+         1 => { return truth(); } // UTILITY CONNECTED
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let grid_v: trit = conflict();
+let phase:  trit = conflict();
+let battery: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let sync_status: trit = monitor_grid_sync(grid_v, phase);
+let power_mode:  trit = switch_power_source(sync_status, battery);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match power_mode {
+    -1 => { return conflict(); } // GRID FAILURE
+     0 => { return hold();     } // LOW POWER MODE
+     1 => { return truth();    } // FULL LOAD ACTIVE
 }

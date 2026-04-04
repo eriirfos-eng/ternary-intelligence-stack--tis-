@@ -1,37 +1,38 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 163_employee_review.tern — Employee Performance Review
+// 163_employee_review.tern — Human Capital Evaluation
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Humans are not "Good" or "Bad". Most employees are "Developing" (0). Binary 
+// ratings force middle-performers into buckets they don't belong in, killing 
+// morale. Ternary captures the "Maintain/Wait-and-See" reality.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn metrics_met(x: trit) -> trit { return x; }
-fn peer_feedback(x: trit) -> trit { return x; }
-fn professional_growth(x: trit) -> trit { return x; }
-
-fn main_decision(m: trit, p: trit, g: trit) -> trit {
-    match m {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match p {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(p, g); }
-             }
-         }
+fn calculate_bonus_eligibility(performance: trit, culture_fit: trit) -> trit {
+    // Culture fit is the inverter of a high performer's toxic impact.
+    let fit_check: trit = consensus(performance, culture_fit);
+    match fit_check {
+        -1 => { return conflict(); } // PIP / Termination
+         0 => { return hold();     } // Standard Salary
+         1 => { return truth();    } // Bonus Eligible
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let output_metric:  trit = truth();
+let team_harmony:   trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let review_result: trit = calculate_bonus_eligibility(output_metric, team_harmony);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match review_result {
+    -1 => { 
+        let action: trit = conflict();
+        return action;
+    }
+     0 => {
+        let action: trit = hold();
+        return action;
+     }
+     1 => {
+        let action: trit = truth();
+        return action;
+     }
 }

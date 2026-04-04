@@ -1,37 +1,41 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 215_privacy_policy_compliance.tern — Privacy Policy Compliance
+// 215_privacy_policy_compliance.tern — Data Minimization Engine
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Privacy isn't just "Public/Private." Ternary (0) introduces "Pseudonymous" 
+// or "Aggregated" states. Data that isn't essential for a feature is 
+// automatically stripped of PII (0) rather than being stored in full (-1).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn evaluate_data_necessity(feature_req: trit, sensitivity: trit) -> trit {
+    return consensus(feature_req, sensitivity);
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+fn storage_policy(necessity: trit, user_consent: trit) -> trit {
+    match user_consent {
+        -1 => { return conflict(); } // Opt-out
+         0 => {
+             match necessity {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // Store pseudonymized
+                  1 => { return hold();     } // Store pseudonymized
              }
+         }
+         1 => {
+             return necessity; // Full store if necessary
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let freq: trit = hold();  // Location data: mid-necessity
+let sens: trit = conflict(); // High sensitivity
+let opt:  trit = truth();    // User agreed
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let nec: trit = evaluate_data_necessity(freq, sens);
+let pol: trit = storage_policy(nec, opt);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match pol {
+    -1 => { return conflict(); } // DO NOT STORE
+     0 => { return hold();     } // ANONYMIZE / AGGREGATE
+     1 => { return truth();    } // STORE FULL RECORD
 }

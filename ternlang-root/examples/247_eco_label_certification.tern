@@ -1,37 +1,54 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 247_eco_label_certification.tern — Eco-label Certification
+// 247_eco_label_certification.tern — Product Scoring
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Eco-labels are often binary "Certified/Not," leading to greenwashing. 
+// Ternary (0) provides an "IN_TRANSITION" label, encouraging companies to 
+// show measurable progress toward sustainability without yet reaching 
+// "Gold" status.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn environmental_impact(carbon_footprint: trit, plastic_content: trit) -> trit {
+    // Low footprint (-1) and low plastic (-1) = High score (1)
+    let score: trit = consensus(invert(carbon_footprint), invert(plastic_content));
+    match score {
+        -1 => { return conflict(); } // POLLUTING
+         0 => { return hold();     } // NEUTRAL
+         1 => { return truth();    } // ECO-FRIENDLY
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn certification_tier(impact: trit, audit_transparency: trit) -> trit {
+    match audit_transparency {
+        -1 => { return conflict(); } // OPAQUE - NO LABEL
+         0 => {
+             // Partial transparency: max tier is Silver
+             match impact {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     } // BRONZE
+                  1 => { return hold();     } // SILVER
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // Fully transparent
+             match impact {
+                 -1 => { return hold();  } // DISCLOSED POLLUTER
+                  0 => { return hold();  } // SILVER
+                  1 => { return truth(); } // GOLD / PLATINUM
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let co2: trit = hold();
+let plastic: trit = conflict();
+let audit: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let impact: trit = environmental_impact(co2, plastic);
+let tier:   trit = certification_tier(impact, audit);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match tier {
+    -1 => { return conflict(); } // REJECTED
+     0 => { return hold();     } // SILVER
+     1 => { return truth();    } // GOLD
 }

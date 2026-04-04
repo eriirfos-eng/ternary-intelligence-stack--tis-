@@ -1,37 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 154_nuclear_sub_reactor.tern — Nuclear Submarine Reactor
+// 154_nuclear_sub_reactor.tern — Primary Coolant Loop Control
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In nuclear engineering, a binary "On/Off" for coolant is fatal. 
+// Ternary (0) captures the "Transient/Cavitation" state in pumps, where
+// flow is present but inefficient. This allows the SCRAM logic to 
+// modulate reactor power (0) rather than either ignoring the noise or 
+// triggering a full blackout at depth.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn coolant_temp(x: trit) -> trit { return x; }
-fn neutron_flux(x: trit) -> trit { return x; }
-fn rod_position(x: trit) -> trit { return x; }
+fn reactor_thermal_state(temp: trit, pressure: trit) -> trit {
+    // Thermal safety depends on pressure-temperature equilibrium.
+    return consensus(temp, pressure);
+}
 
-fn main_decision(c: trit, n: trit, r: trit) -> trit {
-    match c {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match n {
-                 -1 => { return -1; }
-                  0 => { return 0; }
-                  1 => { return consensus(n, r); }
-             }
-         }
+fn control_rod_actuation(thermal_safety: trit, pump_flow: trit) -> trit {
+    match thermal_safety {
+        -1 => { 
+            // Severe over-temperature or pressure loss. SCRAM.
+            return conflict(); 
+        }
+        0 => {
+            // Marginal thermal drift. Adjust rods slowly.
+            match pump_flow {
+                -1 => { return conflict(); } // FLOW LOST - EMERGENCY SCRAM
+                 0 => { return hold();     } // CAVITATION - REDUCE POWER
+                 1 => { return hold();     } // FLOW OK - HOLD POWER
+            }
+        }
+        1 => {
+            // Reactor is stable. Allow power increase.
+            return truth();
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let core_temp:     trit = hold();  // Slight temperature rise
+let loop_pressure: trit = truth(); // Pressure is nominal
+let primary_pump:  trit = hold();  // Pump is vibrating (0)
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let thermal_qc:    trit = reactor_thermal_state(core_temp, loop_pressure);
+let rods_command:  trit = control_rod_actuation(thermal_qc, primary_pump);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match rods_command {
+    -1 => { return conflict(); } // FULL INSERTION - EMERGENCY SHUTDOWN
+     0 => { return hold();     } // MODULATE RODS - REDUCE THERMAL LOAD
+     1 => { return truth();    } // WITHDRAW RODS - FULL POWER
 }

@@ -1,37 +1,47 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 142_autonomous_ship_routing.tern — Autonomous Ship Routing
+// 142_autonomous_ship_routing.tern — Maritime Collision Avoidance
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// In open water, sensor data for "Obstacle Detected" is often ambiguous due to
+// wave clutter or fog. Binary logic might trigger emergency stops for every 
+// large wave. Ternary (0) allows the vessel to slow down and wait for more 
+// data (Persistence) before either resuming speed or maneuvering.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_weather(x: trit) -> trit { return x; }
-fn check_traffic(x: trit) -> trit { return x; }
-fn check_hull(x: trit) -> trit { return x; }
+fn evaluate_sensor_data(lidar: trit, radar: trit) -> trit {
+    // Both sensors must agree for high confidence (1 or -1).
+    // If they conflict or report noise (0), we hold current course with caution.
+    return consensus(lidar, radar);
+}
 
-fn main_decision(w: trit, t: trit, h: trit) -> trit {
-    match h {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match w {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(w, t); }
-             }
-         }
+fn navigation_decision(visibility: trit, sensor_fusion: trit) -> trit {
+    match visibility {
+        -1 => { 
+            // Fog or heavy storm. Force manual/safe mode.
+            return conflict();
+        }
+        0 => {
+            // Limited visibility, rely on fused sensors but stay cautious.
+            match sensor_fusion {
+                -1 => { return conflict(); }
+                 0 => { return hold(); }
+                 1 => { return hold(); } // Stay at hold speed in fog
+            }
+        }
+        1 => {
+            // Clear skies.
+            return sensor_fusion;
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let fog_level: trit = hold(); // Mist
+let fusion:    trit = truth(); // Radar/Lidar see clear path
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let route_state: trit = navigation_decision(fog_level, fusion);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match route_state {
+    -1 => { return conflict(); } // STOP/ANCHOR
+     0 => { return hold();     } // SLOW/CAUTION
+     1 => { return truth();    } // FULL STEAM AHEAD
 }

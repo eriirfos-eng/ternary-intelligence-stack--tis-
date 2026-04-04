@@ -1,39 +1,49 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 150_recidivism_risk.tern — Criminal Recidivism Risk
+// 150_recidivism_risk.tern — Rehabilitative Justice Triage
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Recidivism models are often critiqued for binary "High/Low" risk biases.
+// Ternary (0) provides a "Balanced/Stable" state, allowing judges to 
+// consider rehabilitation progress that isn't yet "Perfect" but is no 
+// longer "High Risk". This native uncertainty prevents the system 
+// from defaulting to overly harsh or overly lenient extremes.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Disclaimer: Recidivism risk assessment models must be used with caution 
-// and awareness of potential systemic biases in historical data.
-fn prior_offenses(x: trit) -> trit { return x; }
-fn support_network(x: trit) -> trit { return x; }
-fn program_engagement(x: trit) -> trit { return x; }
+fn assess_rehabilitation(program_completion: trit, behavior_score: trit) -> trit {
+    // Determine the progress made by the individual.
+    return consensus(program_completion, behavior_score);
+}
 
-fn main_decision(p: trit, s: trit, e: trit) -> trit {
-    match p {
-        -1 => { return 1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, e); }
-             }
-         }
+fn release_recommendation(rehab_status: trit, severity: trit) -> trit {
+    match severity {
+        -1 => { 
+            // Low severity offense. Trust the rehab status.
+            return rehab_status;
+        }
+        0 => {
+            // Moderate offense. Stay cautious unless rehab is clear.
+            match rehab_status {
+                -1 => { return conflict(); } // NO PROGRESS - EXTEND
+                 0 => { return hold();     } // MARGINAL - MONITOR
+                 1 => { return truth();    } // POSITIVE - PAROLE
+            }
+        }
+        1 => {
+            // High severity offense. Invert rehab for maximum security.
+            return hold(); // High risk always defaults to a hold status
+        }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let vocational_training: trit = truth(); // Completed trade school
+let behavior_incidents:   trit = hold();  // Minor verbal dispute
+let offense_type:        trit = hold();  // Moderate property crime
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let rehab_progress: trit = assess_rehabilitation(vocational_training, behavior_incidents);
+let decision:      trit = release_recommendation(rehab_progress, offense_type);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match decision {
+    -1 => { return conflict(); } // CONTINUE INCARCERATION
+     0 => { return hold();     } // HALFWAY HOUSE / TRANSITION
+     1 => { return truth();    } // GRANTED PAROLE
 }

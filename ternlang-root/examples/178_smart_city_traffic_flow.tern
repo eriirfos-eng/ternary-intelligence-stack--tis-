@@ -1,37 +1,44 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 178_smart_city_traffic_flow.tern — Smart City Traffic Flow
+// 178_smart_city_traffic_flow.tern — Urban Congestion Management
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Traffic isn't "Moving" or "Stopped". The "Congested" (0) state is where 
+// intelligence is needed. Ternary logic allows for "ADAPTIVE_TIMING" to 
+// bleed off queues before they become gridlock.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
-
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
-         }
+fn assess_intersection_load(vehicle_count: trit, emergency_vehicle_nearby: trit) -> trit {
+    match emergency_vehicle_nearby {
+        -1 => { return conflict(); } // SIREN DETECTED
+         0 => { return vehicle_count; }
+         1 => { return vehicle_count; }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+fn adjust_signal_phase(intersection_load: trit, air_quality_index: trit) -> trit {
+    match intersection_load {
+        -1 => { return conflict(); } // PRIORITY OVERRIDE (Ambulance)
+         0 => { 
+             // Heavy load, check air quality before idling more cars
+             match air_quality_index {
+                 -1 => { return hold();     } // HIGH POLLUTION - EXPEDITE
+                  0 => { return hold();     }
+                  1 => { return truth();    } // NORMAL ADAPTIVE
+             }
+         }
+         1 => { return truth(); } // LIGHT TRAFFIC
+    }
+}
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let load: trit = hold();
+let siren: trit = truth();
+let aqi:  trit = hold();
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+let current_load: trit = assess_intersection_load(load, siren);
+let signal_plan:  trit = adjust_signal_phase(current_load, aqi);
+
+match signal_plan {
+    -1 => { return conflict(); } // ALL RED (Safety)
+     0 => { return hold();     } // EXTENDED GREEN
+     1 => { return truth();    } // STANDARD CYCLE
 }

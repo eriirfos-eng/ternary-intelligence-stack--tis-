@@ -1,37 +1,52 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 225_asteroid_mining_feasibility.tern — Asteroid Mining Feasibility
+// 225_asteroid_mining_feasibility.tern — Prospecting Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Asteroid composition is rarely certain until drilling begins. Ternary logic 
+// allows a "SPECULATIVE" (0) rating, where the mission proceeds to close-range 
+// spectroscopy rather than immediate mining (1) or total rejection (-1).
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn mineral_wealth(spectroscopy: trit, mass_sensor: trit) -> trit {
+    let density: trit = consensus(spectroscopy, mass_sensor);
+    match density {
+        -1 => { return conflict(); } // ICE/SLAG
+         0 => { return hold();     } // LOW-GRADE ORE
+         1 => { return truth();    } // RARE-EARTH RICH
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn mission_profile(wealth: trit, delta_v_cost: trit) -> trit {
+    // Compare wealth with the fuel cost (delta_v)
+    // If fuel cost is high (1), we need high wealth (1)
+    match delta_v_cost {
+        -1 => { return wealth; } // CHEAP REACH, GO IF ANY VALUE
+         0 => {
+             match wealth {
+                 -1 => { return conflict(); }
+                  0 => { return hold();     }
+                  1 => { return truth();    }
+             }
+         }
          1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
+             // EXPENSIVE: Only go if absolute wealth
+             match wealth {
+                 -1 => { return conflict(); }
+                  0 => { return conflict(); }
+                  1 => { return truth();    }
              }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let minerals: trit = truth();
+let fuel_req: trit = hold();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let worth: trit = mineral_wealth(minerals, fuel_req);
+let decision: trit = mission_profile(worth, fuel_req);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match decision {
+    -1 => { return conflict(); } // REJECT
+     0 => { return hold();     } // SURVEY FURTHER
+     1 => { return truth();    } // CAPTURE / MINE
 }

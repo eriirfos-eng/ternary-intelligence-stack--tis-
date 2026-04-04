@@ -1,37 +1,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 141_space_mission_planning.tern — Space Mission Planning
+// 141_space_mission_planning.tern — Launch Readiness Logic
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Binary "Go/No-Go" logic often forces premature decisions during sensor noise.
+// Ternary (0) provides a "HOLD" state, allowing engineers to resolve transient
+// telemetry spikes without triggering a full abort or a risky launch.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_fuel(x: trit) -> trit { return x; }
-fn check_comms(x: trit) -> trit { return x; }
-fn check_orbit(x: trit) -> trit { return x; }
+fn check_telemetry(signal: trit) -> trit {
+    // If telemetry is noisy (0), we hold. If it's corrupted (-1), we abort.
+    match signal {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
+         1 => { return truth(); }
+    }
+}
 
-fn main_decision(f: trit, c: trit, o: trit) -> trit {
-    match f {
-        -1 => { return -1; }
-         0 => { return 0; }
+fn mission_readiness(fuel: trit, battery: trit, telemetry: trit) -> trit {
+    // Hard gate: Telemetry is the nervous system. If it's -1, we can't launch.
+    match telemetry {
+        -1 => { return conflict(); }
+         0 => { return hold(); }
          1 => {
-             match c {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(c, o); }
-             }
+             // Telemetry ok, check physical systems
+             let hardware: trit = consensus(fuel, battery);
+             return hardware;
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+// Scenario: Sensors show battery jitters (0), but fuel is nominal (1) and telemetry is locked (1).
+let fuel_val:      trit = truth();
+let battery_val:   trit = hold();
+let telemetry_val: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let readiness: trit = mission_readiness(fuel_val, battery_val, telemetry_val);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match readiness {
+    -1 => { return conflict(); } // ABORT
+     0 => { return hold();    } // HOLD - investigate jitter
+     1 => { return truth();   } // GO
 }

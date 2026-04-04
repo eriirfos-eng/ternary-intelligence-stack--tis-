@@ -1,37 +1,53 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// 236_soil_health_assessment.tern — Soil Health Assessment
+// 236_soil_health_assessment.tern — Regenerative Agriculture
 //
-// Binary approach vs Ternary approach.
-// Ternary allows for uncertainty (0) in complex decision systems.
+// WHY TERNARY?
+// Soil health isn't just "Fertile" or "Dead." Ternary (0) captures the 
+// "TRANSITIONAL" state, where soil is recovering from chemical depletion. 
+// This allows for precise application of bio-stimulants rather than 
+// heavy-handed NPK fertilizers.
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn check_primary(x: trit) -> trit { return x; }
-fn check_secondary(x: trit) -> trit { return x; }
-fn check_auxiliary(x: trit) -> trit { return x; }
+fn nutrient_balance(nitrogen: trit, phosphorus: trit) -> trit {
+    let balance: trit = consensus(nitrogen, phosphorus);
+    match balance {
+        -1 => { return conflict(); } // DEPLETED
+         0 => { return hold();     } // BALANCED / TRANSITIONAL
+         1 => { return truth();    } // SATURATED
+    }
+}
 
-fn main_decision(p: trit, s: trit, a: trit) -> trit {
-    match p {
-        -1 => { return -1; }
-         0 => { return 0; }
-         1 => {
-             match s {
-                 -1 => { return 0; }
-                  0 => { return 0; }
-                  1 => { return consensus(s, a); }
-             }
+fn intervention_strategy(balance: trit, microbial_activity: trit) -> trit {
+    match balance {
+        -1 => { 
+            // Depleted soil: check if microbes are alive
+            match microbial_activity {
+                -1 => { return conflict(); } // BIOLOGICALLY DEAD - ADD ORGANIC MATTER
+                 0 => { return hold();     } // DORMANT - ADD BIO-STIMULANT
+                 1 => { return hold();     } // ACTIVE - JUST ADD NITROGEN
+            }
+        }
+         0 => { return hold(); } // SUSTAIN WITH MINIMAL INPUT
+         1 => { 
+            // Saturated: only safe if microbes are processing it
+            match microbial_activity {
+                -1 => { return conflict(); } // RUNOFF RISK
+                 0 => { return hold();     } // LEACHING RISK
+                 1 => { return truth();    } // OPTIMIZED
+            }
          }
     }
 }
 
-// ── Scenario Execution ──
-let s_0: trit = 1;
-let s_1: trit = 0;
-let s_2: trit = -1;
+let n: trit = hold();
+let p: trit = conflict();
+let bio: trit = truth();
 
-let outcome: trit = main_decision(s_0, s_1, s_2);
+let state: trit = nutrient_balance(n, p);
+let plan: trit = intervention_strategy(state, bio);
 
-match outcome {
-    -1 => { return -1; }
-     0 => { return 0;  }
-     1 => { return 1;  }
+match plan {
+    -1 => { return conflict(); } // HEAVY RESTORATION
+     0 => { return hold();     } // LIGHT AMENDMENT
+     1 => { return truth();    } // NO ACTION NEEDED
 }
