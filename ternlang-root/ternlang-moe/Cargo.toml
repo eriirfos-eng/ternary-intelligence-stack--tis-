@@ -1,6 +1,6 @@
 [package]
 name = "ternlang-moe"
-version.workspace = true
+version = "0.1.2"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -9,7 +9,7 @@ authors.workspace = true
 keywords.workspace = true
 categories.workspace = true
 
-description = "Ternary Mixture-of-Experts orchestrator (MoE-13). Dual-key synergistic routing, 6D competence vectors, 1+1=3 triad synthesis, three-tier memory, introspective hold. DOI: 10.17605/OSF.IO/TZ7DC"
+description = "Ternary Mixture-of-Experts orchestrator (MoE-13). Dual-key synergistic routing, 6D competence vectors, 1+1=3 triad synthesis, three-tier memory, introspective hold, 13-agent dual-signal deliberation. DOI: 10.17605/OSF.IO/TZ7DC"
 
 [dependencies]
 ternlang-core = { path = "../ternlang-core", version = "0.1.0" }
