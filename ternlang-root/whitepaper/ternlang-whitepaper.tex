@@ -107,7 +107,11 @@ prompted. The \textbf{MoE-13 Ternary Orchestrator} (Phase~9) implements a
 Mixture-of-Experts head with dual-key synergistic routing, $1{+}1{=}3$
 emergent triad synthesis, a hard-wired safety veto, and a three-tier memory
 mesh, realising the MoE-13 architecture~\cite{moe13_2026} in 146 passing
-tests across the full workspace.
+tests across the full workspace. All nine crates are published to
+\texttt{crates.io} under open-core licensing. A companion corpus of
+twenty executable \texttt{.tern} programs demonstrates the hold state
+across domains spanning aerospace, medicine, distributed systems, civic
+governance, and AI agent design.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -172,6 +176,11 @@ No project provides the full vertical stack.
         (\S\ref{sec:moe}).
   \item \textbf{Ecosystem bridges} connecting existing ternary projects to
         the BET VM as a common runtime (\S\ref{sec:ecosystem}).
+  \item A \textbf{reference example corpus}: twenty executable
+        \texttt{.tern} programs demonstrating the hold state in aerospace,
+        medicine, distributed systems, hardware pipelines, civic governance,
+        finance, and AI agent design—published open-source alongside all
+        nine workspace crates on \texttt{crates.io}.
 \end{enumerate}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -805,6 +814,20 @@ Q-Ternary & Qutrits & \texttt{trittensor} state model (future) \\
 \end{tabular}
 \end{table}
 
+Beyond runtime interoperability, ternlang aims to serve as a
+\emph{conceptual archive} for prior ternary computing work.
+Brandon Smith's Python 9-trit RISC simulator demonstrated a complete
+fetch-decode-execute cycle in balanced ternary—an existence proof that
+received little downstream adoption due to the absence of a compiler
+ecosystem. The Owlet interpreter proved that S-expression evaluation maps
+cleanly to a three-valued substrate. Both contributions are honoured in
+the \texttt{examples/} corpus: \texttt{09\_risc\_fetch\_decode.tern}
+translates Smith's pipeline decision logic into native BET language syntax,
+and \texttt{13\_owlet\_bridge.tern} models cooperative ternary evaluation
+with hold-as-suspension semantics. In this way, prior work that was
+``slowly forgotten'' acquires a working executable form—runnable on the
+same VM that drives the MoE-13 orchestrator.
+
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Implementation Status}
 \label{sec:status}
@@ -834,8 +857,16 @@ Crate & Tests & Description \\
 \end{tabular}
 \end{table}
 
-The full test suite comprises \textbf{146+ tests}, all passing. The repository
-is publicly available at the URL in the author affiliation.
+The full test suite comprises \textbf{146+ tests}, all passing.
+All nine crates are published to \texttt{crates.io} under open-core
+licensing (LGPL-3.0-or-later for the compiler and CLI; BSL-1.1 converting
+to LGPL in 2030 for the ML engine and MoE orchestrator). A companion
+\texttt{examples/} directory contains twenty executable \texttt{.tern}
+programs spanning aerospace, medicine, distributed systems, hardware
+pipelines (CPU fetch-decode tribute to Brandon Smith), civic governance,
+finance, and AI agent design—each with an \texttt{INDEX.md} cataloguing
+patterns, attribution, and quick-reference tables. The repository is
+publicly available at the URL in the author affiliation.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Conclusion and Future Work}
@@ -861,19 +892,30 @@ $t \in \{-1, 0, +1\}$ with an active neutral state:
         all exposed as MCP tool calls to any AI client.
 \end{enumerate}
 
-Future directions include:
+Two near-term publication targets are pending. First, the VS Code extension
+(\texttt{ternlang-0.1.0.vsix}) will be submitted to the VS Code Marketplace
+under publisher \texttt{rfi-irfos}, making the LSP, syntax highlighting, and
+completion available to all VS Code users without manual installation. Second,
+the MCP server will be submitted to the MCP registry, allowing any Claude
+Desktop or compatible AI client to acquire ternary reasoning capabilities by
+adding a single configuration entry.
+
+Further research directions include:
 
 \begin{itemize}
   \item \textbf{FPGA synthesis}: full \texttt{bet\_processor} targeting
         Xilinx Artix-7 and Lattice ECP5 via the pure-Rust RTL simulator
   \item \textbf{Memristor backend}: integration with physical ternary storage
         via the USN uMemristorToolbox~\cite{bos2020ternary}
-  \item \textbf{Streaming deliberation}: SSE endpoint for live
-        \texttt{OrchestrationResult} delivery during multi-round MoE passes
   \item \textbf{End-to-end training}: native ternlang training loop with
         BitNet-style gradient quantization and ternary weight persistence
   \item \textbf{Qutrit bridge}: formal mapping of \texttt{trittensor} to
         qutrit state spaces for quantum-adjacent hardware
+  \item \textbf{Community bootstrap}: structured outreach to the USN group
+        (Bos \& Gundersen) for joint hardware-software co-design, and
+        to the Bitcoin/ternary quantization community around BitNet b1.58
+  \item \textbf{MoE-13 REST endpoints}: non-streaming POST interface for
+        synchronous orchestration results alongside the existing SSE stream
 \end{itemize}
 
 The ternary computing field has been fragmented for decades. Ternlang is
