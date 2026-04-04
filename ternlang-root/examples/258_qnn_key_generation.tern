@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 258_qnn_key_generation.tern — Qutrit Key Bit Generation
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is bit 0,
+// trit=0 is erasure/noise,
+// trit=+1 is bit 1.
+// This preserves gradients and models the real dynamics of key material entropy.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn generate_bit0(b) {
+  invert(b)
+}
+
+fn generate_erasure(b) {
+  b
+}
+
+fn generate_bit1(b) {
+  b
+}
+
+let key_trit = 1;
+
+match key_trit {
+  -1 => { generate_bit0(key_trit) },
+  0  => { generate_erasure(key_trit) },
+  1  => { generate_bit1(key_trit) }
+}

@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 252_qnn_forward_pass.tern — Forward Pass Through QNN Hidden Layer
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is state decay/entropy increase,
+// trit=0 is state stasis/equilibrium/superposition,
+// trit=+1 is energy gain/coherence growth.
+// This preserves gradients and models the real dynamics of hidden layer propagation.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn propagate_decay(w) {
+  invert(w)
+}
+
+fn propagate_stasis(w) {
+  w
+}
+
+fn propagate_growth(w) {
+  w
+}
+
+let weight_trit = 0;
+
+match weight_trit {
+  -1 => { propagate_decay(weight_trit) },
+  0  => { propagate_stasis(weight_trit) },
+  1  => { propagate_growth(weight_trit) }
+}

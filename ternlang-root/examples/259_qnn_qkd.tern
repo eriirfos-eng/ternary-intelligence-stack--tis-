@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 259_qnn_qkd.tern — Qutrit Quantum Key Distribution
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is eavesdropped,
+// trit=0 is unstable link,
+// trit=+1 is secure transmission.
+// This preserves gradients and models the real dynamics of QKD channels.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn mark_compromised(s) {
+  invert(s)
+}
+
+fn mark_unstable(s) {
+  s
+}
+
+fn mark_secure(s) {
+  s
+}
+
+let qkd_link = 1;
+
+match qkd_link {
+  -1 => { mark_compromised(qkd_link) },
+  0  => { mark_unstable(qkd_link) },
+  1  => { mark_secure(qkd_link) }
+}

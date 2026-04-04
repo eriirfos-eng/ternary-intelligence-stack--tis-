@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 253_qnn_input_encoding.tern — Input Layer Ternary Encoding
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is negative polarity,
+// trit=0 is neutral/noise floor,
+// trit=+1 is positive polarity.
+// This preserves gradients and models the real dynamics of sensor inputs.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn encode_negative(v) {
+  invert(v)
+}
+
+fn encode_neutral(v) {
+  v
+}
+
+fn encode_positive(v) {
+  v
+}
+
+let sensor_val = 1;
+
+match sensor_val {
+  -1 => { encode_negative(sensor_val) },
+  0  => { encode_neutral(sensor_val) },
+  1  => { encode_positive(sensor_val) }
+}

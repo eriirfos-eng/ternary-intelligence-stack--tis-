@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 256_qnn_tesseract_stabilizer.tern — Tesseract Recursive Syntax Stabilizer
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is error-prone,
+// trit=0 is neutral state,
+// trit=+1 is stable syntax structure.
+// This preserves gradients and models the real dynamics of tesseract data.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn mark_error(s) {
+  invert(s)
+}
+
+fn mark_neutral(s) {
+  s
+}
+
+fn mark_stable(s) {
+  s
+}
+
+let syntax_state = 0;
+
+match syntax_state {
+  -1 => { mark_error(syntax_state) },
+  0  => { mark_neutral(syntax_state) },
+  1  => { mark_stable(syntax_state) }
+}

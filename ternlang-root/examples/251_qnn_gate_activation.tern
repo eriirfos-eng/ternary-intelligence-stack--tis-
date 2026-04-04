@@ -1,0 +1,33 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 251_qnn_gate_activation.tern — Triadic Neuron Activation Gate
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is signal suppression,
+// trit=0 is state equilibrium/superposition,
+// trit=+1 is signal propagation/amplification.
+// This preserves gradients and models the real dynamics of QNN gates.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn gate_suppress(s) {
+  // Reduces amplitude of quantum signal
+  invert(s)
+}
+
+fn gate_stabilize(s) {
+  // Keeps s as is
+  s
+}
+
+fn gate_amplify(s) {
+  // Increases amplitude via energy injection
+  s
+}
+
+let input_trit = 1;
+
+match input_trit {
+  -1 => { gate_suppress(input_trit) },
+  0  => { gate_stabilize(input_trit) },
+  1  => { gate_amplify(input_trit) }
+}

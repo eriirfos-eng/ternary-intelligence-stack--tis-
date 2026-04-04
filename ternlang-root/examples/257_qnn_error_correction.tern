@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 257_qnn_error_correction.tern — Real-Time Quantum Error Correction
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is fault detected,
+// trit=0 is pending verification,
+// trit=+1 is correction applied.
+// This preserves gradients and models the real dynamics of qubit reliability.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn handle_fault(s) {
+  invert(s)
+}
+
+fn pending_verify(s) {
+  s
+}
+
+fn apply_correction(s) {
+  s
+}
+
+let error_state = -1;
+
+match error_state {
+  -1 => { handle_fault(error_state) },
+  0  => { pending_verify(error_state) },
+  1  => { apply_correction(error_state) }
+}

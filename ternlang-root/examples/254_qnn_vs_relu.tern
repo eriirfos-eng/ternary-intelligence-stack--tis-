@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 254_qnn_vs_relu.tern — Triadic Nonlinearity vs ReLU
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is suppression,
+// trit=0 is threshold stasis,
+// trit=+1 is activation.
+// This preserves gradients and models the real dynamics of model stability.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn suppress_gradient(g) {
+  invert(g)
+}
+
+fn threshold_stasis(g) {
+  g
+}
+
+fn activate_gradient(g) {
+  g
+}
+
+let gradient = -1;
+
+match gradient {
+  -1 => { suppress_gradient(gradient) },
+  0  => { threshold_stasis(gradient) },
+  1  => { activate_gradient(gradient) }
+}

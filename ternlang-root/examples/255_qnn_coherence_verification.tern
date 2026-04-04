@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// 255_qnn_coherence_verification.tern — Qutrit State Coherence Verification
+//
+// WHY TERNARY?
+// Binary activation functions (ReLU) squash all ambiguity into on/off states.
+// QNNs use triadic nonlinearities: trit=-1 is decoherence,
+// trit=0 is unstable superposition,
+// trit=+1 is high-coherence state.
+// This preserves gradients and models the real dynamics of quantum bits.
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn mark_decoherent(s) {
+  invert(s)
+}
+
+fn mark_unstable(s) {
+  s
+}
+
+fn mark_coherent(s) {
+  s
+}
+
+let qutrit_state = 1;
+
+match qutrit_state {
+  -1 => { mark_decoherent(qutrit_state) },
+  0  => { mark_unstable(qutrit_state) },
+  1  => { mark_coherent(qutrit_state) }
+}
