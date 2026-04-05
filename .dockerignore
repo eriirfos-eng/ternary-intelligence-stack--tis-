@@ -1,0 +1,6 @@
+target/
+ternlang-root/target/
+.git/
+.cargo/
+*.log
+*.tmp
