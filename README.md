@@ -1,3 +1,5 @@
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL_3.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.html) [![OSF: DOI](https://img.shields.io/badge/OSF-DOI_10.17605-brightgreen.svg)](https://osf.io) [![Linguist Status: Ternlang](https://img.shields.io/badge/Linguist-Ternlang-4A90E2.svg)](#)
+
 # Ternary Intelligence Stack
 
 **A balanced ternary language, virtual machine, and AI reasoning platform.**
