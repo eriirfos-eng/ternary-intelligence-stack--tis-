@@ -11,7 +11,30 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  # Job 1: Check what changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      logic: ${{ steps.filter.outputs.logic }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          logic:
+            - '**/src/**'
+            - '**/Cargo.toml'
+            - '**/Cargo.lock'
+            - 'Dockerfile'
+          frontend:
+            - '**/index.html'
+
+  # Job 2: Build & Test (Only if logic changed)
   build:
+    needs: changes
+    if: needs.changes.outputs.logic == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -27,16 +50,20 @@ jobs:
           ~/.cargo/git
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-        restore-keys: ${{ runner.os }}-cargo-
     - name: Build all crates
       run: cargo build --workspace --verbose
     - name: Run tests
       run: cargo test --workspace --verbose
 
+  # Job 3: Deploy (Always runs if either logic OR frontend changed)
   deploy:
     runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [changes, build]
+    # Run if logic changed (and build passed) OR if ONLY frontend changed
+    if: |
+      always() &&
+      (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.logic == 'true') &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped')
     steps:
     - uses: actions/checkout@v4
     - name: Install flyctl
