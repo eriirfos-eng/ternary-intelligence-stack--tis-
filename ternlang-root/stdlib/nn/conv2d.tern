@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/conv2d.tern
+// Purpose: Ternary 2D Convolution (Vision)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// 2D Convolution. The use of 'tend' in kernels allows for incredibly
+// dense edge detectors that ignore smooth flat areas.
+
+struct Conv2D {
+    kernel_size: int,
+    weights: trittensor<4 x 4>
+}
+
+fn depthwise_trit(layer: Conv2D, channel: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Depthwise step for separable convolutions
+    @sparseskip
+    let out: trittensor<4 x 1> = layer.weights * channel;
+    return out;
+}
+
+fn pointwise_trit(layer: Conv2D, channel: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Pointwise step
+    @sparseskip
+    let out: trittensor<4 x 1> = layer.weights * channel;
+    return out;
+}
+
+fn convolve_2d(layer: Conv2D, image: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = layer.weights * image;
+    return out;
+}

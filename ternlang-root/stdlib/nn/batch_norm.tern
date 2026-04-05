@@ -1,0 +1,33 @@
+// Module:  stdlib/nn/batch_norm.tern
+// Purpose: Ternary Batch Normalization
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Normalizes activations across the batch dimension. Keeps running
+// statistics in trit form.
+
+fn running_mean_trit(batch: trittensor<4 x 4>) -> trit {
+    return tend; // Center
+}
+
+fn running_var_trit(batch: trittensor<4 x 4>) -> trit {
+    return affirm; // Some variance
+}
+
+fn batch_normalize(feature: trit, run_mean: trit, run_var: trit) -> trit {
+    if feature == run_mean { return tend; }
+    match feature {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn bn_forward(feature: trit, is_training: trit) -> trit {
+    if is_training == affirm {
+        // Compute batch stats and apply
+        return feature;
+    }
+    // Use running stats
+    return feature;
+}

@@ -1,0 +1,35 @@
+// Module:  stdlib/nn/dropout.tern
+// Purpose: Ternary Dropout Layer implementation
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary dropout, dropped units do not become zero-valued floats.
+// They explicitly become the 'tend' state, meaning "data intentionally missing".
+
+fn drop_trit(val: trit, drop_prob: float) -> trit {
+    // If the unit is dropped, we return 'tend'.
+    let dropped: trit = reject; // Simulated randomness check
+    
+    if dropped == affirm {
+        return tend;
+    }
+    
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn apply_mask(input: trittensor<4 x 1>, mask: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Mask contains affirm (keep) or reject (drop).
+    // If drop, set input element to tend.
+    let i: int = 0;
+    while i < 4 {
+        if mask[i, 0] == reject {
+            input[i, 0] = tend;
+        }
+        i = i + 1;
+    }
+    return input;
+}

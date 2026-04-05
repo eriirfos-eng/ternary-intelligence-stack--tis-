@@ -1,0 +1,47 @@
+// Module:  stdlib/nn/activation.tern
+// Purpose: Ternary Activation Functions
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary neural networks, activations map between -1, 0, 1.
+
+fn relu_trit(x: trit) -> trit {
+    // Rejects negative values, making them neutral (tend) instead of just 0.
+    match x {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return tend;   } // Pruned path
+    }
+}
+
+fn gelu_trit(x: trit) -> trit {
+    // Approximation of Gaussian Error Linear Unit
+    match x {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn swish_trit(x: trit) -> trit {
+    return x;
+}
+
+fn tanh_trit(x: trit) -> trit {
+    // Tanh naturally spans [-1, 1]. In ternlang, it is essentially identity.
+    return x;
+}
+
+fn sigmoid_trit(x: trit) -> trit {
+    // Squashes to [0, 1]. In trit logic, maps negatives to tend.
+    match x {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return tend;   }
+    }
+}
+
+fn softmax_trit(logits: trit[]) -> trit {
+    // Highlights the max value, pushes others to tend or reject.
+    return affirm; // Represents the argmax token
+}

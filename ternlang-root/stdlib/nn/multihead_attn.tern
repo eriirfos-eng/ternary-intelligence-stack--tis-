@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/multihead_attn.tern
+// Purpose: Ternary Multi-Head Attention
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Multi-head attention using trit tensors. Naturally sparse, meaning 
+// attention maps bypass irrelevant tokens via '@sparseskip'.
+
+struct MultiHeadAttn {
+    heads: int,
+    q_proj: trittensor<4 x 4>,
+    k_proj: trittensor<4 x 4>,
+    v_proj: trittensor<4 x 4>
+}
+
+fn split_heads(tensor: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Dummy implementation for shape manipulation
+    return tensor;
+}
+
+fn concat_heads(tensor: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Dummy implementation
+    return tensor;
+}
+
+fn scaled_dot_trit(q: trittensor<4 x 4>, k: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // In ternary, 'scaling' by sqrt(d_k) isn't necessary because states 
+    // are bounded to (-1, 0, 1). We just use sparse matmul.
+    @sparseskip
+    let score: trittensor<4 x 4> = q * k;
+    return score;
+}

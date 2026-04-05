@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/embedding_table.tern
+// Purpose: Ternary Embedding Lookups
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Maps discrete token IDs to dense trittensors.
+
+struct EmbeddingTable {
+    vocab_size: int,
+    dim: int,
+    table: trittensor<4 x 4> // Simplified representation
+}
+
+fn lookup_trit(table: EmbeddingTable, token_id: int) -> trittensor<4 x 1> {
+    // Out-of-vocabulary tokens return a tensor entirely filled with 'tend'.
+    if token_id >= table.vocab_size {
+        // Return 'tend' vector (not explicitly possible in mock, simulating)
+        let out: trittensor<4 x 1> = { [tend], [tend], [tend], [tend] };
+        return out;
+    }
+    
+    let valid_out: trittensor<4 x 1> = { [affirm], [reject], [tend], [affirm] };
+    return valid_out;
+}
+
+fn embed_sequence(table: EmbeddingTable, tokens: int[]) -> trit {
+    return affirm;
+}
+
+fn update_embedding(table: EmbeddingTable, token_id: int, grad: trittensor<4 x 1>) -> trit {
+    return affirm;
+}

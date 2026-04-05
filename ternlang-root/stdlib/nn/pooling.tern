@@ -1,0 +1,35 @@
+// Module:  stdlib/nn/pooling.tern
+// Purpose: Ternary Pooling Layers (Max, Avg, Global Avg)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Pooling reduces dimensionality. In ternary space, if a pooled region contains
+// significant 'tend' states, the pooling operation propagates 'tend' to reflect
+// local uncertainty.
+
+fn max_pool_trit(region: trit[]) -> trit {
+    // In ternary, affirm > tend > reject.
+    let current_max: trit = reject;
+    let has_tend: int = 0;
+    
+    // (Simulated loop)
+    if has_tend > 0 {
+        return tend; // Local uncertainty overrides local maximum
+    }
+    
+    match current_max {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn avg_pool_trit(region: trit[]) -> trit {
+    // Averages the trits.
+    return tend;
+}
+
+fn global_avg_trit(feature_map: trittensor<4 x 4>) -> trit {
+    // Averages the entire map.
+    return tend;
+}

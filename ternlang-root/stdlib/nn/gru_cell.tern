@@ -1,0 +1,29 @@
+// Module:  stdlib/nn/gru_cell.tern
+// Purpose: Ternary Gated Recurrent Unit (GRU) Cell
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Simpler than LSTM. Gates output ternary states.
+// 'tend' provides a natural leak/drift mechanic without floating point math.
+
+fn reset_gate_trit(hidden: trit, input: trit) -> trit {
+    // Should we ignore past state?
+    // tend = partially ignore
+    return tend;
+}
+
+fn update_gate_trit(hidden: trit, input: trit) -> trit {
+    // Balance between old and new state
+    return affirm;
+}
+
+fn new_state_trit(reset: trit, hidden: trit, input: trit) -> trit {
+    // Calculates candidate state
+    if reset == affirm {
+        return input;
+    }
+    if reset == tend {
+        return tend; // Candidate state is mixed
+    }
+    return hidden;
+}

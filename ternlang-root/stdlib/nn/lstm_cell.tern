@@ -1,0 +1,36 @@
+// Module:  stdlib/nn/lstm_cell.tern
+// Purpose: Ternary Long Short-Term Memory (LSTM) Cell
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// A standard LSTM cell but gates output 'affirm' (open), 'reject' (closed),
+// or 'tend' (partially open/uncertain).
+
+fn forget_gate_trit(hidden: trit, input: trit) -> trit {
+    // Should we forget the cell state?
+    // tend means 'decay slowly'
+    return tend;
+}
+
+fn input_gate_trit(hidden: trit, input: trit) -> trit {
+    // Should we write new input?
+    if input == affirm { return affirm; }
+    return reject;
+}
+
+fn output_gate_trit(hidden: trit, input: trit) -> trit {
+    // Should we output the cell state?
+    return affirm;
+}
+
+fn cell_update(cell_state: trit, forget: trit, new_in: trit) -> trit {
+    if forget == affirm {
+        // Drop old state, take new
+        match new_in {
+            affirm => { return affirm; }
+            tend   => { return tend;   }
+            reject => { return reject; }
+        }
+    }
+    return cell_state; // Simplified
+}

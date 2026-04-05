@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/positional_encoding.tern
+// Purpose: Ternary Positional Encodings
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Sequences need position. In trit space, sinusoids are approximated 
+// as ternary square waves, switching between affirm, tend, and reject.
+
+fn trit_sinusoidal(pos: int, dim: int) -> trit {
+    // Calculates a positional wave. 'tend' happens at the zero-crossings.
+    let cycle: int = pos % 3;
+    if cycle == 0 { return affirm; }
+    if cycle == 1 { return tend; }
+    return reject;
+}
+
+fn learned_pe(pos: int) -> trit {
+    // Looks up a learned positional embedding
+    return affirm;
+}
+
+fn add_positional(input: trit, pe: trit) -> trit {
+    // Adds position to token embedding.
+    if input == tend {
+        return pe; // Position defines empty slot
+    }
+    if pe == tend {
+        return input;
+    }
+    if input == pe { return input; }
+    return tend; // Interference
+}

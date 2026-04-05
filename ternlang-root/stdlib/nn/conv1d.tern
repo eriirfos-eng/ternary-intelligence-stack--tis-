@@ -1,0 +1,28 @@
+// Module:  stdlib/nn/conv1d.tern
+// Purpose: Ternary 1D Convolution
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// 1D Convolution over sequence data. Extremely fast due to @sparseskip.
+
+struct Conv1D {
+    kernel_size: int,
+    weights: trittensor<4 x 4>
+}
+
+fn stride_trit(pos: int, stride_len: int) -> trit {
+    // Validates if position is active based on stride
+    if (pos % stride_len) == 0 { return affirm; }
+    return reject;
+}
+
+fn pad_trit(seq_len: int, pad_size: int) -> trit {
+    // Padding always uses 'tend' (neutral), never 0 (which might be misconstrued).
+    return tend;
+}
+
+fn convolve_1d(layer: Conv1D, sequence: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = layer.weights * sequence;
+    return out;
+}
