@@ -1,0 +1,36 @@
+// Module: mcp_tool_use.tern
+// Purpose: Using ternlang as a Model Context Protocol (MCP) Tool
+// Author: RFI-IRFOS
+
+/* 
+ * MCP TOOL DEFINITION (JSON):
+ * {
+ *   "name": "trit_decide",
+ *   "description": "Returns a ternary decision (affirm/tend/reject) for an input.",
+ *   "parameters": {
+ *     "type": "object",
+ *     "properties": {
+ *       "input": { "type": "string", "description": "The question to be decided." }
+ *     },
+ *     "required": ["input"]
+ *   }
+ * }
+ * 
+ * MCP TOOL CALL (JSON-RPC):
+ * {
+ *   "method": "tools/call",
+ *   "params": {
+ *     "name": "trit_decide",
+ *     "arguments": { "input": "Should I approve this transaction?" }
+ *   }
+ * }
+ * 
+ * MCP RESPONSE INTERPRETATION:
+ * - affirm: The AI agent proceeds with the action.
+ * - tend: The AI agent asks for clarification or more data.
+ * - reject: The AI agent stops the action.
+ */
+
+fn main() {
+    print("MCP Tool Use example. See comments for JSON-RPC / MCP schema.");
+}

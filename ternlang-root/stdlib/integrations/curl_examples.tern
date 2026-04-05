@@ -1,0 +1,39 @@
+// Module: curl_examples.tern
+// Purpose: Interacting with the ternlang.com API via curl
+// Author: RFI-IRFOS
+
+/* 
+ * API Reference: https://ternlang.com/api
+ * 
+ * 1. trit_decide: Returns a single trit decision for an input.
+ * curl -X POST https://ternlang.com/api/trit_decide \
+ *      -H "Content-Type: application/json" \
+ *      -d '{"input": "Should I proceed with the medical test?"}'
+ * 
+ * Result: {"decision": "tend"}
+ * 
+ * 2. trit_deliberate: Orchestrates multiple agents for a consensus.
+ * curl -X POST https://ternlang.com/api/trit_deliberate \
+ *      -H "Content-Type: application/json" \
+ *      -d '{"input": "Proposed legal settlement of $500k", "agents": ["Optimist", "Pessimist"]}'
+ * 
+ * Result: {"consensus": "tend", "rounds": 2}
+ * 
+ * 3. moe_orchestrate: Calls the Mixture of Experts for complex tasks.
+ * curl -X POST https://ternlang.com/api/moe_orchestrate \
+ *      -H "Content-Type: application/json" \
+ *      -d '{"task": "Analyze the financial risk of this 4x4 matrix", "matrix": [[1,0,-1,0],[0,1,0,-1],[-1,0,1,0],[0,-1,0,1]]}'
+ * 
+ * Result: {"risk_score": "affirm", "confidence": "affirm"}
+ * 
+ * 4. hallucination_score: Measures the 'tend' (uncertainty) of a response.
+ * curl -X POST https://ternlang.com/api/hallucination_score \
+ *      -H "Content-Type: application/json" \
+ *      -d '{"response": "The capital of France is Paris."}'
+ * 
+ * Result: {"score": "affirm"} (No hallucination)
+ */
+
+fn main() {
+    print("API Integration examples. See comments for curl commands.");
+}

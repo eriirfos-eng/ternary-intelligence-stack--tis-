@@ -1,0 +1,41 @@
+// Module: python_bridge.tern
+// Purpose: Bridging Python applications to ternlang.com API
+// Author: RFI-IRFOS
+
+/* 
+ * PYTHON CLIENT EXAMPLE:
+ * 
+ * import requests
+ * 
+ * class TernlangClient:
+ *     def __init__(self, api_url="https://ternlang.com/api"):
+ *         self.api_url = api_url
+ * 
+ *     def decide(self, text):
+ *         response = requests.post(f"{self.api_url}/trit_decide", json={"input": text})
+ *         return response.json()["decision"] # 'affirm', 'tend', or 'reject'
+ * 
+ *     def handle_decision(self, decision):
+ *         if decision == "affirm":
+ *             print("Python Action: Proceeding.")
+ *         elif decision == "tend":
+ *             print("Python Action: Holding for more data.")
+ *         else:
+ *             print("Python Action: Aborting.")
+ * 
+ * # Usage
+ * client = TernlangClient()
+ * decision = client.decide("Is the sensor data valid?")
+ * client.handle_decision(decision)
+ */
+
+agent PythonBridgeAgent {
+    // This agent represents the ternlang side of the bridge.
+    fn handle(msg: trit) -> trit {
+        return msg; // Logic implemented in Python via API.
+    }
+}
+
+fn main() {
+    print("Python Bridge example. See comments for Python client code.");
+}

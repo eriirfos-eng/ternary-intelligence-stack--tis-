@@ -1,0 +1,26 @@
+// Module: encoding_efficiency.tern
+// Purpose: Comparing Binary Encoding vs 2-bit Trit Packing
+// Author: RFI-IRFOS
+
+// Benchmarks the storage and information density of ternary.
+
+fn compare_encoding() {
+    // 1. 64 trits can represent 3^64 unique states.
+    // 2. 64 binary bits can represent 2^64 unique states.
+    
+    // 3^64 is ~3.4 x 10^30
+    // 2^64 is ~1.8 x 10^19
+    
+    // Ternary (3-state) has ~1.58 bits of information per trit.
+    // Packed as 2-bit BET (Binary-Encoded Ternary), 64 trits need 128 bits.
+    
+    print("--- TERNARY VS BINARY INFORMATION DENSITY ---");
+    print("64 units: Binary states = 1.84e19");
+    print("64 units: Ternary states = 3.43e30");
+    print("Ternary information advantage: 1.86e11x more states.");
+    print("BET Packing: 128 bits for 3x the logical depth.");
+}
+
+fn main() {
+    compare_encoding();
+}
