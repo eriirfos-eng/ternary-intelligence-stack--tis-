@@ -1,7 +1,8 @@
 Business Source License 1.1
 
 Licensor:             RFI-IRFOS (Simeon Kepp)
-Licensed Work:        ternlang-ml, ternlang-mcp, ternlang-hdl, ternlang-runtime
+Licensed Work:        ternlang-ml, ternlang-moe, ternlang-mcp, ternlang-hdl,
+                      ternlang-runtime, ternlang-api
                       (the "Restricted Crates") — Version 0.1 and later
 Additional Use Grant: You may use the Licensed Work for non-commercial,
                       personal, research, or evaluation purposes only,

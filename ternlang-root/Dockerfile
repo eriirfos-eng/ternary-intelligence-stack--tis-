@@ -1,5 +1,5 @@
 # ─── Stage 1: build ──────────────────────────────────────────────────────────
-FROM rust:1.85-slim AS builder
+FROM rust:1.86-slim AS builder
 
 RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
 
@@ -39,7 +39,8 @@ COPY ternlang-codegen/src   ternlang-codegen/src
 COPY ternlang-ml/src        ternlang-ml/src
 COPY ternlang-cli/src       ternlang-cli/src
 COPY ternlang-api/src       ternlang-api/src
-COPY ternlang-web/index.html ternlang-web/index.html
+COPY ternlang-web/index.html   ternlang-web/index.html
+COPY ternlang-web/pricing.html ternlang-web/pricing.html
 COPY ternlang-mcp/src       ternlang-mcp/src
 COPY ternlang-moe/src       ternlang-moe/src
 COPY ternlang-test/src      ternlang-test/src

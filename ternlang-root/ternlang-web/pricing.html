@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ternlang — Pricing & Licensing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #0d0d14;
+      --bg2:     #13131f;
+      --border:  #1e2030;
+      --teal:    #00f5c4;
+      --blue:    #4a9eff;
+      --muted:   #4a5568;
+      --text:    #e2e8f0;
+      --dim:     #a0aec0;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      padding: 48px 24px;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .page { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header { margin-bottom: 56px; }
+    .header .logo { color: var(--teal); font-size: 13px; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .header h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+    .header p { color: var(--dim); font-size: 15px; max-width: 560px; }
+
+    /* Tiers */
+    .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 56px; }
+    .tier {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+    }
+    .tier.highlight { border-color: var(--teal); box-shadow: 0 0 24px rgba(0,245,196,0.08); }
+    .tier.enterprise { border-color: var(--blue); }
+
+    .tier-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .badge-free       { background: var(--border); color: var(--dim); }
+    .badge-dev        { background: var(--teal); color: #000; }
+    .badge-enterprise { background: rgba(74,158,255,0.15); color: var(--blue); border: 1px solid rgba(74,158,255,0.3); }
+
+    .tier h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .tier .license { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+    .tier .price { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+    .tier .price span { font-size: 13px; font-weight: 400; color: var(--dim); }
+    .tier .price-note { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+
+    .tier ul { list-style: none; flex-grow: 1; margin-bottom: 28px; }
+    .tier ul li {
+      font-size: 13px;
+      color: var(--dim);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .tier ul li:last-child { border-bottom: none; }
+    .tier ul li .icon { flex-shrink: 0; font-weight: 700; }
+    .icon-free { color: var(--muted); }
+    .icon-dev  { color: var(--teal); }
+    .icon-ent  { color: var(--blue); }
+
+    .tier .cta {
+      display: block;
+      text-align: center;
+      padding: 11px 20px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .cta-free { border: 1px solid var(--border); color: var(--dim); }
+    .cta-free:hover { border-color: var(--dim); color: var(--text); }
+    .cta-dev  { background: var(--teal); color: #000; }
+    .cta-dev:hover { background: #00d4a8; }
+    .cta-ent  { border: 1px solid rgba(74,158,255,0.4); color: var(--blue); }
+    .cta-ent:hover { background: rgba(74,158,255,0.08); }
+
+    /* Usage table */
+    .section-title {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 56px; font-size: 13px; }
+    th { text-align: left; padding: 10px 14px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--dim); }
+    td:first-child { color: var(--text); font-weight: 500; }
+    .check-teal { color: var(--teal); font-weight: 700; }
+    .check-blue { color: var(--blue); font-weight: 700; }
+    .check-no   { color: var(--muted); }
+
+    /* BSL note */
+    .bsl-note {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 56px;
+      font-size: 13px;
+      color: var(--dim);
+      line-height: 1.8;
+    }
+    .bsl-note strong { color: var(--text); }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 12px; color: var(--muted); padding-top: 24px; border-top: 1px solid var(--border); }
+    .footer a { color: var(--teal); text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="logo">RFI-IRFOS · Ternlang</div>
+    <h1>Pricing &amp; Licensing</h1>
+    <p>The Ternary Intelligence Stack. Balanced ternary computing infrastructure for the next generation of AI systems.</p>
+  </div>
+
+  <!-- Tier cards -->
+  <div class="tiers">
+
+    <!-- Tier 1 -->
+    <div class="tier">
+      <div class="tier-badge badge-free mono">Tier 1 — Open Core</div>
+      <h2>Free</h2>
+      <div class="license">LGPL-3.0-or-later</div>
+      <div class="price">€0 <span>forever</span></div>
+      <div class="price-note">No API access. Local use only.</div>
+      <ul>
+        <li><span class="icon icon-free">›</span> ternlang-core (compiler + BET VM)</li>
+        <li><span class="icon icon-free">›</span> ternlang-cli &amp; LSP</li>
+        <li><span class="icon icon-free">›</span> ternpkg package manager</li>
+        <li><span class="icon icon-free">›</span> 250+ open .tern examples</li>
+        <li><span class="icon icon-free">›</span> VS Code extension</li>
+      </ul>
+      <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-" target="_blank" class="cta cta-free">View on GitHub</a>
+    </div>
+
+    <!-- Tier 2 -->
+    <div class="tier highlight">
+      <div class="tier-badge badge-dev mono">Tier 2 — Developer</div>
+      <h2>Restricted API</h2>
+      <div class="license">BSL 1.1 (converts to Apache 2.0 in 2030)</div>
+      <div class="price">€24.99 <span>/month</span></div>
+      <div class="price-note">10,000 API calls/month. Resets 1st of each month.</div>
+      <ul>
+        <li><span class="icon icon-dev">+</span> All Tier 1 features</li>
+        <li><span class="icon icon-dev">+</span> ternlang.com API access</li>
+        <li><span class="icon icon-dev">+</span> trit_decide, trit_deliberate, MoE-13</li>
+        <li><span class="icon icon-dev">+</span> MCP Server integration</li>
+        <li><span class="icon icon-dev">+</span> ternlang-ml sparse engine</li>
+        <li><span class="icon icon-dev">+</span> API key delivered by email</li>
+      </ul>
+      <a href="https://buy.stripe.com/00w5kFgpigajfyB37a7N604" target="_blank" class="cta cta-dev">Subscribe — €24.99/mo</a>
+    </div>
+
+    <!-- Tier 3 -->
+    <div class="tier enterprise">
+      <div class="tier-badge badge-enterprise mono">Tier 3 — Enterprise</div>
+      <h2>Enterprise</h2>
+      <div class="license">Proprietary — custom terms</div>
+      <div class="price">Custom <span>pricing</span></div>
+      <div class="price-note">Annual contract. Volume discounts available.</div>
+      <ul>
+        <li><span class="icon icon-ent">~</span> All Tier 2 features</li>
+        <li><span class="icon icon-ent">~</span> Unlimited API calls</li>
+        <li><span class="icon icon-ent">~</span> 99.9% uptime SLA</li>
+        <li><span class="icon icon-ent">~</span> Commercial BSL license (embed in products)</li>
+        <li><span class="icon icon-ent">~</span> Priority support (24h response)</li>
+        <li><span class="icon icon-ent">~</span> Custom FPGA / Verilog implementations</li>
+        <li><span class="icon icon-ent">~</span> On-premise deployment option</li>
+      </ul>
+      <a href="mailto:licensing@ternlang.com?subject=Enterprise Licensing Inquiry" class="cta cta-ent">Contact Sales</a>
+    </div>
+
+  </div>
+
+  <!-- Feature comparison -->
+  <div class="section-title">Feature comparison</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Free</th>
+        <th>Developer</th>
+        <th>Enterprise</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Compiler + BET VM</td><td class="check-teal">✓</td><td class="check-teal">✓</td><td class="check-teal">✓</td></tr>
+      <tr><td>CLI, LSP, ternpkg</td><td class="check-teal">✓</td><td class="check-teal">✓</td><td class="check-teal">✓</td></tr>
+      <tr><td>API access (ternlang.com)</td><td class="check-no">—</td><td class="check-teal">✓</td><td class="check-teal">✓</td></tr>
+      <tr><td>Monthly API call limit</td><td class="check-no">—</td><td>10,000 / month</td><td>Unlimited</td></tr>
+      <tr><td>MoE-13 orchestrator</td><td class="check-no">—</td><td class="check-teal">✓</td><td class="check-teal">✓</td></tr>
+      <tr><td>ternlang-ml sparse engine</td><td class="check-no">—</td><td class="check-teal">API only</td><td class="check-teal">✓ + embed</td></tr>
+      <tr><td>MCP Server integration</td><td class="check-no">—</td><td class="check-teal">✓</td><td class="check-teal">✓</td></tr>
+      <tr><td>Commercial BSL license</td><td class="check-no">—</td><td class="check-no">—</td><td class="check-blue">✓</td></tr>
+      <tr><td>Uptime SLA</td><td class="check-no">—</td><td class="check-no">—</td><td class="check-blue">99.9%</td></tr>
+      <tr><td>Support response time</td><td class="check-no">—</td><td>Community</td><td class="check-blue">24h guaranteed</td></tr>
+      <tr><td>Custom FPGA / Verilog work</td><td class="check-no">—</td><td class="check-no">—</td><td class="check-blue">✓ (project-based)</td></tr>
+      <tr><td>On-premise deployment</td><td class="check-no">—</td><td class="check-no">—</td><td class="check-blue">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- BSL note -->
+  <div class="bsl-note">
+    <strong>About the Business Source License (BSL 1.1)</strong><br>
+    The restricted crates (ternlang-ml, ternlang-moe, ternlang-hdl, ternlang-runtime, ternlang-mcp, ternlang-api) are
+    <strong>source-visible</strong> but may not be used for commercial purposes without a license from RFI-IRFOS.
+    On <strong>2030-04-03</strong>, they automatically convert to Apache 2.0.<br><br>
+    Non-commercial use (research, personal projects, evaluation) is permitted under all tiers.
+    To embed BSL crates in a commercial product, contact <a href="mailto:licensing@ternlang.com">licensing@ternlang.com</a>.
+  </div>
+
+  <div class="footer">
+    <p>Ternlang · RFI-IRFOS · <a href="https://ternlang.com">ternlang.com</a> · <a href="mailto:licensing@ternlang.com">licensing@ternlang.com</a></p>
+  </div>
+
+</div>
+</body>
+</html>

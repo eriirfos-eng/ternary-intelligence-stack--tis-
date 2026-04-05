@@ -37,12 +37,15 @@
 use axum::{
     Router,
     Json,
+    body::Bytes,
     extract::{Path, Query, State},
     http::{HeaderMap, Method, StatusCode},
     middleware::{self, Next},
     response::{sse::{Event, Sse}, Html, IntoResponse, Response},
     routing::{delete, get, post},
 };
+use hmac::{Hmac, Mac};
+use sha2::Sha256;
 use tokio_stream::StreamExt as TokioStreamExt;
 use std::convert::Infallible;
 use chrono::Utc;
@@ -71,6 +74,14 @@ use ternlang_ml::{
 
 // ─── Key store ───────────────────────────────────────────────────────────────
 
+/// Monthly call limit per tier. Tier 3 = unlimited.
+fn tier_monthly_limit(tier: u8) -> Option<u64> {
+    match tier {
+        2 => Some(10_000),
+        _ => None, // tier 3+ = unlimited
+    }
+}
+
 /// One API key entry. Raw key string is used as the HashMap key so lookup is O(1).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiKeyEntry {
@@ -80,7 +91,17 @@ pub struct ApiKeyEntry {
     pub note:          String,   // free-form admin note
     pub created_at:    String,   // ISO 8601
     pub is_active:     bool,
-    pub request_count: u64,
+    pub request_count: u64,      // lifetime total
+    #[serde(default)]
+    pub monthly_calls: u64,      // calls this calendar month
+    #[serde(default)]
+    pub month_key:     String,   // "YYYY-MM" — resets monthly_calls when it changes
+}
+
+pub enum KeyCheckResult {
+    Valid(ApiKeyEntry),
+    RateLimited { used: u64, limit: u64 },
+    Invalid,
 }
 
 /// Persistent key store — serialised as JSON to `path`.
@@ -120,15 +141,34 @@ impl KeyStore {
         }
     }
 
-    /// Check a raw key and, if valid, increment its counter.
-    pub async fn validate_and_bump(&self, raw_key: &str) -> Option<ApiKeyEntry> {
+    /// Check a raw key, enforce monthly rate limit, and increment counters.
+    pub async fn validate_and_bump(&self, raw_key: &str) -> KeyCheckResult {
         let mut data = self.data.write().await;
-        let entry = data.keys.get_mut(raw_key)?;
+        let entry = match data.keys.get_mut(raw_key) {
+            Some(e) => e,
+            None    => return KeyCheckResult::Invalid,
+        };
         if !entry.is_active {
-            return None;
+            return KeyCheckResult::Invalid;
         }
+
+        // Reset monthly counter if the calendar month has rolled over
+        let current_month = Utc::now().format("%Y-%m").to_string();
+        if entry.month_key != current_month {
+            entry.month_key     = current_month;
+            entry.monthly_calls = 0;
+        }
+
+        // Enforce limit for capped tiers
+        if let Some(limit) = tier_monthly_limit(entry.tier) {
+            if entry.monthly_calls >= limit {
+                return KeyCheckResult::RateLimited { used: entry.monthly_calls, limit };
+            }
+        }
+
         entry.request_count += 1;
-        Some(entry.clone())
+        entry.monthly_calls += 1;
+        KeyCheckResult::Valid(entry.clone())
     }
 
     /// Generate a new key. Returns (raw_key, entry).
@@ -145,6 +185,8 @@ impl KeyStore {
             created_at:    Utc::now().to_rfc3339(),
             is_active:     true,
             request_count: 0,
+            monthly_calls: 0,
+            month_key:     Utc::now().format("%Y-%m").to_string(),
         };
 
         self.data.write().await.keys.insert(raw.clone(), entry.clone());
@@ -167,16 +209,37 @@ impl KeyStore {
     /// List all entries (key hidden, only metadata).
     pub async fn list(&self) -> Vec<Value> {
         let data = self.data.read().await;
-        data.keys.iter().map(|(raw, e)| json!({
+        data.keys.iter().map(|(raw, e)| {
+            let limit = tier_monthly_limit(e.tier);
+            json!({
+                "key_id":        e.key_id,
+                "key_preview":   format!("{}…", &raw[..12]),
+                "tier":          e.tier,
+                "email":         e.email,
+                "note":          e.note,
+                "created_at":    e.created_at,
+                "is_active":     e.is_active,
+                "request_count": e.request_count,
+                "monthly_calls": e.monthly_calls,
+                "monthly_limit": limit,
+                "month_key":     e.month_key,
+            })
+        }).collect()
+    }
+
+    /// Return usage info for a single raw key (for GET /api/usage).
+    pub async fn usage(&self, raw_key: &str) -> Option<Value> {
+        let data = self.data.read().await;
+        let e = data.keys.get(raw_key)?;
+        let limit = tier_monthly_limit(e.tier);
+        Some(json!({
             "key_id":        e.key_id,
-            "key_preview":   format!("{}…", &raw[..12]),
             "tier":          e.tier,
-            "email":         e.email,
-            "note":          e.note,
-            "created_at":    e.created_at,
-            "is_active":     e.is_active,
+            "monthly_calls": e.monthly_calls,
+            "monthly_limit": limit,
+            "month_key":     e.month_key,
             "request_count": e.request_count,
-        })).collect()
+        }))
     }
 }
 
@@ -184,9 +247,11 @@ impl KeyStore {
 
 #[derive(Clone)]
 struct AppState {
-    admin_key: String,
-    keys:      Arc<KeyStore>,
-    version:   &'static str,
+    admin_key:              String,
+    keys:                   Arc<KeyStore>,
+    version:                &'static str,
+    stripe_webhook_secret:  String,
+    resend_api_key:         String,
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -216,6 +281,9 @@ async fn require_api_key(
     // Public endpoints — no key required
     if path == "/" || path == "/health" || path == "/mcp"
         || path == "/.well-known/mcp/server-card.json"
+        || path == "/stripe/webhook"
+        || path == "/pricing"
+        || path == "/api/usage"
         || path.starts_with("/admin") {
         return next.run(request).await;
     }
@@ -231,8 +299,25 @@ async fn require_api_key(
     }
 
     match state.keys.validate_and_bump(raw).await {
-        Some(_entry) => next.run(request).await,
-        None => api_error(StatusCode::UNAUTHORIZED, "Invalid or revoked API key."),
+        KeyCheckResult::Valid(entry) => {
+            // /api/* requires Tier 2 or above (paid commercial access)
+            if path.starts_with("/api/") && entry.tier < 2 {
+                return api_error(StatusCode::FORBIDDEN,
+                    "This endpoint requires a Tier 2 or higher key. Upgrade at https://ternlang.com/#licensing");
+            }
+            next.run(request).await
+        }
+        KeyCheckResult::RateLimited { used, limit } => {
+            (StatusCode::TOO_MANY_REQUESTS, Json(json!({
+                "error": "Monthly call limit reached.",
+                "used":  used,
+                "limit": limit,
+                "upgrade": "https://ternlang.com/#licensing",
+                "resets": "1st of next month (UTC)",
+            }))).into_response()
+        }
+        KeyCheckResult::Invalid =>
+            api_error(StatusCode::UNAUTHORIZED, "Invalid or revoked API key."),
     }
 }
 
@@ -265,7 +350,12 @@ async fn require_admin_key(
 
 // ─── GET / ───────────────────────────────────────────────────────────────────
 
-static INDEX_HTML: &str = include_str!("../../ternlang-web/index.html");
+static INDEX_HTML:   &str = include_str!("../../ternlang-web/index.html");
+static PRICING_HTML: &str = include_str!("../../ternlang-web/pricing.html");
+
+async fn pricing_page() -> Html<&'static str> {
+    Html(PRICING_HTML)
+}
 
 async fn root(State(state): State<Arc<AppState>>, headers: HeaderMap) -> Response {
     // Serve the website to browsers; return JSON manifest to API clients.
@@ -1697,6 +1787,155 @@ fn mcp_tools_manifest() -> Value {
     ]})
 }
 
+// ─── GET /api/usage ───────────────────────────────────────────────────────────
+
+async fn api_usage(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+) -> Response {
+    let raw = headers
+        .get("X-Ternlang-Key")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+
+    match state.keys.usage(raw).await {
+        Some(info) => (StatusCode::OK, Json(info)).into_response(),
+        None       => api_error(StatusCode::UNAUTHORIZED, "Invalid or revoked API key."),
+    }
+}
+
+// ─── Stripe webhook ───────────────────────────────────────────────────────────
+
+/// Verify Stripe-Signature header against the raw body.
+/// Stripe signs: "{timestamp}.{raw_body}" with HMAC-SHA256.
+fn verify_stripe_signature(secret: &str, raw_body: &[u8], sig_header: &str) -> bool {
+    // Parse t=... and v1=... from the header
+    let mut timestamp = "";
+    let mut v1_sig    = "";
+    for part in sig_header.split(',') {
+        if let Some(ts) = part.strip_prefix("t=")  { timestamp = ts; }
+        if let Some(s)  = part.strip_prefix("v1=") { v1_sig    = s;  }
+    }
+    if timestamp.is_empty() || v1_sig.is_empty() { return false; }
+
+    let payload = format!("{}.{}", timestamp, String::from_utf8_lossy(raw_body));
+    let mut mac = Hmac::<Sha256>::new_from_slice(secret.as_bytes())
+        .expect("HMAC accepts any key length");
+    mac.update(payload.as_bytes());
+    let expected = hex::encode(mac.finalize().into_bytes());
+    expected == v1_sig
+}
+
+/// Send the API key to the customer via Resend.
+async fn send_key_email(resend_key: &str, to_email: &str, api_key: &str, key_id: &str) {
+    let html = format!(r#"
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="background:#0d0d14;color:#e2e8f0;font-family:monospace;padding:40px;max-width:600px;margin:0 auto;">
+  <p style="color:#00f5c4;font-size:22px;font-weight:bold;margin-bottom:4px;">Ternlang API</p>
+  <p style="color:#666;font-size:12px;margin-top:0;">Ternary Intelligence Stack — RFI-IRFOS</p>
+  <hr style="border-color:#1e2030;margin:24px 0;">
+  <p style="font-size:15px;">Your <strong>Tier 2 API key</strong> is ready.</p>
+  <div style="background:#13131f;border:1px solid #00f5c4;border-radius:8px;padding:20px;margin:20px 0;">
+    <p style="color:#888;font-size:11px;margin:0 0 8px 0;">KEY ID: {key_id}</p>
+    <p style="color:#00f5c4;font-size:16px;font-weight:bold;letter-spacing:1px;margin:0;word-break:break-all;">{api_key}</p>
+  </div>
+  <p style="font-size:14px;">Use it in every API request:</p>
+  <pre style="background:#13131f;padding:16px;border-radius:6px;color:#a0aec0;font-size:13px;">curl -X POST https://ternlang.com/api/trit_decide \
+  -H "X-Ternlang-Key: {api_key}" \
+  -H "Content-Type: application/json" \
+  -d '{{"a":1,"b":-1}}'</pre>
+  <p style="font-size:13px;color:#888;">Keep this key private — it is not recoverable. If you lose it, contact <a href="mailto:rfi.irfos@gmail.com" style="color:#00f5c4;">rfi.irfos@gmail.com</a>.</p>
+  <hr style="border-color:#1e2030;margin:24px 0;">
+  <p style="font-size:11px;color:#555;">ternlang.com · RFI-IRFOS · BSL-1.1</p>
+</body>
+</html>"#, key_id = key_id, api_key = api_key);
+
+    let body = json!({
+        "from":    "Ternlang API <noreply@ternlang.com>",
+        "to":      [to_email],
+        "subject": "Your Ternlang API Key — Tier 2 Access",
+        "html":    html,
+    });
+
+    let client = reqwest::Client::new();
+    match client
+        .post("https://api.resend.com/emails")
+        .bearer_auth(resend_key)
+        .json(&body)
+        .send()
+        .await
+    {
+        Ok(r) if r.status().is_success() =>
+            eprintln!("[stripe] email sent to {}", to_email),
+        Ok(r) =>
+            eprintln!("[stripe] Resend error {}: {:?}", r.status(), r.text().await),
+        Err(e) =>
+            eprintln!("[stripe] Resend request failed: {}", e),
+    }
+}
+
+/// POST /stripe/webhook
+async fn stripe_webhook(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+    body: Bytes,
+) -> Response {
+    // 1. Verify signature
+    let sig_header = match headers.get("stripe-signature").and_then(|v| v.to_str().ok()) {
+        Some(s) => s.to_string(),
+        None    => return api_error(StatusCode::BAD_REQUEST, "Missing Stripe-Signature header."),
+    };
+
+    if !state.stripe_webhook_secret.is_empty()
+        && !verify_stripe_signature(&state.stripe_webhook_secret, &body, &sig_header)
+    {
+        eprintln!("[stripe] signature verification failed");
+        return api_error(StatusCode::UNAUTHORIZED, "Invalid webhook signature.");
+    }
+
+    // 2. Parse event
+    let event: Value = match serde_json::from_slice(&body) {
+        Ok(v)  => v,
+        Err(e) => {
+            eprintln!("[stripe] JSON parse error: {}", e);
+            return api_error(StatusCode::BAD_REQUEST, "Invalid JSON.");
+        }
+    };
+
+    let event_type = event["type"].as_str().unwrap_or("");
+    eprintln!("[stripe] received event: {}", event_type);
+
+    // 3. Handle checkout completed
+    if event_type == "checkout.session.completed" {
+        let session     = &event["data"]["object"];
+        let customer_email = session["customer_details"]["email"]
+            .as_str()
+            .or_else(|| session["customer_email"].as_str())
+            .unwrap_or("");
+
+        if customer_email.is_empty() {
+            eprintln!("[stripe] checkout.session.completed: no email found in session");
+            return (StatusCode::OK, Json(json!({ "status": "ok_no_email" }))).into_response();
+        }
+
+        // 4. Generate key
+        let (raw_key, entry) = state.keys.generate(
+            2,
+            customer_email.to_string(),
+            "stripe-auto".to_string(),
+        ).await;
+
+        eprintln!("[stripe] provisioned key {} for {}", entry.key_id, customer_email);
+
+        // 5. Email it
+        send_key_email(&state.resend_api_key, customer_email, &raw_key, &entry.key_id).await;
+    }
+
+    (StatusCode::OK, Json(json!({ "received": true }))).into_response()
+}
+
 // ─── 404 fallback ─────────────────────────────────────────────────────────────
 
 async fn not_found() -> Response {
@@ -1724,7 +1963,23 @@ async fn main() {
 
     let keys = KeyStore::load(keys_file).await;
 
-    let state = Arc::new(AppState { admin_key, keys, version: "0.1.0" });
+    let stripe_webhook_secret = env::var("STRIPE_WEBHOOK_SECRET").unwrap_or_else(|_| {
+        eprintln!("[ternlang-api] WARNING: STRIPE_WEBHOOK_SECRET not set — webhook signature verification disabled");
+        String::new()
+    });
+
+    let resend_api_key = env::var("RESEND_API_KEY").unwrap_or_else(|_| {
+        eprintln!("[ternlang-api] WARNING: RESEND_API_KEY not set — post-payment emails will not be sent");
+        String::new()
+    });
+
+    let state = Arc::new(AppState {
+        admin_key,
+        keys,
+        version: "0.1.0",
+        stripe_webhook_secret,
+        resend_api_key,
+    });
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::OPTIONS])
@@ -1737,6 +1992,9 @@ async fn main() {
         .route("/health", get(health))
         .route("/mcp",    get(mcp_info).post(mcp_handler))
         .route("/.well-known/mcp/server-card.json", get(mcp_server_card))
+        .route("/stripe/webhook", post(stripe_webhook))
+        .route("/pricing",        get(pricing_page))
+        .route("/api/usage",      get(api_usage))
         // API (requires X-Ternlang-Key)
         .route("/api/trit_decide",       post(trit_decide))
         .route("/api/trit_vector",       post(trit_vector))
