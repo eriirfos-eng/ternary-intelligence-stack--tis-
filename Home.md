@@ -1,0 +1,1 @@
+# Ternary Intelligence Stack\n\nThe Ternary Intelligence Stack is a framework designed for building advanced AI applications that leverage ternary computing principles. It facilitates the integration of various AI methodologies, enhancing performance and adaptability. Here, you'll find resources and documentation to help you get started with the Ternary Intelligence Stack.
