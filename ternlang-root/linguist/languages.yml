@@ -1,0 +1,13 @@
+Ternlang:
+  type: programming
+  color: "#4A90E2"
+  extensions:
+    - ".tern"
+  tm_scope: source.tern
+  ace_mode: text
+  language_id: 1000001
+  aliases:
+    - tern
+    - ternlang
+  interpreters:
+    - ternlang

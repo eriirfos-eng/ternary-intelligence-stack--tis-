@@ -1,0 +1,46 @@
+# CODEOWNERS — Ternlang / Ternary Intelligence Stack (TIS)
+# RFI-IRFOS | https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-
+#
+# This file designates the canonical maintainer for every component of the
+# ternlang ecosystem, including .tern syntax specifications, BET VM, and
+# all associated tooling.
+#
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global: all files default to RFI-IRFOS
+*                           @eriirfos-eng
+
+# Language specification and grammar (authoritative .tern syntax)
+/spec/                      @eriirfos-eng
+/linguist/                  @eriirfos-eng
+*.tern                      @eriirfos-eng
+
+# Compiler and BET VM (open-core, LGPL-3.0)
+/ternlang-core/             @eriirfos-eng
+/ternlang-cli/              @eriirfos-eng
+/ternlang-codegen/          @eriirfos-eng
+
+# AI/ML components (commercial, BSL-1.1)
+/ternlang-ml/               @eriirfos-eng
+/ternlang-moe/              @eriirfos-eng
+
+# Language server and editor tooling
+/ternlang-lsp/              @eriirfos-eng
+
+# Package manager
+/ternpkg/                   @eriirfos-eng
+
+# HDL backend (Verilog/FPGA)
+/ternlang-hdl/              @eriirfos-eng
+
+# Distributed runtime
+/ternlang-runtime/          @eriirfos-eng
+
+# API and deployment
+/ternlang-api/              @eriirfos-eng
+/ternlang-web/              @eriirfos-eng
+
+# Documentation
+/BET-ISA-SPEC.md            @eriirfos-eng
+/LANGUAGE.md                @eriirfos-eng
+/TERNARY-ECOSYSTEM.md       @eriirfos-eng

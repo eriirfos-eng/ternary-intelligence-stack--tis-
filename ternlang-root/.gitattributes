@@ -1,0 +1,35 @@
+# .gitattributes — Ternlang / Ternary Intelligence Stack (TIS)
+# RFI-IRFOS | https://ternlang.com
+
+# ─── GitHub Linguist: force .tern files to be detected as Ternlang ──────────
+# Phase 1 (before Linguist PR merges): override as "Rust" to get syntax
+# highlighting on the most structurally similar language. This is temporary.
+# After the Linguist PR merges, replace "Rust" with "Ternlang".
+# UNCOMMENT ONLY ONE BLOCK AT A TIME.
+
+# --- PHASE 1 (pre-merge): Interim highlighting via Rust grammar ---
+# Ternlang is syntactically adjacent to Rust: fn/let/match/struct/use/mod.
+# Rust highlighting is imperfect but far better than "Text" and keeps
+# .tern files as a visually distinct class in GitHub's language bar.
+*.tern linguist-language=Rust
+
+# --- PHASE 2 (post-merge): Switch to native Ternlang detection ---
+# Uncomment this and remove the Rust line after the Linguist PR is accepted:
+# *.tern linguist-language=Ternlang
+
+# ─── Linguist detectability flags ───────────────────────────────────────────
+# Do NOT mark .tern as vendored or generated — these are primary source files.
+*.tern linguist-vendored=false
+*.tern linguist-generated=false
+*.tern linguist-detectable=true
+
+# ─── BET bytecode (binary, never diff) ──────────────────────────────────────
+*.tbc binary
+
+# ─── HDL output (treat as Verilog for diff purposes) ────────────────────────
+*.v linguist-language=Verilog
+
+# ─── Line endings ────────────────────────────────────────────────────────────
+*.tern text eol=lf
+*.toml text eol=lf
+*.md   text eol=lf

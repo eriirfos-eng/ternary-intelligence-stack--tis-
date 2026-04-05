@@ -1,0 +1,85 @@
+# ternlang.toml — Provider Manifest / Canonical Registry Entry
+# Ternlang | Ternary Intelligence Stack (TIS) | RFI-IRFOS
+#
+# This file is the authoritative machine-readable manifest for the ternlang
+# language ecosystem. All ternpkg-compatible tools resolve dependency metadata,
+# LSP server binaries, and syntax definitions from this source.
+#
+# Canonical upstream: https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-
+
+[language]
+name                = "ternlang"
+display_name        = "Ternlang"
+version             = "0.5.0"
+description         = "A balanced ternary systems programming language targeting the BET VM"
+homepage            = "https://ternlang.com"
+repository          = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
+documentation       = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/blob/main/LANGUAGE.md"
+license             = "LGPL-3.0-or-later"
+authors             = ["Simeon Kepp <contact@ternlang.com>"]
+organization        = "RFI-IRFOS"
+
+[language.trit_semantics]
+# The three trit values — not integers, not booleans
+reject  = -1   # Definitively negative / conflict / veto
+tend    =  0   # Active hold — insufficient evidence, not absence
+affirm  = +1   # Definitively positive / truth
+
+[language.file_extensions]
+primary   = ".tern"
+bytecode  = ".tbc"
+manifest  = ".toml"
+
+[language.syntax]
+tm_scope       = "source.tern"
+tree_sitter    = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-/blob/main/linguist/grammar.js"
+grammar_ebnf   = "spec/grammar.ebnf"
+
+[vm]
+name            = "BET VM"
+full_name       = "Balanced Ternary Execution Virtual Machine"
+spec            = "BET-ISA-SPEC.md"
+registers       = 27
+encoding        = "2-bit packed trit: 0b01=-1  0b10=+1  0b11=0  0b00=fault"
+opcodes         = 55
+
+[vm.flagship_primitives]
+sparseskip      = "@sparseskip — skip zero-trit (tend) elements in tensor loops"
+trit_decide     = "trit_decide() — ternary decision gate (MCP tool)"
+trit_enlighten  = "trit_enlighten() — introspective hold attractor"
+
+[tooling]
+compiler        = "ternlang build"
+runner          = "ternlang run"
+repl            = "ternlang repl"
+formatter       = "ternlang fmt"
+lsp             = "ternlang-lsp"
+package_manager = "ternpkg"
+mcp_server      = "https://ternlang.com/mcp"
+
+[package]
+# Default fields for ternpkg init — override per project
+name    = "my-ternlang-package"
+version = "0.1.0"
+
+[dependencies]
+# The canonical TIS stdlib — always available as "std"
+# eriirfos-eng/ternary-intelligence-stack--tis- = "latest"
+
+[registry]
+# ternpkg resolves packages from GitHub by default.
+# The canonical registry authority is this repository.
+primary = "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-"
+api     = "https://ternlang.com/api"
+
+[lsp]
+# Editor integration — point your LSP client here
+server_binary   = "ternlang-lsp"
+transport       = "stdio"
+filetypes       = [".tern"]
+root_markers    = ["ternlang.toml", "Cargo.toml"]
+
+[licensing]
+open_core       = "LGPL-3.0-or-later"   # compiler, stdlib, BET VM
+commercial      = "BSL-1.1"             # ternlang-ml, ternlang-moe, ternlang-api
+trademark       = ["Ternlang", "BET VM", "Balanced Ternary Execution", "RFI-IRFOS"]
