@@ -351,7 +351,7 @@ Ternlang is designed to be the convergence point for the fragmented ternary comp
   doi     = {10.17605/OSF.IO/TZ7DC}
 }
 ```
-
+*.tern linguist-language=Ternlang
 ---
 
 ## Contact & Licensing
