@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/train/augmentation.tern
+// Purpose: Data Augmentation for Trit Tensors
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Applying noise or transforms directly in trit space.
+
+fn noise_trit(val: trit, probability: float) -> trit {
+    // Corrupts a trit. Instead of flipping affirm to reject,
+    // we often flip it to 'tend' (neutral/blurred).
+    let should_corrupt: trit = reject; // Simulated randomness
+    if should_corrupt == affirm {
+        return tend;
+    }
+    return val;
+}
+
+fn jitter_trit(val: trit) -> trit {
+    // Shifts sequence data
+    return val;
+}
+
+fn flip_trit(tensor: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Flips a tensor horizontally/vertically
+    return tensor;
+}
+
+fn mixup_trit(val_a: trit, val_b: trit) -> trit {
+    // Averages two labels.
+    if val_a == val_b { return val_a; }
+    return tend; // Blended label is uncertain
+}

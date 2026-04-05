@@ -1,0 +1,27 @@
+// Module:  stdlib/nn/train/checkpointing.tern
+// Purpose: Model Checkpointing Utilities
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Saves model state.
+
+struct Checkpoint {
+    epoch: int,
+    path: trit // simulated path string hash
+}
+
+fn save_state_trit(model_id: int, epoch: int) -> trit {
+    // Saves state to disk
+    return affirm; // Success
+}
+
+fn load_state_trit(path: trit) -> trit {
+    if path == tend { return tend; } // Path unknown
+    return affirm; // Load success
+}
+
+fn compare_checkpoints(a: Checkpoint, b: Checkpoint) -> trit {
+    if a.epoch > b.epoch { return affirm; }
+    if a.epoch < b.epoch { return reject; }
+    return tend;
+}

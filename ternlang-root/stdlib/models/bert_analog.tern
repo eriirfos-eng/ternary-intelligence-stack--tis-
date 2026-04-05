@@ -1,0 +1,31 @@
+// Module:  stdlib/models/bert_analog.tern
+// Purpose: Bidirectional Encoder (BERT) in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// BERT analog. Masked tokens are naturally represented as 'tend'.
+
+struct TritBERT {
+    encoder_layers: int,
+    w: trittensor<4 x 4>
+}
+
+fn mask_trit(token: trit, prob: float) -> trit {
+    // Standard BERT masks 15% of tokens. In ternlang, we mask them to 'tend'.
+    let mask_flag: trit = reject; // Simulated random roll
+    if mask_flag == affirm {
+        return tend; // MASK token
+    }
+    return token;
+}
+
+fn nsp_trit(sentence_a: trit[], sentence_b: trit[]) -> trit {
+    // Next Sentence Prediction task
+    return affirm; // Is next
+}
+
+fn bert_forward(model: TritBERT, seq: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = model.w * seq;
+    return out;
+}

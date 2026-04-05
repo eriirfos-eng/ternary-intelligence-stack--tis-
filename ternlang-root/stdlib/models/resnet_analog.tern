@@ -1,0 +1,37 @@
+// Module:  stdlib/models/resnet_analog.tern
+// Purpose: ResNet Architecture in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Deep residual network. Heavily sparse skips.
+
+struct TritResNet {
+    conv1: trittensor<4 x 4>,
+    conv2: trittensor<4 x 4>
+}
+
+fn bottleneck_trit(model: TritResNet, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // 1x1, 3x3, 1x1 convolutions
+    @sparseskip
+    let out: trittensor<4 x 1> = model.conv1 * input;
+    return out;
+}
+
+fn residual_block_trit(model: TritResNet, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    let processed: trittensor<4 x 1> = bottleneck_trit(model, input);
+    
+    // Add input (skip connection)
+    // Simplified logic
+    return processed;
+}
+
+fn resnet_forward(model: TritResNet, input: trittensor<4 x 1>) -> trit {
+    let feat: trittensor<4 x 1> = residual_block_trit(model, input);
+    
+    let res: trit = feat[0, 0];
+    match res {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

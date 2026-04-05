@@ -1,0 +1,31 @@
+// Module:  stdlib/models/diffusion_analog.tern
+// Purpose: Discrete Ternary Diffusion Model
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Forward diffusion gradually corrupts 'affirm'/'reject' states into 'tend'.
+// Reverse diffusion denoises 'tend' back into structure.
+
+struct TritDiffusion {
+    steps: int,
+    w: trittensor<4 x 4>
+}
+
+fn noise_schedule_trit(step: int, max_steps: int) -> float {
+    // Returns probability of corruption
+    return 0.1;
+}
+
+fn denoise_step_trit(model: TritDiffusion, noisy: trittensor<4 x 1>, step: int) -> trittensor<4 x 1> {
+    @sparseskip
+    let less_noisy: trittensor<4 x 1> = model.w * noisy;
+    return less_noisy;
+}
+
+fn sample_trit(model: TritDiffusion) -> trittensor<4 x 1> {
+    // Start with pure noise (all 'tend')
+    let current: trittensor<4 x 1> = { [tend], [tend], [tend], [tend] };
+    
+    // Iterative denoise ...
+    return current;
+}

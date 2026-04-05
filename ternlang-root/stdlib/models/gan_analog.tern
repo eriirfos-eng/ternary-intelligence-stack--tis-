@@ -1,0 +1,40 @@
+// Module:  stdlib/models/gan_analog.tern
+// Purpose: Generative Adversarial Network in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Generator tries to create 'affirm' states that discriminator can't tell from real.
+// If discriminator is confused, it outputs 'tend' (perfect generator equilibrium).
+
+struct TritGAN {
+    generator: trittensor<4 x 4>,
+    discriminator: trittensor<4 x 4>
+}
+
+fn gen_forward(model: TritGAN, noise: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let fake: trittensor<4 x 1> = model.generator * noise;
+    return fake;
+}
+
+fn disc_forward(model: TritGAN, sample: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let logit: trittensor<4 x 1> = model.discriminator * sample;
+    let res: trit = logit[0, 0];
+    
+    match res {
+        affirm => { return affirm; } // Real
+        tend   => { return tend;   } // Can't tell (Generator wins)
+        reject => { return reject; } // Fake
+    }
+}
+
+fn adversarial_trit(disc_real: trit, disc_fake: trit) -> trit {
+    // Compute adversarial loss
+    if disc_real == affirm {
+        if disc_fake == reject {
+            return affirm; // Discriminator wins
+        }
+    }
+    return reject; // Generator is learning
+}

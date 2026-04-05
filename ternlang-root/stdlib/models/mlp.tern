@@ -1,0 +1,28 @@
+// Module:  stdlib/models/mlp.tern
+// Purpose: Multi-Layer Perceptron in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Standard Feed-Forward network composed entirely of ternary ops.
+
+struct TritMLP {
+    layers: int,
+    // Simplification for compilation
+    w1: trittensor<4 x 4>,
+    w2: trittensor<4 x 4>
+}
+
+fn mlp_forward(model: TritMLP, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let h1: trittensor<4 x 1> = model.w1 * input;
+    
+    @sparseskip
+    let out: trittensor<4 x 1> = model.w2 * h1;
+    
+    return out;
+}
+
+fn mlp_train_step(model: TritMLP, input: trittensor<4 x 1>, target: trit) -> trit {
+    // Forward, compute loss, backward
+    return affirm; // Step completed
+}

@@ -1,0 +1,35 @@
+// Module:  stdlib/nn/train/early_stopping.tern
+// Purpose: Early Stopping for Trit Models
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Stops training when validation score stalls. If validation returns 'tend',
+// it waits before stopping.
+
+struct EarlyStopper {
+    patience: int,
+    best_score: trit
+}
+
+fn best_score_trit(current: trit, best: trit) -> trit {
+    if current == affirm { return affirm; } // Improved
+    if current == best { return tend; } // Same
+    return reject; // Worse
+}
+
+fn patience_check(stall_count: int, patience_limit: int) -> trit {
+    if stall_count >= patience_limit { return affirm; }
+    return tend;
+}
+
+fn should_stop(stopper: EarlyStopper, current_score: trit) -> trit {
+    let improve: trit = best_score_trit(current_score, stopper.best_score);
+    if improve == affirm { return reject; } // Do not stop
+    
+    let over_patience: trit = patience_check(5, stopper.patience); // Simulated
+    match over_patience {
+        affirm => { return affirm; } // Stop!
+        tend   => { return tend;   } // Wait
+        reject => { return reject; } // Do not stop
+    }
+}

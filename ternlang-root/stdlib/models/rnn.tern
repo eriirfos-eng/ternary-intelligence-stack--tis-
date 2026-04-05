@@ -1,0 +1,32 @@
+// Module:  stdlib/models/rnn.tern
+// Purpose: Recurrent Neural Network in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Sequence modeling where hidden state handles 'tend' natively for missing data.
+
+struct TritRNN {
+    w_hx: trittensor<4 x 4>,
+    w_hh: trittensor<4 x 4>
+}
+
+fn hidden_state_trit(old_h: trittensor<4 x 1>, update: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Blend hidden states
+    return update;
+}
+
+fn rnn_step(model: TritRNN, x: trittensor<4 x 1>, h: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let input_feat: trittensor<4 x 1> = model.w_hx * x;
+    
+    @sparseskip
+    let hidden_feat: trittensor<4 x 1> = model.w_hh * h;
+    
+    return hidden_state_trit(h, input_feat); // Simplified update
+}
+
+fn rnn_sequence(model: TritRNN, seq: trittensor<4 x 1>[]) -> trittensor<4 x 1> {
+    let h: trittensor<4 x 1> = seq[0];
+    // Loop over sequence ...
+    return h;
+}

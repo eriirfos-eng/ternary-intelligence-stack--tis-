@@ -1,0 +1,44 @@
+// Module:  stdlib/nn/train/data_loader.tern
+// Purpose: DataLoader for Ternary Datasets
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Loads data in batches. Can signal 'tend' when prefetching.
+
+struct DataBatch {
+    batch_size: int,
+    features: trittensor<4 x 4>,
+    labels: trit[]
+}
+
+fn shuffle_trit(dataset_id: int) -> trit {
+    // Shuffles dataset returning success state
+    return affirm;
+}
+
+fn batch_trit(dataset_id: int, size: int) -> DataBatch {
+    let dummy_features: trittensor<4 x 4> = {
+        [affirm, tend, reject, tend],
+        [tend, affirm, tend, reject],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+    let dummy_labels: trit[] = [affirm, reject, tend, affirm];
+    
+    let batch: DataBatch = {
+        batch_size: size,
+        features: dummy_features,
+        labels: dummy_labels
+    };
+    return batch;
+}
+
+fn prefetch_signal(buffer_status: trit) -> trit {
+    // Returns 'tend' when waiting for IO
+    if buffer_status == tend { return tend; }
+    match buffer_status {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

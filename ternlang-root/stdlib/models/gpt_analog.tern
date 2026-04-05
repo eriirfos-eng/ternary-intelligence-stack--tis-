@@ -1,0 +1,37 @@
+// Module:  stdlib/models/gpt_analog.tern
+// Purpose: Causal Language Model (GPT) in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Autoregressive generation. Tend signals 'end of thought' or 'uncertain'.
+
+struct TritGPT {
+    layers: int,
+    w: trittensor<4 x 4>
+}
+
+fn causal_mask_trit(seq_len: int) -> trittensor<4 x 4> {
+    // Returns a mask where future tokens are 'tend' (invisible)
+    let mask: trittensor<4 x 4> = {
+        [affirm, tend, tend, tend],
+        [affirm, affirm, tend, tend],
+        [affirm, affirm, affirm, tend],
+        [affirm, affirm, affirm, affirm]
+    };
+    return mask;
+}
+
+fn next_token_trit(logits: trittensor<4 x 1>) -> trit {
+    let t: trit = logits[0, 0];
+    match t {
+        affirm => { return affirm; }
+        tend   => { return tend;   } // Uncertainty in generation
+        reject => { return reject; }
+    }
+}
+
+fn generate_trit(model: TritGPT, prompt: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let out: trittensor<4 x 1> = model.w * prompt;
+    return next_token_trit(out);
+}

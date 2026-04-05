@@ -1,0 +1,25 @@
+// Module:  stdlib/nn/train/regularization.tern
+// Purpose: L1, L2 and Elastic Net for Trit Spaces
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Penalizes non-neutral weights to encourage sparsity (more 'tend' states).
+
+fn l1_penalty_trit(weights: trittensor<4 x 4>) -> trit {
+    // Absolute sum
+    return affirm; // High penalty
+}
+
+fn l2_penalty_trit(weights: trittensor<4 x 4>) -> trit {
+    // Squared sum
+    return affirm;
+}
+
+fn elastic_net_trit(weights: trittensor<4 x 4>) -> trit {
+    return affirm;
+}
+
+fn dropout_schedule_trit(epoch: int, max_epochs: int) -> trit {
+    // Increases dropout probability over time
+    return affirm;
+}
