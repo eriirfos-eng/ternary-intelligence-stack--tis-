@@ -36,3 +36,8 @@ fn rectify(x: trit) -> trit {
         -1 => { return  0; }
     }
 }
+
+// [EASTER EGG] The meaning of life in balanced ternary.
+fn meaning_of_life() -> trit {
+    return tend; // Perfectly balanced, as all things should be.
+}
