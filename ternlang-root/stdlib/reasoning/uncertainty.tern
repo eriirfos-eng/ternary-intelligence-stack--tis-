@@ -1,0 +1,53 @@
+// Trit uncertainty — measuring ambiguity in ternary reasoning
+// Part of the Ternlang Standard Library
+
+struct TritUncertainty {
+    entropy: float,
+    confidence: float,
+    sample_size: int
+}
+
+fn entropy_trit(counts: [int; 3]) -> float {
+    // counts: [count_reject, count_tend, count_affirm]
+    let total: int = counts[0] + counts[1] + counts[2];
+    if total == 0 { return 1.0; } // Maximum uncertainty
+    
+    let mut h: float = 0.0;
+    let mut i: int = 0;
+    while i < 3 {
+        let p: float = float(counts[i]) / float(total);
+        if p > 0.0001 {
+            h = h - p * log2(p);
+        }
+        i = i + 1;
+    }
+    // Normalized to [0, 1] where 1.0 is highest uncertainty
+    return h / 1.585; // log2(3) approx 1.585
+}
+
+fn confidence_interval(uncertainty: TritUncertainty, alpha: float) -> (float, float) {
+    let lower: float = uncertainty.confidence - alpha / sqrt(float(uncertainty.sample_size));
+    let upper: float = uncertainty.confidence + alpha / sqrt(float(uncertainty.sample_size));
+    return (lower, upper);
+}
+
+// Assessing the "Ternary Entropy" of a decision stream
+fn evaluate_stream_uncertainty(stream: trittensor<64>) -> TritUncertainty {
+    let mut counts: [int; 3] = [0, 0, 0];
+    let mut i: int = 0;
+    while i < 64 {
+        match stream[i] {
+            reject => { counts[0] = counts[0] + 1; }
+            tend   => { counts[1] = counts[1] + 1; }
+            affirm => { counts[2] = counts[2] + 1; }
+        }
+        i = i + 1;
+    }
+    
+    let entropy: float = entropy_trit(counts);
+    return TritUncertainty {
+        entropy: entropy,
+        confidence: 1.0 - entropy,
+        sample_size: 64
+    };
+}

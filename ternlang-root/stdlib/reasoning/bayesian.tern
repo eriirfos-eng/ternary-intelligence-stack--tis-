@@ -1,0 +1,56 @@
+// Trit Bayesian — probabilistic belief updates in ternary space
+// Part of the Ternlang Standard Library
+
+struct TritBeliefState {
+    priors: [float; 3], // [p_reject, p_tend, p_affirm]
+    confidence: float
+}
+
+fn update_belief(belief: &mut TritBeliefState, observation: trit, likelihood: float) {
+    // Bayes Rule: P(H|E) = P(E|H) * P(H) / P(E)
+    let obs_idx: int = trit_to_idx(observation);
+    
+    // Posterior proportional to Likelihood * Prior
+    let mut i: int = 0;
+    let mut total: float = 0.0;
+    while i < 3 {
+        // Likelihood is higher for matching states
+        let L: float = (i == obs_idx) ? likelihood : (1.0 - likelihood) / 2.0;
+        belief.priors[i] = L * belief.priors[i];
+        total = total + belief.priors[i];
+        i = i + 1;
+    }
+    
+    // Normalize posteriors back to [0, 1]
+    let mut j: int = 0;
+    while j < 3 {
+        belief.priors[j] = belief.priors[j] / total;
+        j = j + 1;
+    }
+}
+
+fn get_most_likely(belief: TritBeliefState) -> trit {
+    if belief.priors[2] > belief.priors[1] && belief.priors[2] > belief.priors[0] {
+        return affirm;
+    }
+    if belief.priors[0] > belief.priors[1] && belief.priors[0] > belief.priors[2] {
+        return reject;
+    }
+    return tend;
+}
+
+fn trit_to_idx(t: trit) -> int {
+    match t {
+        reject => { return 0; }
+        tend   => { return 1; }
+        affirm => { return 2; }
+    }
+}
+
+// Initial belief state: Maximum entropy (neutral)
+fn init_belief() -> TritBeliefState {
+    return TritBeliefState { 
+        priors: [0.333, 0.333, 0.333], 
+        confidence: 0.1 
+    };
+}

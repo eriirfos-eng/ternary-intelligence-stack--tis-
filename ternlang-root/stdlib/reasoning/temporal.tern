@@ -1,0 +1,49 @@
+// Trit temporal — time-aware reasoning and forecasting
+// Part of the Ternlang Standard Library
+
+struct TritEvent {
+    id: int,
+    signal: trit,
+    timestamp: int,
+    duration: int
+}
+
+fn temporal_decay(signal: trit, age: int, halflife: int) -> trit {
+    if age > halflife {
+        return tend; // Decay to neutral state
+    }
+    return signal;
+}
+
+// Forecast: Predicting the next state based on temporal patterns
+fn forecast_trit(history: trittensor<64>) -> trit {
+    let mut i: int = 1;
+    let mut trend_sum: int = 0;
+    while i < 64 {
+        // Simple linear trend calculation
+        let diff: int = 0;
+        let c: int = trit_to_int(history[i]);
+        let p: int = trit_to_int(history[i-1]);
+        trend_sum = trend_sum + (c - p);
+        i = i + 1;
+    }
+    
+    if trend_sum > 2 { return affirm; }
+    if trend_sum < -2 { return reject; }
+    return tend;
+}
+
+fn trit_to_int(t: trit) -> int {
+    match t {
+        affirm => { return 1; }
+        tend   => { return 0; }
+        reject => { return -1; }
+    }
+}
+
+// Assessing event overlap and causality in time
+fn temporal_overlap(e1: TritEvent, e2: TritEvent) -> bool {
+    let end1: int = e1.timestamp + e1.duration;
+    let end2: int = e2.timestamp + e2.duration;
+    return (e1.timestamp < end2) && (e2.timestamp < end1);
+}

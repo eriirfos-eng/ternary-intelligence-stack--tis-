@@ -1,0 +1,52 @@
+// Trit causal — causal chain reasoning and counterfactuals
+// Part of the Ternlang Standard Library
+
+struct TritCause {
+    source: int,
+    target: int,
+    strength: float,
+    mechanism: trit // affirm: positive, tend: neutral, reject: inhibitory
+}
+
+struct CausalChain {
+    links: [TritCause; 16],
+    num_links: int
+}
+
+// Counterfactual reasoning: "What if X was affirm instead of reject?"
+fn counterfactual(chain: CausalChain, intervention: (int, trit)) -> trittensor<16> {
+    let mut state: trittensor<16> = trittensor<16>::zero();
+    state[intervention.0] = intervention.1;
+    
+    // Propagate the intervention through the chain
+    let mut i: int = 0;
+    while i < chain.num_links {
+        let link: TritCause = chain.links[i];
+        if link.source == intervention.0 {
+            // Apply causal mechanism
+            state[link.target] = propagate_causal(state[link.source], link.mechanism);
+        }
+        i = i + 1;
+    }
+    return state;
+}
+
+// Do-calculus: Intervening on a variable in a ternary causal graph
+fn do_intervention(graph: &mut TritGraph, variable: int, value: trit) {
+    // Cut all incoming edges to the variable and force its value
+    let mut i: int = 0;
+    while i < graph.num_nodes {
+        graph.adj[i][variable] = tend; // No influence
+        i = i + 1;
+    }
+    graph.nodes[variable] = value;
+}
+
+// Helper: Propagate influence based on causal mechanism
+fn propagate_causal(input: trit, mech: trit) -> trit {
+    match mech {
+        affirm => { return input; } // positive influence
+        tend   => { return tend; }  // no influence
+        reject => { return trit_not(input); } // inhibitory influence
+    }
+}
