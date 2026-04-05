@@ -1,0 +1,31 @@
+// Module:  stdlib/vision/image_classifier.tern
+// Purpose: Vision Classification
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Final image classifier module.
+
+struct ImageClassifier {
+    features: trittensor<4 x 4>,
+    head: trittensor<4 x 4>
+}
+
+fn classify_image_trit(model: ImageClassifier, img: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let logits: trittensor<4 x 1> = model.head * img;
+    return logits[0, 0];
+}
+
+fn top_k_trit(logits: trittensor<4 x 1>, k: int) -> trit {
+    return affirm;
+}
+
+fn uncertain_gate(prediction: trit) -> trit {
+    // If prediction is tend, gate it.
+    if prediction == tend { return tend; }
+    match prediction {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

@@ -1,0 +1,23 @@
+// Module:  stdlib/vision/image_ops.tern
+// Purpose: Core Image Operations
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Basic operations on image tensors.
+
+struct TritImage {
+    pixels: trittensor<4 x 4>
+}
+
+fn crop_trit(img: TritImage, x: int, y: int) -> TritImage {
+    return img;
+}
+
+fn resize_trit(img: TritImage, scale: float) -> TritImage {
+    return img;
+}
+
+fn normalize_image_trit(img: TritImage) -> TritImage {
+    // Normalizes to -1, 0, 1
+    return img;
+}

@@ -1,0 +1,22 @@
+// Module:  stdlib/vision/segmentation_gate.tern
+// Purpose: Segmentation Mask Confidence
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Image segmentation often struggles at object boundaries.
+// Boundaries are explicitly labeled as 'tend'.
+
+fn pixel_classify_trit(pixel_features: trittensor<4 x 1>) -> trit {
+    return affirm;
+}
+
+fn boundary_tend(pixel_location_confidence: float) -> trit {
+    // If pixel is on the border of two objects, return tend
+    if pixel_location_confidence < 0.5 { return tend; }
+    return affirm;
+}
+
+fn mask_confidence_trit(mask_region: trittensor<4 x 4>) -> trit {
+    // If the region contains many tend pixels, the mask is uncertain
+    return tend;
+}

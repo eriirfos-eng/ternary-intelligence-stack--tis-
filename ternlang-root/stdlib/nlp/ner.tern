@@ -1,0 +1,35 @@
+// Module:  stdlib/nlp/ner.tern
+// Purpose: Named Entity Recognition
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Extracts entities. 'tend' handles uncertain boundaries.
+
+struct NERTagger {
+    model: trittensor<4 x 4>
+}
+
+fn bio_encode(token_state: trit) -> trit {
+    // B-Begin (affirm), I-Inside (tend), O-Outside (reject)
+    match token_state {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn tag_trit(tagger: NERTagger, seq: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let logits: trittensor<4 x 1> = tagger.model * seq;
+    return bio_encode(logits[0, 0]);
+}
+
+fn entity_gate_trit(confidence: trit) -> trit {
+    // Uncertain spans = tend
+    if confidence == tend { return tend; }
+    match confidence {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

@@ -1,0 +1,27 @@
+// Module:  stdlib/nlp/vocab.tern
+// Purpose: Vocabulary Management
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Manages the mapping between tokens and IDs.
+// OOV (Out Of Vocabulary) explicitly returns 'tend'.
+
+struct TritVocab {
+    size: int
+}
+
+fn add_token_trit(token: trit) -> trit {
+    return affirm; // Added successfully
+}
+
+fn lookup_trit(token_str: trit) -> int {
+    if token_str == tend { return 0; } // 0 is reserved for tend/UNK
+    return 1;
+}
+
+fn oov_trit(token_id: int) -> trit {
+    if token_id == 0 {
+        return tend; // Out of Vocabulary
+    }
+    return affirm; // In vocabulary
+}

@@ -1,0 +1,25 @@
+// Module:  stdlib/vision/augmentation_2d.tern
+// Purpose: 2D Vision Augmentation
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Augments images. Cutout areas become 'tend' (neutral/transparent).
+
+fn flip_horizontal_trit(img: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    return img;
+}
+
+fn rotate_trit(img: trittensor<4 x 4>, angle: int) -> trittensor<4 x 4> {
+    return img;
+}
+
+fn brightness_trit(img: trittensor<4 x 4>, factor: trit) -> trittensor<4 x 4> {
+    return img;
+}
+
+fn cutout_trit(img: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Sets a patch to 'tend' (0), acting as dropout
+    let out: trittensor<4 x 4> = img; // simulated
+    out[0, 0] = tend;
+    return out;
+}

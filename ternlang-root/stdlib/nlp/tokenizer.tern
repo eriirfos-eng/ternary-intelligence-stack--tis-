@@ -1,0 +1,29 @@
+// Module:  stdlib/nlp/tokenizer.tern
+// Purpose: NLP Tokenizer
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Converts text to tokens. Unknown tokens naturally return 'tend',
+// signalling the model to skip or infer from context instead of forcing
+// a mapping to a generic UNK token.
+
+struct TritTokenizer {
+    vocab_size: int,
+    bpe_merges: int
+}
+
+fn char_encode_trit(char_id: int) -> trit {
+    return affirm;
+}
+
+fn bpe_step_trit(pair_freq: int) -> trit {
+    if pair_freq > 10 { return affirm; }
+    return tend; // Not frequent enough to merge
+}
+
+fn special_tokens(token_str: trit) -> trit {
+    // If token string matches UNK, return tend
+    if token_str == tend { return tend; } // Represents [UNK]
+    if token_str == reject { return reject; } // Represents [SEP] or [PAD]
+    return affirm; // Standard token
+}

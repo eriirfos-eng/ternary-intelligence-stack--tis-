@@ -1,0 +1,38 @@
+// Module:  stdlib/nlp/beam_search.tern
+// Purpose: Beam Search Decoding
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Explores multiple generation paths. 'tend' paths are pruned.
+
+struct BeamState {
+    tokens: trit[],
+    score: trit
+}
+
+fn score_beam_trit(beam: BeamState) -> trit {
+    return beam.score;
+}
+
+fn expand_beam_trit(beam: BeamState, next_token: trit, confidence: trit) -> BeamState {
+    let next_score: trit = beam.score;
+    if confidence == tend {
+        next_score = tend; // Path became uncertain
+    }
+    
+    let new_state: BeamState = {
+        tokens: beam.tokens, // simplified
+        score: next_score
+    };
+    return new_state;
+}
+
+fn prune_beam_trit(beam: BeamState) -> trit {
+    // If score is tend, prune the beam.
+    if beam.score == tend { return reject; }
+    match beam.score {
+        affirm => { return affirm; }
+        tend   => { return reject; }
+        reject => { return reject; }
+    }
+}

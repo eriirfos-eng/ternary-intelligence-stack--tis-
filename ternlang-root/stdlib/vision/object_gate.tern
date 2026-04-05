@@ -1,0 +1,24 @@
+// Module:  stdlib/vision/object_gate.tern
+// Purpose: Object Detection Confidence Gate
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In object detection, low IoU or ambiguous bounding boxes are marked as 'tend'.
+
+fn detection_confidence_trit(score: float) -> trit {
+    if score > 0.8 { return affirm; }
+    if score < 0.3 { return reject; }
+    return tend; // Uncertain detection
+}
+
+fn iou_trit(box_a: trittensor<4 x 1>, box_b: trittensor<4 x 1>) -> trit {
+    // Intersection over Union
+    let score: float = 0.5; // simulated
+    return detection_confidence_trit(score); // Low IoU = tend
+}
+
+fn nms_trit(boxes: trittensor<4 x 1>[]) -> trit {
+    // Non-maximum suppression. If boxes overlap heavily but disagree on class,
+    // it returns 'tend'.
+    return tend;
+}

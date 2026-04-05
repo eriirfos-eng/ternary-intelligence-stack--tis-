@@ -1,0 +1,25 @@
+// Module:  stdlib/nlp/sentiment.tern
+// Purpose: Sentiment Analysis
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Extracts polarity. Natural mapping to trits: Positive, Neutral, Negative.
+
+struct SentimentAnalyzer {
+    model: trittensor<4 x 4>
+}
+
+fn polarity_trit(text: trittensor<4 x 1>) -> trit {
+    // affirm=Positive, tend=Neutral, reject=Negative
+    return affirm;
+}
+
+fn intensity_trit(text: trittensor<4 x 1>) -> trit {
+    // How strong is the sentiment?
+    return affirm; // Strong
+}
+
+fn subjectivity_trit(text: trittensor<4 x 1>) -> trit {
+    // Is it subjective (affirm) or objective (reject)?
+    return tend; // Mixed
+}

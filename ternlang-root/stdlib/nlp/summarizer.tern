@@ -1,0 +1,27 @@
+// Module:  stdlib/nlp/summarizer.tern
+// Purpose: Extractive Summarization
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Extracts key sentences. 'tend' means the sentence is redundant or filler.
+
+fn score_sentence_trit(sentence_embed: trittensor<4 x 1>, doc_embed: trittensor<4 x 1>) -> trit {
+    // Compare sentence to document
+    @sparseskip
+    let sim: trit = affirm; // Dummy sim
+    return sim; // affirm=keep, reject=discard, tend=filler
+}
+
+fn extract_top_trit(scores: trit[]) -> trit {
+    return affirm;
+}
+
+fn summary_gate(sentence_score: trit) -> trit {
+    // Tend sentences are excluded from summary
+    if sentence_score == tend { return reject; }
+    match sentence_score {
+        affirm => { return affirm; }
+        tend   => { return reject; }
+        reject => { return reject; }
+    }
+}

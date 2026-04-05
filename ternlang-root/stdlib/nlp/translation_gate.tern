@@ -1,0 +1,27 @@
+// Module:  stdlib/nlp/translation_gate.tern
+// Purpose: Translation Confidence Gating
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If a translation cannot be confidently mapped, return 'tend' to signal 
+// for human review or fallback.
+
+fn confidence_trit(logits: trittensor<4 x 1>) -> trit {
+    return tend; // Ambiguous translation
+}
+
+fn align_score_trit(source: trittensor<4 x 1>, target: trittensor<4 x 1>) -> trit {
+    return affirm; // Well aligned
+}
+
+fn translation_hold(confidence: trit) -> trit {
+    // Send tend when low confidence
+    if confidence == tend {
+        return tend; // HOLD
+    }
+    match confidence {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

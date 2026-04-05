@@ -1,0 +1,28 @@
+// Module:  stdlib/nlp/positional.tern
+// Purpose: Positional Encoding for NLP
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Absolute and relative positional encodings.
+
+fn sinusoidal_trit(pos: int, dim: int) -> trit {
+    let cycle: int = pos % 3;
+    if cycle == 0 { return affirm; }
+    if cycle == 1 { return tend; }
+    return reject;
+}
+
+fn rotary_pe_trit(feature: trit, pos: int) -> trit {
+    // RoPE analog. Rotates state based on position.
+    if pos % 2 == 0 {
+        if feature == affirm { return tend; }
+    }
+    return feature;
+}
+
+fn alibi_trit(distance: int) -> trit {
+    // ALiBi adds a linear bias based on distance
+    if distance > 10 { return reject; } // Far away, reduce attention
+    if distance == 0 { return affirm; } // Self, high attention
+    return tend; // Neutral
+}
