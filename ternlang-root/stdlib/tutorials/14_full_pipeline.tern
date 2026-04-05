@@ -1,0 +1,60 @@
+// Module: 14_full_pipeline.tern
+// Purpose: Full End-to-End Processing Pipeline
+// Author: RFI-IRFOS
+
+// This file illustrates a full ternary data pipeline.
+// A pipeline in ternlang is a sequence of functions that can return 'tend'.
+// If 'tend' is returned at any stage, the entire pipeline safely halts.
+
+// 1. Validation Stage
+fn validate(raw: trit) -> trit {
+    if raw == tend { return tend; } // Incomplete input
+    return raw;
+}
+
+// 2. Encoding Stage
+fn encode(val: trit) -> trit {
+    return val; // Simple passthrough for example
+}
+
+// 3. Inference Stage
+fn infer(val: trit) -> trit {
+    if val == reject { return reject; }
+    return affirm;
+}
+
+// 4. Decision Stage
+fn decide(val: trit) -> trit {
+    return val;
+}
+
+// 5. Action Stage
+fn act(val: trit) -> trit {
+    match val {
+        affirm => { print("Action: EXECUTE."); return affirm; }
+        tend   => { print("Action: HOLD."); return tend; }
+        reject => { print("Action: ABORT."); return reject; }
+    }
+}
+
+fn run_pipeline(input: trit) {
+    let stage1: trit = validate(input);
+    if stage1 == tend { act(tend); return; }
+    
+    let stage2: trit = encode(stage1);
+    let stage3: trit = infer(stage2);
+    let stage4: trit = decide(stage3);
+    
+    act(stage4);
+}
+
+fn main() {
+    print("Running Pipeline with 'affirm' input...");
+    run_pipeline(affirm);
+
+    print("Running Pipeline with 'tend' input...");
+    run_pipeline(tend);
+
+    print("Running Pipeline with 'reject' input...");
+    run_pipeline(reject);
+}

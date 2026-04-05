@@ -1,0 +1,60 @@
+// Module: 12_uncertainty.tern
+// Purpose: Deep Dive into 'tend' (0) as an Active State
+// Author: RFI-IRFOS
+
+// In binary systems, 'tend' (uncertainty) is often conflated with 'reject' (false).
+// In ternary systems, 'tend' is an active, meaningful state.
+// Here are 5 examples where binary logic fails and ternary logic succeeds.
+
+// 1. Medical Hold: When symptoms are inconclusive.
+fn medical_hold(symptoms: trit) -> trit {
+    match symptoms {
+        affirm => { return affirm; } // Definite illness
+        tend   => { return tend; }   // Inconclusive - Needs observation
+        reject => { return reject; } // Definite health
+    }
+}
+
+// 2. Legal Insufficient Evidence: When proof is not definitive.
+fn legal_evidence(proof: trit) -> trit {
+    match proof {
+        affirm => { return affirm; } // Guilty beyond doubt
+        tend   => { return tend; }   // Insufficient evidence (Not guilty, not innocent)
+        reject => { return reject; } // Innocent
+    }
+}
+
+// 3. Sensor Noise: When a signal is drowned in static.
+fn sensor_read(signal: trit, noise: trit) -> trit {
+    if noise == affirm {
+        return tend; // Signal is unreliable, do not guess.
+    }
+    return signal;
+}
+
+// 4. Incomplete Data: When a field is missing in a database.
+fn data_field(val: trit) -> trit {
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend; } // Explicitly 'data missing', not 'false'.
+        reject => { return reject; }
+    }
+}
+
+// 5. Model Conflict: When two AI agents disagree.
+fn resolve_conflict(a1: trit, a2: trit) -> trit {
+    if a1 != a2 {
+        return tend; // Conflict detected, hold for deliberation.
+    }
+    return a1;
+}
+
+fn main() {
+    print("Example 1: Medical Hold returns tend on inconclusive symptoms.");
+    print("Example 2: Legal Evidence returns tend on insufficient proof.");
+    print("Example 3: Sensor Noise returns tend on static.");
+    print("Example 4: Incomplete Data returns tend on missing fields.");
+    print("Example 5: Model Conflict returns tend on disagreement.");
+    
+    print("The power of 'tend': It forces the system to pause instead of hallucinating.");
+}

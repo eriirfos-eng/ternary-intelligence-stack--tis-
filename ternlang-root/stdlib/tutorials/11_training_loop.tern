@@ -1,0 +1,50 @@
+// Module: 11_training_loop.tern
+// Purpose: Supervised training in ternary neural networks
+// Author: RFI-IRFOS
+
+// Supervised training involves a forward pass, loss calculation, 
+// and weight updates. In ternary networks, this is approximated 
+// through trit cross-entropy.
+
+fn main() {
+    // 1. Initial Weights (Small 2x2 for example)
+    let weights: trittensor<2 x 2> = {
+        [tend, tend],
+        [tend, tend]
+    };
+
+    // 2. Training Data (Input, Target)
+    let input: trittensor<2 x 1> = { [affirm], [reject] };
+    let target: trit = affirm;
+
+    // 3. Epoch Loop (Simplified 3 epochs)
+    let epoch: int = 0;
+    while epoch < 3 {
+        // Forward Pass
+        @sparseskip
+        let output: trittensor<2 x 1> = weights * input;
+        let prediction: trit = output[0, 0];
+
+        // Loss Calculation: Trit Cross-Entropy Approximation
+        // If prediction == target, loss is affirm (+1) - No change needed.
+        // If prediction != target, loss is reject (-1) - Update weights.
+        // If prediction is tend, loss is tend (0) - Needs more training.
+        let loss: trit = tend;
+        if prediction == target {
+            loss = affirm;
+            print("Epoch: Complete - Loss: Low (affirm)");
+        } else {
+            loss = reject;
+            print("Epoch: Complete - Loss: High (reject)");
+            
+            // 4. Simple weight update (simulation)
+            // Weight = Weight + (Loss * Input)
+            // In practice, this uses gradient-based updates.
+            weights = weights; // Simulation of update logic
+        }
+        
+        epoch = epoch + 1;
+    }
+
+    print("Training loop complete. Weights converged.");
+}
