@@ -1,0 +1,44 @@
+// Trit classifier — 2-layer ternary neural network demo
+// Part of the Ternlang Standard Library
+
+struct TritClassifier {
+    w1: trittensor<64 x 128>,
+    w2: trittensor<128 x 10>,
+    b1: trittensor<128>,
+    b2: trittensor<10>
+}
+
+fn forward(model: TritClassifier, input: trittensor<64>) -> trittensor<10> {
+    // Layer 1
+    let mut h1: trittensor<128> = trittensor<128>::zero();
+    @sparseskip
+    let mut i: int = 0;
+    while i < 128 {
+        let mut acc: int = 0;
+        let mut j: int = 0;
+        while j < 64 {
+            match input[j] {
+                affirm => { acc = acc + (model.w1[j][i] == affirm ? 1 : (model.w1[j][i] == reject ? -1 : 0)); }
+                tend   => { /* Skip */ }
+                reject => { acc = acc + (model.w1[j][i] == affirm ? -1 : (model.w1[j][i] == reject ? 1 : 0)); }
+            }
+            j = j + 1;
+        }
+        h1[i] = (acc > 0) ? affirm : (acc < 0 ? reject : tend);
+        i = i + 1;
+    }
+    
+    // Layer 2
+    let mut out: trittensor<10> = trittensor<10>::zero();
+    // ... similar logic for second layer ...
+    return out;
+}
+
+// Training loop placeholder
+fn train_classifier(model: &mut TritClassifier, dataset: Dataset) {
+    let mut epoch: int = 0;
+    while epoch < 10 {
+        // Step through dataset and update weights
+        epoch = epoch + 1;
+    }
+}

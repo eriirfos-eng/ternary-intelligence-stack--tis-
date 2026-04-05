@@ -1,0 +1,52 @@
+// Trit sentiment engine — ternary emotion classification
+// Part of the Ternlang Standard Library
+
+struct SentimentModel {
+    lexicon: associative_store<string, trit>,
+    neutral_threshold: float
+}
+
+fn score_text(model: SentimentModel, tokens: [string; 100]) -> trit {
+    let mut score: int = 0;
+    let mut i: int = 0;
+    while i < 100 {
+        let val: trit = recall(model.lexicon, tokens[i]);
+        match val {
+            affirm => { score = score + 1; }
+            tend   => { score = score + 0; }
+            reject => { score = score - 1; }
+        }
+        i = i + 1;
+    }
+    
+    // Result mapping
+    if score > 5 { return affirm; } // positive sentiment
+    if score < -5 { return reject; } // negative sentiment
+    return tend; // neutral sentiment
+}
+
+fn batch_score(model: SentimentModel, batch: [[string; 100]; BATCH]) -> trittensor<BATCH> {
+    let mut results: trittensor<BATCH> = trittensor<BATCH>::zero();
+    let mut b: int = 0;
+    while b < BATCH {
+        results[b] = score_text(model, batch[b]);
+        b = b + 1;
+    }
+    return results;
+}
+
+// Assessing the "Ternary Bias" of a dataset
+fn assess_bias(results: trittensor<BATCH>) -> float {
+    let mut pos: int = 0;
+    let mut neg: int = 0;
+    let mut b: int = 0;
+    while b < BATCH {
+        match results[b] {
+            affirm => { pos = pos + 1; }
+            tend   => { /* neutral */ }
+            reject => { neg = neg + 1; }
+        }
+        b = b + 1;
+    }
+    return float(pos - neg) / float(BATCH);
+}

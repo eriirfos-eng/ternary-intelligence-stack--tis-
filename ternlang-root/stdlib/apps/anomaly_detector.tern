@@ -1,0 +1,52 @@
+// Trit anomaly detector — streaming detection and severity gating
+// Part of the Ternlang Standard Library
+
+struct AnomalyDetector {
+    baseline: trittensor<64>,
+    threshold: float,
+    current_severity: float
+}
+
+fn process_signal(det: &mut AnomalyDetector, signal: trittensor<64>) -> trit {
+    let mut diff_score: float = 0.0;
+    let mut i: int = 0;
+    while i < 64 {
+        if signal[i] != det.baseline[i] {
+            diff_score = diff_score + 1.0;
+        }
+        i = i + 1;
+    }
+    diff_score = diff_score / 64.0;
+    det.current_severity = diff_score;
+    
+    // Output severity trit
+    // affirm: serious anomaly, tend: minor deviation, reject: normal
+    if diff_score > det.threshold { return affirm; }
+    if diff_score > (det.threshold / 2.0) { return tend; }
+    return reject;
+}
+
+fn alert_gate(signal: trit, severity: float) {
+    match signal {
+        affirm => { 
+            // Trigger critical alert
+            print("CRITICAL ANOMALY DETECTED: " + float_to_string(severity));
+        }
+        tend   => { 
+            // Warning log
+            print("Warning: Minor signal deviation.");
+        }
+        reject => { /* All normal */ }
+    }
+}
+
+// Adaptive baseline: Slowly update baseline to follow slow trends
+fn update_baseline(det: &mut AnomalyDetector, signal: trittensor<64>, rate: float) {
+    let mut i: int = 0;
+    while i < 64 {
+        if random_float() < rate {
+            det.baseline[i] = signal[i];
+        }
+        i = i + 1;
+    }
+}

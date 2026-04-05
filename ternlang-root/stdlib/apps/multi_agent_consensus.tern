@@ -1,0 +1,54 @@
+// Trit multi-agent consensus — 5-agent flagship demo
+// Part of the Ternlang Standard Library
+
+struct ConsensusApp {
+    agents: [TritDebater; 5],
+    coordinator: TritCoordinator,
+    current_task: trittensor<64>
+}
+
+fn run_consensus_round(app: &mut ConsensusApp) -> trit {
+    // 1. Dispatch task to agents
+    let responses: [trittensor<64>; 16] = dispatch(app.coordinator, app.current_task);
+    
+    // 2. Agents debate (1-on-1 rounds)
+    // d1 vs d2, d3 vs d4
+    let winner1: int = debate(&mut app.agents[0], &mut app.agents[1], &mut app.agents[4], 3);
+    let winner2: int = debate(&mut app.agents[2], &mut app.agents[3], &mut app.agents[4], 3);
+    
+    // 3. Final consensus vote
+    let mut final_votes: trittensor<5> = trittensor<5>::zero();
+    let mut i: int = 0;
+    while i < 5 {
+        final_votes[i] = app.agents[i].belief[0]; // simplistic first-trit vote
+        i = i + 1;
+    }
+    
+    return majority_vote(final_votes);
+}
+
+fn main() {
+    // Initialize 5 agents with different internal "biases" (beliefs)
+    let mut app: ConsensusApp = init_app();
+    
+    // Mission: reach consensus on a ternary signal
+    let mut step: int = 0;
+    while step < 10 {
+        let result: trit = run_consensus_round(&mut app);
+        match result {
+            affirm => { print("SWARM REACHED POSITIVE CONSENSUS"); }
+            tend   => { print("SWARM IS UNDECIDED (TEND)"); }
+            reject => { print("SWARM REACHED NEGATIVE CONSENSUS"); }
+        }
+        step = step + 1;
+    }
+}
+
+fn init_app() -> ConsensusApp {
+    // Boilerplate for initialization
+    return ConsensusApp { 
+        agents: [TritDebater { id: 0, belief: trittensor<64>::zero(), confidence: 0.5 }; 5],
+        coordinator: TritCoordinator { agents: [TritDebater { id: 0, belief: trittensor<64>::zero(), confidence: 0.5 }; 16], num_agents: 5 },
+        current_task: trittensor<64>::zero()
+    };
+}

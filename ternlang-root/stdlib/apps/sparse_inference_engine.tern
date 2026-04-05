@@ -1,0 +1,62 @@
+// Trit sparse inference engine — high performance @sparseskip demo
+// Part of the Ternlang Standard Library
+
+struct InferenceEngine {
+    weights: trittensor<1024 x 1024>,
+    sparsity: float
+}
+
+fn sparse_matmul(engine: InferenceEngine, input: trittensor<1024>) -> trittensor<1024> {
+    let mut out: trittensor<1024> = trittensor<1024>::zero();
+    
+    // Core engine loop utilizing the compiler @sparseskip hint
+    // This can provide up to 2.3x speedup on ternary hardware/simulators
+    @sparseskip
+    let mut i: int = 0;
+    while i < 1024 {
+        let mut acc: int = 0;
+        let mut j: int = 0;
+        while j < 1024 {
+            match input[j] {
+                affirm => { 
+                    match engine.weights[j][i] {
+                        affirm => { acc = acc + 1; }
+                        tend   => { /* Skip weights */ }
+                        reject => { acc = acc - 1; }
+                    }
+                }
+                tend   => { /* Compiler skips entire 'j' loop body here */ }
+                reject => {
+                    match engine.weights[j][i] {
+                        affirm => { acc = acc - 1; }
+                        tend   => { /* Skip weights */ }
+                        reject => { acc = acc + 1; }
+                    }
+                }
+            }
+            j = j + 1;
+        }
+        out[i] = (acc > 0) ? affirm : (acc < 0 ? reject : tend);
+        i = i + 1;
+    }
+    return out;
+}
+
+// Measure performance: Returns speedup ratio based on sparsity
+fn measure_speedup(engine: InferenceEngine) -> float {
+    let mut zeros: int = 0;
+    let mut i: int = 0;
+    while i < 1024 {
+        let mut j: int = 0;
+        while j < 1024 {
+            if engine.weights[i][j] == tend {
+                zeros = zeros + 1;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    let sparsity: float = float(zeros) / 1048576.0;
+    // Expected speedup is 1 / (1 - sparsity)
+    return 1.0 / (1.0 - sparsity);
+}
