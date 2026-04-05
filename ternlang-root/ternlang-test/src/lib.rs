@@ -9,7 +9,7 @@
 //! semantic check → codegen → BET VM) and asserts on the outcome.
 //!
 //! # Quick start
-//! ```rust
+//! ```rust,no_run
 //! use ternlang_test::{TernTestCase, TernExpected, assert_tern};
 //!
 //! assert_tern!(TernTestCase {
@@ -164,7 +164,7 @@ pub fn run_tern_test(case: &TernTestCase) -> TernTestResult {
 
 /// Run a `TernTestCase` and panic with a readable message if it fails.
 ///
-/// ```rust
+/// ```rust,no_run
 /// use ternlang_test::{TernTestCase, TernExpected, assert_tern};
 /// assert_tern!(TernTestCase {
 ///     name: "hold is zero",

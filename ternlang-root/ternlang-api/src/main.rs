@@ -283,10 +283,12 @@ async fn require_api_key(
         || path == "/.well-known/mcp/server-card.json"
         || path == "/stripe/webhook"
         || path == "/pricing"
-        || path == "/api/usage"
         || path.starts_with("/admin") {
         return next.run(request).await;
     }
+
+    // /api/usage requires a valid key (any tier) — key holder sees their own usage
+    // Unauthenticated callers get a 401, not usage data
 
     let raw = headers
         .get("X-Ternlang-Key")
@@ -300,7 +302,11 @@ async fn require_api_key(
 
     match state.keys.validate_and_bump(raw).await {
         KeyCheckResult::Valid(entry) => {
-            // /api/* requires Tier 2 or above (paid commercial access)
+            // /api/usage — any valid key can read their own usage stats
+            if path == "/api/usage" {
+                return next.run(request).await;
+            }
+            // All other /api/* endpoints require Tier 2 or above (paid commercial access)
             if path.starts_with("/api/") && entry.tier < 2 {
                 return api_error(StatusCode::FORBIDDEN,
                     "This endpoint requires a Tier 2 or higher key. Upgrade at https://ternlang.com/#licensing");
