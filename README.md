@@ -185,3 +185,6 @@ Commercial licensing: [licensing@ternlang.com](mailto:licensing@ternlang.com)
 ---
 
 *Built by Simeon Kepp · RFI-IRFOS · 2026*
+
+
+<!-- Index Nudge: Sun Apr  5 20:04:33 GMT 2026 -->
