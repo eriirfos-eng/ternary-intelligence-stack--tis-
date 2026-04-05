@@ -1,0 +1,75 @@
+// Ternary signal processing — filtering and detection for streams
+// Part of the Ternlang Standard Library
+
+// Moving average for trits: return majority of window
+fn moving_average_trit(stream: trittensor<N>, window: int) -> trittensor<N> {
+    let mut out: trittensor<N> = trittensor<N>::zero();
+    let mut i: int = 0;
+    while i < N {
+        let mut sum_val: int = 0;
+        let mut j: int = 0;
+        while j < window && (i - j) >= 0 {
+            match stream[i - j] {
+                affirm => { sum_val = sum_val + 1; }
+                tend => { sum_val = sum_val + 0; }
+                reject => { sum_val = sum_val - 1; }
+            }
+            j = j + 1;
+        }
+        
+        if sum_val > 0 { out[i] = affirm; }
+        else if sum_val < 0 { out[i] = reject; }
+        else { out[i] = tend; }
+        i = i + 1;
+    }
+    return out;
+}
+
+// Edge detection: detects state changes in a trit stream
+fn edge_detect(curr: trit, prev: trit) -> trit {
+    if curr == prev { return tend; } // Stable signal
+    
+    match curr {
+        affirm => { return affirm; } // Rising edge/Strong affirm
+        tend => { 
+            match prev {
+                affirm => { return reject; } // Falling edge from affirm
+                reject => { return affirm; } // Rising edge from reject
+                tend => { return tend; }
+            }
+        }
+        reject => { return reject; } // Falling edge/Strong reject
+    }
+}
+
+// Spike detect: detect brief deviations from the mean
+fn spike_detect(stream: trittensor<N>, sensitivity: int) -> bool {
+    let mut avg: int = 0;
+    let mut i: int = 0;
+    while i < N {
+        match stream[i] {
+            affirm => { avg = avg + 1; }
+            tend => { avg = avg + 0; }
+            reject => { avg = avg - 1; }
+        }
+        i = i + 1;
+    }
+    
+    // Check if the current trit deviates significantly from the window
+    let last: trit = stream[N - 1];
+    let diff: int = 0;
+    match last {
+        affirm => { diff = 1; }
+        tend => { diff = 0; }
+        reject => { diff = -1; }
+    }
+    
+    if (diff * N - avg) > sensitivity { return true; }
+    return false;
+}
+
+// Ternary filter: bandpass analog for ternary logic
+fn ternary_filter(input: trit, threshold: float, strength: float) -> trit {
+    if strength > threshold { return input; }
+    return tend;
+}

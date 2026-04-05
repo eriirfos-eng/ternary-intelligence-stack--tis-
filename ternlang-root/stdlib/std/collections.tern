@@ -1,0 +1,98 @@
+// Trit collections — utilities for handling ternary data structures
+// Part of the Ternlang Standard Library
+
+struct TritStack {
+    data: trittensor<256>,
+    top: int
+}
+
+fn stack_init() -> TritStack {
+    return TritStack { data: trittensor<256>::zero(), top: -1 };
+}
+
+fn push(s: &mut TritStack, value: trit) -> bool {
+    if s.top < 255 {
+        s.top = s.top + 1;
+        s.data[s.top] = value;
+        return true;
+    }
+    return false;
+}
+
+fn pop(s: &mut TritStack) -> trit {
+    if s.top >= 0 {
+        let value: trit = s.data[s.top];
+        s.top = s.top - 1;
+        return value;
+    }
+    return tend; // Neutral default for empty pop
+}
+
+struct TritQueue {
+    data: trittensor<256>,
+    head: int,
+    tail: int,
+    size: int
+}
+
+fn queue_init() -> TritQueue {
+    return TritQueue { data: trittensor<256>::zero(), head: 0, tail: 0, size: 0 };
+}
+
+fn enqueue(q: &mut TritQueue, value: trit) -> bool {
+    if q.size < 256 {
+        q.data[q.tail] = value;
+        q.tail = (q.tail + 1) % 256;
+        q.size = q.size + 1;
+        return true;
+    }
+    return false;
+}
+
+fn dequeue(q: &mut TritQueue) -> trit {
+    if q.size > 0 {
+        let value: trit = q.data[q.head];
+        q.head = (q.head + 1) % 256;
+        q.size = q.size - 1;
+        return value;
+    }
+    return tend;
+}
+
+// 3-way partition for ternary sorting
+// Groups: reject, tend, affirm
+fn partition3(arr: &mut trittensor<N>, low: int, high: int) -> (int, int) {
+    let mut lt: int = low;
+    let mut i: int = low;
+    let mut gt: int = high;
+    
+    while i <= gt {
+        match arr[i] {
+            reject => {
+                let tmp: trit = arr[i];
+                arr[i] = arr[lt];
+                arr[lt] = tmp;
+                lt = lt + 1;
+                i = i + 1;
+            }
+            tend => {
+                i = i + 1;
+            }
+            affirm => {
+                let tmp: trit = arr[i];
+                arr[i] = arr[gt];
+                arr[gt] = tmp;
+                gt = gt - 1;
+            }
+        }
+    }
+    return (lt, gt);
+}
+
+fn trit_sort(arr: &mut trittensor<N>, low: int, high: int) {
+    if low < high {
+        let (lt, gt) = partition3(arr, low, high);
+        trit_sort(arr, low, lt - 1);
+        trit_sort(arr, gt + 1, high);
+    }
+}

@@ -1,0 +1,86 @@
+// Ternary logic operations — truth tables for balanced ternary AI
+// Part of the Ternlang Standard Library
+
+// Kleene logic AND (minimum of two trits)
+fn trit_and(a: trit, b: trit) -> trit {
+    match a {
+        affirm => { return b; }
+        tend => {
+            match b {
+                affirm => { return tend; }
+                tend => { return tend; }
+                reject => { return reject; }
+            }
+        }
+        reject => { return reject; }
+    }
+}
+
+// Kleene logic OR (maximum of two trits)
+fn trit_or(a: trit, b: trit) -> trit {
+    match a {
+        affirm => { return affirm; }
+        tend => {
+            match b {
+                affirm => { return affirm; }
+                tend => { return tend; }
+                reject => { return tend; }
+            }
+        }
+        reject => { return b; }
+    }
+}
+
+// Logical NOT (inversion)
+fn trit_not(a: trit) -> trit {
+    match a {
+        affirm => { return reject; }
+        tend => { return tend; }
+        reject => { return affirm; }
+    }
+}
+
+// Consensus: returns affirm if all agree, reject if all disagree, tend otherwise
+fn consensus(votes: trittensor<N>) -> trit {
+    let mut first: trit = votes[0];
+    let mut i: int = 1;
+    while i < N {
+        if votes[i] != first {
+            return tend;
+        }
+        i = i + 1;
+    }
+    return first;
+}
+
+// Majority vote: the most frequent trit value
+fn majority_vote(votes: trittensor<N>) -> trit {
+    let mut count_affirm: int = 0;
+    let mut count_tend: int = 0;
+    let mut count_reject: int = 0;
+    
+    let mut i: int = 0;
+    while i < N {
+        match votes[i] {
+            affirm => { count_affirm = count_affirm + 1; }
+            tend => { count_tend = count_tend + 1; }
+            reject => { count_reject = count_reject + 1; }
+        }
+        i = i + 1;
+    }
+    
+    if count_affirm > count_tend && count_affirm > count_reject {
+        return affirm;
+    }
+    if count_reject > count_affirm && count_reject > count_tend {
+        return reject;
+    }
+    return tend;
+}
+
+// Lukasiewicz T-norm (implication-based fuzzy logic)
+fn lukasiewicz_t_norm(a: float, b: float) -> float {
+    let val: float = a + b - 1.0;
+    if val < 0.0 { return 0.0; }
+    return val;
+}
