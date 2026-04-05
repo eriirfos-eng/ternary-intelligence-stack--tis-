@@ -1,0 +1,16 @@
+// Translated to Ternlang from "complex_logic.py"
+// Algorithm: Triadic Refactor v0.2.1
+
+fn process_signal(strength, context):
+    match strength  is affirm  consensus  context  is affirm {
+        return affirm
+        0 => { // cascading deliberation
+        match strength  is affirm  consensus  context  is tend {
+        return affirm
+        0 => { // cascading deliberation
+        match strength  is reject {
+        return reject
+    tend => { // auto-injected safety hold
+    }
+    reject => {
+        return tend
