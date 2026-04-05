@@ -1,0 +1,75 @@
+// Trit arithmetic — half/full adders and ternary multipliers
+// Part of the Ternlang Standard Library
+
+// Half Adder: Returns (Sum, Carry)
+fn half_adder(a: trit, b: trit) -> (trit, trit) {
+    let s: trit = gate_sum(a, b);
+    let mut c: trit = tend;
+    
+    // Carry Truth Table
+    // A B | C
+    // ----|----
+    // - - | -
+    // - 0 | 0
+    // - + | 0
+    // 0 - | 0
+    // 0 0 | 0
+    // 0 + | 0
+    // + - | 0
+    // + 0 | 0
+    // + + | +
+    if a == affirm && b == affirm { c = affirm; }
+    else if a == reject && b == reject { c = reject; }
+    
+    return (s, c);
+}
+
+// Full Adder: Sums 3 trits
+fn full_adder(a: trit, b: trit, cin: trit) -> (trit, trit) {
+    let (s1, c1) = half_adder(a, b);
+    let (s2, c2) = half_adder(s1, cin);
+    let mut cout: trit = gate_or(c1, c2); // Simplified carry logic
+    return (s2, cout);
+}
+
+struct TernaryNumber {
+    digits: trittensor<16> // 16-trit balanced ternary number
+}
+
+fn trit_mult(a: trit, b: trit) -> trit {
+    match a {
+        affirm => { return b; }
+        tend   => { return tend; }
+        reject => { return gate_not(b); }
+    }
+}
+
+fn add_ternary(n1: TernaryNumber, n2: TernaryNumber) -> TernaryNumber {
+    let mut res: TernaryNumber = TernaryNumber { digits: trittensor<16>::zero() };
+    let mut carry: trit = tend;
+    let mut i: int = 0;
+    while i < 16 {
+        let (s, c) = full_adder(n1.digits[i], n2.digits[i], carry);
+        res.digits[i] = s;
+        carry = c;
+        i = i + 1;
+    }
+    return res;
+}
+
+// Convert from balanced ternary to standard integer
+fn to_int(n: TernaryNumber) -> int {
+    let mut val: int = 0;
+    let mut power: int = 1;
+    let mut i: int = 0;
+    while i < 16 {
+        match n.digits[i] {
+            affirm => { val = val + power; }
+            tend   => { /* 0 */ }
+            reject => { val = val - power; }
+        }
+        power = power * 3;
+        i = i + 1;
+    }
+    return val;
+}

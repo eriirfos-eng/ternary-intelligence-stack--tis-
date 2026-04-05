@@ -1,0 +1,108 @@
+// Trit gates — full ternary logic gate library
+// Part of the Ternlang Standard Library
+
+// Truth Table: Buffer (BUF)
+// Input  | Output
+// -------|-------
+// reject | reject
+// tend   | tend
+// affirm | affirm
+fn gate_buf(a: trit) -> trit { return a; }
+
+// Truth Table: Inverter (NOT / NEG)
+// Input  | Output
+// -------|-------
+// reject | affirm
+// tend   | tend
+// affirm | reject
+fn gate_not(a: trit) -> trit {
+    match a {
+        reject => { return affirm; }
+        tend   => { return tend; }
+        affirm => { return reject; }
+    }
+}
+
+// Truth Table: AND (Min)
+// A B | Out
+// ----|----
+// - - | -
+// - 0 | -
+// - + | -
+// 0 - | -
+// 0 0 | 0
+// 0 + | 0
+// + - | -
+// + 0 | 0
+// + + | +
+fn gate_and(a: trit, b: trit) -> trit {
+    match a {
+        reject => { return reject; }
+        tend   => {
+            match b {
+                reject => { return reject; }
+                tend   => { return tend; }
+                affirm => { return tend; }
+            }
+        }
+        affirm => { return b; }
+    }
+}
+
+// Truth Table: OR (Max)
+// A B | Out
+// ----|----
+// - - | -
+// - 0 | 0
+// - + | +
+// 0 - | 0
+// 0 0 | 0
+// 0 + | +
+// + - | +
+// + 0 | +
+// + + | +
+fn gate_or(a: trit, b: trit) -> trit {
+    match a {
+        reject => { return b; }
+        tend   => {
+            match b {
+                reject => { return tend; }
+                tend   => { return tend; }
+                affirm => { return affirm; }
+            }
+        }
+        affirm => { return affirm; }
+    }
+}
+
+// Sum Gate (Modulo-3 Addition / XOR-equivalent)
+// A B | Out
+// ----|----
+// - - | +
+// - 0 | -
+// - + | 0
+// 0 - | -
+// 0 0 | 0
+// 0 + | +
+// + - | 0
+// + 0 | +
+// + + | -
+fn gate_sum(a: trit, b: trit) -> trit {
+    match a {
+        reject => {
+            match b {
+                reject => { return affirm; }
+                tend   => { return reject; }
+                affirm => { return tend; }
+            }
+        }
+        tend => { return b; }
+        affirm => {
+            match b {
+                reject => { return tend; }
+                tend   => { return affirm; }
+                affirm => { return reject; }
+            }
+        }
+    }
+}

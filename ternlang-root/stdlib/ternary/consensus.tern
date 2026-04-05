@@ -1,0 +1,65 @@
+// Trit consensus — voting and democratic protocols
+// Part of the Ternlang Standard Library
+
+// Plurality: Majority vote (already defined in logic.tern, refined here)
+fn plurality(votes: trittensor<BATCH>) -> trit {
+    return majority_vote(votes);
+}
+
+// Condorcet: Pairwise comparison winner (reject vs tend, tend vs affirm, reject vs affirm)
+fn condorcet(votes: trittensor<BATCH>) -> trit {
+    let mut rt: int = 0; // reject vs tend
+    let mut ta: int = 0; // tend vs affirm
+    let mut ra: int = 0; // reject vs affirm
+    
+    let mut i: int = 0;
+    while i < BATCH {
+        match votes[i] {
+            reject => { rt = rt + 1; ra = ra + 1; }
+            tend   => { rt = rt - 1; ta = ta + 1; }
+            affirm => { ta = ta - 1; ra = ra - 1; }
+        }
+        i = i + 1;
+    }
+    
+    if rt > 0 && ra > 0 { return reject; }
+    if rt < 0 && ta > 0 { return tend; }
+    if ta < 0 && ra < 0 { return affirm; }
+    return tend; // Cycle or no clear winner
+}
+
+// Borda count: Weights given to rank (reject=0, tend=1, affirm=2)
+fn borda_count(votes: trittensor<BATCH>) -> trit {
+    let mut score: int = 0;
+    let mut i: int = 0;
+    while i < BATCH {
+        match votes[i] {
+            reject => { score = score + 0; }
+            tend   => { score = score + 1; }
+            affirm => { score = score + 2; }
+        }
+        i = i + 1;
+    }
+    
+    let avg: float = float(score) / float(BATCH);
+    if avg > 1.5 { return affirm; }
+    if avg < 0.5 { return reject; }
+    return tend;
+}
+
+// Liquid democracy: Delegation-based voting
+struct Delegation {
+    voter: int,
+    delegate: int
+}
+
+fn liquid_democracy(votes: &mut trittensor<BATCH>, delegations: [Delegation; 10]) {
+    let mut i: int = 0;
+    while i < 10 {
+        let v: int = delegations[i].voter;
+        let d: int = delegations[i].delegate;
+        // Voter follows delegate's choice
+        votes[v] = votes[d];
+        i = i + 1;
+    }
+}
