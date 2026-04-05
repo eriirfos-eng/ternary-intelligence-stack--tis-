@@ -1,0 +1,12 @@
+[package]
+name = "ternlang-translator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+regex = "1.10"
+colored = "2.1"
+anyhow = "1.0"
