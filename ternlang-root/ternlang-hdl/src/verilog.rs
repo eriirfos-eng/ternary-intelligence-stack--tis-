@@ -98,10 +98,7 @@ endmodule"#.into(),
     reg [3:0] result; // {carry[1:0], sum[1:0]}
     always @(*) begin
         case ({a, b})
-            // a=-1, b=-1 → sum=+1, carry=-1
-            4'b0101: result = {2'b01, 2'b10}; // wait: -1+-1 = -2, not in range
-            // Corrected: -1 + -1 = +1 carry -1 (since -1*3 + 1 = -2 ? no)
-            // BET: -1 + -1: sum = +1, carry = -1  (because +1 + (-1)*3 = -2 = +1 - 3)
+            // BET: -1 + -1: sum = +1, carry = -1
             4'b0101: result = {2'b01, 2'b10};  // sum=+1, carry=-1
             // a=-1, b=0 → sum=-1, carry=0
             4'b0111: result = {2'b11, 2'b01};
@@ -124,6 +121,17 @@ endmodule"#.into(),
     end
     assign carry = result[3:2];
     assign sum   = result[1:0];
+
+`ifdef FORMAL
+    // Recommendation 4: Formal Verification for Ternary Carry Logic
+    // Proves that valid ternary inputs never generate a FAULT (00) state.
+    always @(*) begin
+        if (a != 2'b00 && b != 2'b00) begin
+            assert(sum != 2'b00);
+            assert(carry != 2'b00);
+        end
+    end
+`endif
 endmodule"#.into(),
         }
     }
@@ -186,20 +194,20 @@ endmodule"#.into(),
         let name = format!("sparse_matmul_{}x{}", n, n);
         let mut body = format!(
             r#"// N={n} sparse ternary matmul
-// Each weight wire-pair has a skip enable: when weight==hold, the multiply is gated off.
+// Recommendation 1: Pipelined design for improved clock frequency.
+// Recommendation 3: Uses explicit clock enable (en) instead of clock gating.
 module {name} #(parameter N = {n}) (
     input  clk,
     input  rst_n,
+    input  en,                 // Clock enable
     input  [N*2-1:0] a_flat,   // input vector (N trits, 2 bits each)
     input  [N*N*2-1:0] w_flat, // weight matrix (N*N trits, 2 bits each)
     output [N*2-1:0] out_flat  // output vector (N trits)
 );
-    genvar row, col, k;
-    // Accumulator array
-    reg [1:0] acc [0:N-1];
-    // Partial product array
+    genvar row, col;
+    // Pipelined partial products
+    reg [1:0] prod_pipe [0:N-1][0:N-1];
     wire [1:0] prod [0:N-1][0:N-1];
-    // Skip signals
     wire skip [0:N-1][0:N-1];
 
 "#,
@@ -207,8 +215,7 @@ module {name} #(parameter N = {n}) (
             name = name
         );
 
-        body.push_str(&format!(
-            r#"    // Generate multiply cells with zero-skip
+        body.push_str(r#"    // Generate multiply cells with zero-skip
     generate
         for (row = 0; row < N; row = row + 1) begin : gen_row
             for (col = 0; col < N; col = col + 1) begin : gen_col
@@ -225,32 +232,48 @@ module {name} #(parameter N = {n}) (
         end
     endgenerate
 
-    // Accumulate — sequential for synthesis simplicity
     integer i, j;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             for (i = 0; i < N; i = i + 1)
-                acc[i] <= 2'b11; // hold
-        end else begin
-            for (i = 0; i < N; i = i + 1) begin
-                acc[i] <= 2'b11;
-                for (j = 0; j < N; j = j + 1) begin
-                    // Consensus accumulate (simplified — production uses trit_add chain)
-                    if (!skip[i][j])
-                        acc[i] <= (acc[i] == prod[i][j]) ? acc[i] : 2'b11;
-                end
-            end
+                for (j = 0; j < N; j = j + 1)
+                    prod_pipe[i][j] <= 2'b11; // hold
+        end else if (en) begin
+            for (i = 0; i < N; i = i + 1)
+                for (j = 0; j < N; j = j + 1)
+                    prod_pipe[i][j] <= prod[i][j];
         end
     end
 
+    // Recommendation 2: Standard Matmul Accumulation using trit_add.
+    // For synthesis, we chain addition combinatorially, then register the final sum.
+    wire [1:0] row_sum [0:N-1][0:N];
+    wire [1:0] row_carry [0:N-1][0:N];
+    
     generate
-        for (row = 0; row < N; row = row + 1) begin : gen_out
-            assign out_flat[row*2 +: 2] = acc[row];
+        for (row = 0; row < N; row = row + 1) begin : gen_acc
+            assign row_sum[row][0] = 2'b11; // initial sum = hold
+            assign row_carry[row][0] = 2'b11; // initial carry = hold
+            for (col = 0; col < N; col = col + 1) begin : gen_add
+                trit_add u_add (
+                    .a(row_sum[row][col]),
+                    .b(prod_pipe[row][col]),
+                    .sum(row_sum[row][col+1]),
+                    .carry(row_carry[row][col+1])
+                );
+            end
+            
+            // Output register (Pipeline stage 2)
+            reg [1:0] final_acc;
+            always @(posedge clk or negedge rst_n) begin
+                if (!rst_n) final_acc <= 2'b11;
+                else if (en) final_acc <= row_sum[row][N];
+            end
+            assign out_flat[row*2 +: 2] = final_acc;
         end
     endgenerate
 
-endmodule"#
-        ));
+endmodule"#);
 
         VerilogModule { name, body }
     }
