@@ -24,245 +24,499 @@
       theme: {
         extend: {
           colors: {
-            t_bg: '#020617',
-            t_bg2: '#0f172a',
-            t_bg3: '#1e293b',
-            t_blue: '#4A90E2',
+            t_bg: '#05050A',
+            t_bg2: '#0D0D16',
+            t_bg3: '#151522',
+            t_text: '#dde0f0',
+            t_muted: '#7a7d99',
+            t_border: '#232336',
             t_teal: '#00f5c4',
+            t_blue: '#4A90E2',
             t_red: '#ff4d4d',
-            t_border: 'rgba(255,255,255,0.1)',
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #020617; color: #f8fafc; }
-    .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: var(--theme-bg); color: var(--theme-text); }
+    .glass-card { background: rgba(21, 21, 34, 0.8); backdrop-filter: blur(12px); border: 1px solid var(--theme-border); }
+    .glow-tend { box-shadow: 0 0 30px rgba(0, 212, 170, 0.1); }
+    .glow-affirm { box-shadow: 0 0 30px rgba(74, 144, 226, 0.1); }
     #page-slider { display: flex; width: 600vw; transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1); }
     .slide-page { width: 100vw; flex-shrink: 0; min-height: 100vh; overflow-y: auto; padding-top: 5rem; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+    .scenario-pill { padding: 0.5rem 1rem; border-radius: 9999px; border: 1px solid #232336; background: #151522; color: #7a7d99; font-size: 0.75rem; font-family: monospace; cursor: pointer; transition: all 0.2s; }
+    .scenario-pill.active { border-color: #00f5c4; color: #00f5c4; background: rgba(0, 212, 170, 0.1); }
+    .term-window { background: #0D0D16; border: 1px solid #232336; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+    .term-titlebar { background: #151522; padding: 0.75rem 1rem; border-bottom: 1px solid #232336; display: flex; align-items: center; }
+    .term-dot { width: 10px; height: 10px; rounded-full: 9999px; margin-right: 6px; border-radius: 50%; }
+    .term-body { display: flex; height: 400px; }
+    .term-sidebar { width: 180px; border-right: 1px solid #232336; background: #0D0D16; overflow-y: auto; }
+    .term-file { padding: 8px 16px; font-family: monospace; font-size: 11px; color: #7a7d99; cursor: pointer; border-left: 2px solid transparent; }
+    .term-file.active { background: rgba(0, 212, 170, 0.05); color: #00f5c4; border-left-color: #00f5c4; }
+    .term-editor { flex: 1; background: #070710; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #e0e0f0; overflow-y: auto; white-space: pre; }
+    .term-output { height: 120px; background: #05050A; border-top: 1px solid #232336; padding: 12px 20px; font-family: monospace; font-size: 12px; overflow-y: auto; }
+    .tc-kw { color: #89b4fa; font-weight: 600; }
+    .tc-fn { color: #cba6f7; }
+    .tc-str { color: #a6e3a1; }
+    .tc-num { color: #fab387; }
+    .tc-out-info { color: #7a7d99; font-style: italic; }
   </style>
 </head>
-<body class="antialiased overflow-x-hidden">
+<body class="bg-t_bg text-t_text antialiased overflow-x-hidden">
+
+  <canvas id="ternary-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-20"></canvas>
 
   <!-- Navigation -->
   <nav class="fixed top-0 left-0 right-0 z-50 border-b border-t_border bg-t_bg/80 backdrop-blur-xl h-20">
     <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
       <div class="flex items-center gap-12">
         <a href="#" onclick="showPage(0)" class="text-2xl font-black tracking-tighter hover:text-t_blue transition-colors">TERNARY</a>
-        <div class="hidden lg:flex items-center gap-6">
+        <div class="hidden lg:flex items-center gap-8">
           <div class="relative group py-2">
-            <button class="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-widest flex items-center gap-1">
-              Products <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <button class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest flex items-center gap-1">
+              PRODUCTS <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
             <div class="absolute top-full left-0 w-56 bg-t_bg2 border border-t_border rounded-xl p-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all shadow-2xl">
-              <a href="#" onclick="showPage(1)" class="block p-3 hover:bg-t_bg3 rounded-lg">
-                <div class="text-sm font-bold text-white">Albert-Agent</div>
-                <div class="text-[10px] text-slate-500 uppercase">Sovereign Node</div>
-              </a>
-              <a href="#" onclick="showPage(2)" class="block p-3 hover:bg-t_bg3 rounded-lg">
-                <div class="text-sm font-bold text-white">Translator</div>
-                <div class="text-[10px] text-slate-500 uppercase">Binary Migration</div>
-              </a>
-              <a href="#" onclick="showPage(3)" class="block p-3 hover:bg-t_bg3 rounded-lg">
-                <div class="text-sm font-bold text-white">Decision Auditor</div>
-                <div class="text-[10px] text-slate-500 uppercase">Explainable Traces</div>
-              </a>
+              <a href="#" onclick="showPage(1)" class="block p-3 hover:bg-t_bg3 rounded-lg"><div class="text-sm font-bold text-white uppercase">Albert Node</div></a>
+              <a href="#" onclick="showPage(2)" class="block p-3 hover:bg-t_bg3 rounded-lg"><div class="text-sm font-bold text-white uppercase">Translator</div></a>
+              <a href="#" onclick="showPage(3)" class="block p-3 hover:bg-t_bg3 rounded-lg"><div class="text-sm font-bold text-white uppercase">Auditor</div></a>
             </div>
           </div>
-          <a href="#" onclick="showPage(0); setTimeout(()=>document.getElementById('quickstart').scrollIntoView({behavior:'smooth'}),100)" class="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-widest">Quickstart</a>
-          <a href="#" onclick="showPage(4)" class="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-widest">Pricing</a>
-          <a href="#" onclick="showPage(5)" class="text-sm font-bold text-slate-300 hover:text-white uppercase tracking-widest">Benchmarks</a>
+          <a href="#" onclick="showPage(0); setTimeout(()=>document.getElementById('quickstart').scrollIntoView({behavior:'smooth'}),100)" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Quickstart</a>
+          <a href="#" onclick="showPage(4)" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Pricing</a>
+          <a href="#" onclick="showPage(5)" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Benchmarks</a>
         </div>
       </div>
-      <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" class="px-6 py-2.5 bg-t_blue text-white rounded-full text-sm font-black shadow-lg shadow-t_blue/20">GITHUB</a>
+      <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" class="px-6 py-2 bg-t_bg3 border border-t_border text-white text-[10px] font-black tracking-widest hover:bg-t_bg2 transition-all">GITHUB REPO</a>
     </div>
   </nav>
 
   <div id="page-slider">
     
-    <!-- PAGE 0: HOME -->
+    <!-- PAGE 0: HOME (Restored High-Mass Landing) -->
     <div class="slide-page">
-      <header class="py-32 px-6 text-center">
-        <h1 class="text-7xl md:text-9xl font-black text-white mb-8 tracking-tighter leading-none">
-          THE WORLD ISN'T<br/><span class="text-t_blue">BINARY.</span>
-        </h1>
-        <p class="text-2xl text-slate-400 max-w-3xl mx-auto mb-12">Yes, No, and <span class="text-white font-bold italic">Not Yet</span>. Ternlang gives AI the formal right to deliberate before committing.</p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <button onclick="showPage(1)" class="px-10 py-4 bg-white text-black font-black rounded-full hover:bg-t_blue hover:text-white transition-all">MEET ALBERT</button>
-          <button onclick="showPage(4)" class="px-10 py-4 border border-white/20 text-white font-black rounded-full hover:bg-white/5 transition-all">GET API KEY</button>
+      <header class="relative pt-32 pb-20 px-6 text-center overflow-hidden">
+        <div class="max-w-5xl mx-auto reveal active">
+          <p class="font-mono text-xs text-t_teal tracking-[0.3em] uppercase mb-6">RFI-IRFOS &middot; Ternary Intelligence Stack</p>
+          <h1 class="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.9]">
+            The world isn't <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-t_teal to-t_blue">binary.</span>
+          </h1>
+          <p class="text-2xl md:text-3xl text-t_muted font-light mb-12 max-w-2xl mx-auto">
+            Yes, No, and <em class="text-white not-italic font-semibold underline decoration-t_teal underline-offset-8">not yet</em>. Ternlang gives AI the formal right to deliberate before committing.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+            <button onclick="showPage(1)" class="px-10 py-4 bg-t_teal text-black font-black rounded hover:bg-white transition-all shadow-[0_0_20px_rgba(0,212,170,0.3)]">MEET ALBERT</button>
+            <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" target="_blank" class="px-10 py-4 border border-t_border text-white font-black hover:border-t_teal transition-all">READ SOURCE</a>
+          </div>
         </div>
       </header>
 
-      <section id="quickstart" class="py-24 bg-t_bg2 border-y border-t_border">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-          <h2 class="text-4xl font-black mb-8">⚡ DEPLOY STACK IN 60S</h2>
-          <div class="bg-t_bg p-6 rounded-2xl border border-t_blue/30 mb-8 font-mono text-t_blue">
-            curl -fsSL https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/scripts/install.sh | bash
+      <!-- RESTORED: Plain English Section -->
+      <section id="why" class="py-24 px-6 bg-t_bg border-y border-t_border">
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center mb-16 reveal">
+            <h2 class="text-4xl font-light text-white mb-6 uppercase tracking-tight">You already think <strong class="font-black text-t_teal">in three states.</strong></h2>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/QUICKSTART.md" class="p-6 bg-t_bg3 rounded-2xl border border-t_border hover:border-t_teal transition-all">
-              <div class="text-t_teal font-bold mb-1">Manual</div>
-              <div class="text-xs text-slate-500 uppercase">Step-by-step</div>
-            </a>
-            <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/examples" class="p-6 bg-t_bg3 rounded-2xl border border-t_border hover:border-t_blue transition-all">
-              <div class="text-t_blue font-bold mb-1">Examples</div>
-              <div class="text-xs text-slate-500 uppercase">300+ Programs</div>
-            </a>
-            <a href="#" onclick="showPage(4)" class="p-6 bg-t_bg3 rounded-2xl border border-t_border hover:border-t_red transition-all">
-              <div class="text-t_red font-bold mb-1">Scale</div>
-              <div class="text-xs text-slate-500 uppercase">Enterprise Node</div>
-            </a>
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-card rounded-xl p-8"><h3 class="text-lg font-bold text-white mb-4 uppercase text-t_blue">Engineering</h3><p class="text-t_muted text-sm leading-relaxed">A traffic light with only two states causes accidents. Red and green are not sufficient. Yellow encodes a third meaning: the intersection state is changing.</p></div>
+            <div class="glass-card rounded-xl p-8"><h3 class="text-lg font-bold text-white mb-4 uppercase text-t_teal">Medicine</h3><p class="text-t_muted text-sm leading-relaxed">Clinical hold is not a refusal. It is a protocol state. Trit = 0 gives the machine a formal right to request more evidence before committing.</p></div>
+            <div class="glass-card rounded-xl p-8"><h3 class="text-lg font-bold text-white mb-4 uppercase text-t_red">Law</h3><p class="text-t_muted text-sm leading-relaxed">"Insufficient evidence" is a verdict, not an abstention. A court that dismisses for lack of evidence has made a precise determination.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESTORED: Interactive Deliberation Engine -->
+      <section class="py-24 px-6 bg-t_bg2 border-b border-t_border">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-12 reveal">
+            <h2 class="text-4xl font-black text-white mb-6 uppercase">Watch evidence <span class="text-t_teal">resolve.</span></h2>
+            <p class="text-t_muted max-w-2xl">The deliberation engine runs EMA convergence — round by round — until the evidence is strong enough to commit.</p>
+          </div>
+          <div class="glass-card rounded-3xl p-10 shadow-2xl overflow-hidden">
+            <div class="mb-8 flex gap-3" id="scenario-btns">
+              <button class="scenario-pill active" data-s="0">DEPLOY TONIGHT?</button>
+              <button class="scenario-pill" data-s="1">APPROVE LOAN?</button>
+              <button class="scenario-pill" data-s="2">ROLLBACK?</button>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12">
+              <div class="space-y-8">
+                <div><div id="evidence-pills" class="flex flex-wrap gap-2 mb-4"></div><p class="text-[10px] font-mono text-t_muted">S_r = α·e_r + (1−α)·S_r-1</p></div>
+                <button id="deliberate-btn" class="w-full py-4 bg-t_teal/10 hover:bg-t_teal/20 border border-t_teal/50 text-t_teal font-black rounded-xl transition-all">▶ DELIBERATE</button>
+                <div class="flex items-center gap-6 p-6 bg-t_bg3 rounded-2xl border border-t_border">
+                  <div id="verdict-ring" class="w-20 h-20 rounded-full border-2 border-t_border flex items-center justify-center relative"><div id="verdict-state" class="text-3xl font-black text-t_muted">?</div></div>
+                  <div><span class="text-[10px] text-t_muted uppercase block">VM Verdict</span><strong id="verdict-label" class="text-white uppercase">Awaiting Data</strong></div>
+                </div>
+              </div>
+              <div class="bg-[#070710] rounded-2xl border border-t_border p-6 font-mono text-xs overflow-y-auto h-[300px]" id="round-feed">
+                <div class="text-t_muted/40">Select scenario and begin deliberation.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESTORED: Three-Layer Memory Section -->
+      <section class="py-24 px-6 bg-t_bg border-b border-t_border">
+        <div class="max-w-7xl mx-auto text-center mb-16 reveal">
+          <h2 class="text-4xl font-black text-white mb-6 uppercase">AI Memory like a <span class="text-t_blue">Human Mind.</span></h2>
+          <p class="text-t_muted max-w-2xl mx-auto leading-relaxed">Three layers modelled on biological consolidation — with ternary confidence scores and conflict resolution on every promotion.</p>
+        </div>
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+          <div class="glass-card p-8 rounded-2xl glow-reject">
+            <h3 class="text-t_red font-black text-xs mb-4 uppercase tracking-widest">Working</h3>
+            <p class="text-sm text-slate-400">Hot context. Current turn. Affirm (+1) entries promote to session on consolidate.</p>
+          </div>
+          <div class="glass-card p-8 rounded-2xl glow-tend border-t_teal">
+            <h3 class="text-t_teal font-black text-xs mb-4 uppercase tracking-widest">Session</h3>
+            <p class="text-sm text-slate-400">Flow patterns. Ternary-compressed on write. Strips tend-noise, preserves signal.</p>
+          </div>
+          <div class="glass-card p-8 rounded-2xl glow-affirm border-t_blue">
+            <h3 class="text-t_blue font-black text-xs mb-4 uppercase tracking-widest">Core</h3>
+            <h3 class="text-white font-bold text-lg mb-2">Identity Anchors</h3>
+            <p class="text-sm text-slate-400">Vetoes and personality anchors. Resolved by full 13-expert MoE orchestrator.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESTORED: Terminal Mockup -->
+      <section class="py-24 px-6 bg-t_bg2">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-12"><h2 class="text-4xl font-black text-white mb-4 uppercase">See TERNLANG <span class="text-t_teal">THINK.</span></h2></div>
+          <div class="term-window">
+            <div class="term-titlebar"><span class="term-dot bg-t_red"></span><span class="term-dot bg-yellow-500"></span><span class="term-dot bg-t_teal"></span><span class="ml-4 text-xs font-mono text-slate-500 uppercase tracking-widest">BET VM Console</span><button class="ml-auto bg-t_teal text-black text-[10px] font-black px-4 py-1 rounded" id="term-run-btn">RUN</button></div>
+            <div class="term-body">
+              <div class="term-sidebar">
+                <div class="term-file active" data-prog="0">classify.tern</div>
+                <div class="term-file" data-prog="1">pipeline.tern</div>
+                <div class="term-file" data-prog="2">sparse_nn.tern</div>
+              </div>
+              <div class="term-editor" id="term-editor"></div>
+            </div>
+            <div class="term-output" id="term-output">// Select program and press RUN</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quickstart" class="py-24 bg-t_bg border-t border-t_border">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+          <h2 class="text-4xl font-black mb-8 uppercase">Deploy in 60s</h2>
+          <div class="bg-t_bg2 p-8 rounded-3xl border border-t_blue/30 mb-8 font-mono text-t_blue text-lg break-all">
+            curl -fsSL https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/scripts/install.sh | bash
           </div>
         </div>
       </section>
     </div>
 
-    <!-- PAGE 1: ALBERT -->
-    <div class="slide-page bg-[#020617]">
+    <!-- PAGE 1: ALBERT (Implementation Deep-Dive) -->
+    <div class="slide-page bg-t_bg2">
       <div class="max-w-6xl mx-auto px-6 py-20">
-        <div class="text-center mb-20">
-          <h2 class="text-6xl font-black mb-6 uppercase">Project <span class="text-t_blue">Albert.</span></h2>
-          <p class="text-xl text-slate-400">The offline-first ternary agent. Alignment solved at the compiler level.</p>
+        <div class="text-center mb-24 reveal active">
+          <p class="font-mono text-t_blue text-xs tracking-widest uppercase mb-4">Core Implementation</p>
+          <h2 class="text-7xl font-black text-white mb-8 leading-none uppercase">Project <span class="text-t_blue">Albert.</span></h2>
+          <p class="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">The offline-first ternary agent. Albert doesn't hallucinate certainty; it enforces the algorithmic right to hold at State 0.</p>
         </div>
-        <div class="grid md:grid-cols-2 gap-12">
-          <div class="p-10 bg-t_bg2 border border-t_border rounded-[3rem] shadow-2xl font-mono">
-            <div class="text-t_blue mb-4">albert-cli v0.9.1</div>
-            <div class="text-slate-500">> Analyze power grid...</div>
-            <div class="bg-t_blue/10 p-6 rounded-2xl border border-t_blue/30 text-white mt-4">
-              [TRIT 0] EQUILIBRIUM.<br/>
-              Conflict detected. Holding execution.
+        <div class="grid lg:grid-cols-2 gap-16 items-start">
+          <div class="glass-card p-10 rounded-[3rem] shadow-2xl border-white/5 relative">
+            <div class="flex items-center gap-2 mb-8 text-xs font-mono text-slate-500 border-b border-white/10 pb-4 uppercase">
+              <span class="text-t_blue font-bold">albert-agent</span> / <span class="text-white">harness.rs</span>
+            </div>
+            <div class="font-mono space-y-6 text-sm">
+              <div class="text-slate-500">> user: should i invest in the new protocol?</div>
+              <div class="p-6 bg-t_blue/5 border border-t_blue/30 rounded-2xl">
+                <span class="text-t_blue font-bold block mb-2">[TRIT 0] LOGICAL EQUILIBRIUM.</span>
+                Potential yield vector (+0.82) offset by liquidity risk (-0.79). 
+                System entering <span class="text-white font-bold italic">introspective hold</span>. 
+                Supply depth-of-market audit to resolve.
+              </div>
+              <div class="text-slate-500">> awaiting parameter update...</div>
             </div>
           </div>
-          <div class="space-y-6">
-            <div class="p-8 bg-t_bg3 rounded-3xl border border-white/5">
-              <h4 class="text-t_teal font-black mb-2">NATIVE VETO</h4>
-              <p class="text-slate-400">Any of the 13 experts can signal -1 to abort immediately.</p>
+          <div class="space-y-12">
+            <div class="reveal active">
+              <h4 class="text-white font-black text-xl mb-4 uppercase tracking-tight flex items-center gap-3"><span class="w-8 h-8 rounded bg-t_teal/10 border border-t_teal/30 flex items-center justify-center font-mono text-xs text-t_teal">⊘</span> Veto Protection</h4>
+              <p class="text-slate-400 leading-relaxed">Any dimension marked <span class="text-t_red font-mono">hard</span> triggers an immediate VM-level abort. Safety isn't an aggregate score; it's a constraint that propagates through the entire call stack.</p>
             </div>
-            <div class="p-8 bg-t_bg3 rounded-3xl border border-white/5">
-              <h4 class="text-t_blue font-black mb-2">OFFLINE FIRST</h4>
-              <p class="text-slate-400">No cloud dependencies. Sovereignty by design.</p>
+            <div class="reveal active" style="transition-delay: 100ms;">
+              <h4 class="text-white font-black text-xl mb-4 uppercase tracking-tight flex items-center gap-3"><span class="w-8 h-8 rounded bg-t_blue/10 border border-t_blue/30 flex items-center justify-center font-mono text-xs text-t_blue">★</span> Dual-Key Routing</h4>
+              <p class="text-slate-400 leading-relaxed">MoE-13 orchestration routes queries to the pair of experts that maximize both local relevance and global synergy. 1+1=3.</p>
             </div>
+            <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert-agent" target="_blank" class="inline-flex items-center gap-4 px-10 py-5 bg-white text-black font-black rounded-full hover:bg-t_blue hover:text-white transition-all transform hover:scale-105 uppercase tracking-widest text-sm shadow-2xl">Explore Repository →</a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE 2: TRANSLATOR -->
+    <!-- PAGE 2: TRANSLATOR (Full Restoration) -->
     <div class="slide-page bg-t_bg">
       <div class="max-w-6xl mx-auto px-6 py-20">
-        <h2 class="text-6xl font-black text-center mb-12">BINARY <span class="text-t_teal">PORT.</span></h2>
-        <div class="glass-card rounded-[3rem] border border-t_border overflow-hidden min-h-[600px] flex flex-col">
-          <div class="p-6 bg-t_bg2 border-b border-t_border flex gap-4">
-            <select id="trans-lang" class="bg-t_bg border border-t_border text-t_teal p-2 rounded">
-              <option>Python</option><option>Rust</option>
+        <div class="text-center mb-16">
+          <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Onboarding Utility</p>
+          <h2 class="text-7xl font-black text-white mb-8 uppercase leading-none">Binary <span class="text-t_teal">Port.</span></h2>
+          <p class="text-xl text-slate-400">Migrate your legacy binary logic to balanced ternary instantly.</p>
+        </div>
+        <div class="glass-card rounded-[3rem] border border-t_border overflow-hidden shadow-3xl min-h-[600px] flex flex-col">
+          <div class="p-8 bg-t_bg2 border-b border-t_border flex items-center gap-6">
+            <select id="trans-lang" class="bg-t_bg border border-t_border text-t_teal font-mono text-xs px-6 py-2 rounded-full focus:outline-none uppercase">
+              <option value="python">Python</option><option value="rust">Rust</option><option value="java">Java</option>
             </select>
-            <button onclick="translate()" class="ml-auto bg-t_teal text-black font-bold px-8 py-2 rounded-full">TRANSLATE</button>
+            <button id="trans-run-btn" class="ml-auto px-10 py-2 bg-t_teal text-black font-black rounded-full hover:bg-white transition-all uppercase text-xs tracking-widest">Translate to .tern</button>
           </div>
-          <div class="flex-grow grid md:grid-cols-2">
-            <textarea id="trans-input" class="bg-t_bg p-8 text-slate-300 outline-none border-r border-t_border" placeholder="Paste binary code..."></textarea>
-            <div id="trans-output" class="p-8 text-t_teal font-mono"></div>
+          <div class="flex-grow grid lg:grid-cols-2">
+            <div class="flex flex-col border-r border-t_border">
+              <div class="bg-t_bg3 px-8 py-3 text-[10px] font-black text-slate-500 uppercase tracking-widest">Source Input</div>
+              <textarea id="trans-input" class="flex-grow bg-t_bg p-10 font-mono text-sm text-slate-300 outline-none resize-none" placeholder="Paste your logic here..."></textarea>
+            </div>
+            <div class="flex flex-col bg-[#070710]">
+              <div class="bg-t_bg3 px-8 py-3 text-[10px] font-black text-t_teal uppercase tracking-widest">Ternlang Output</div>
+              <div id="trans-output" class="flex-grow p-10 font-mono text-sm text-t_teal whitespace-pre leading-relaxed"></div>
+            </div>
+          </div>
+          <div class="p-8 bg-t_bg3 border-t border-t_border">
+            <h4 class="text-white font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-3"><span class="text-t_blue">ℹ</span> Triadic Logic Insight</h4>
+            <div id="trans-insight" class="grid sm:grid-cols-2 gap-4 text-[11px] text-slate-400 leading-relaxed uppercase">
+              <div class="p-4 bg-t_bg border border-t_border rounded-xl">Awaiting binary input...</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE 3: AUDITOR -->
+    <!-- PAGE 3: AUDITOR (Forensic View) -->
     <div class="slide-page bg-black">
       <div class="max-w-5xl mx-auto px-6 py-20 text-center">
-        <h2 class="text-6xl font-black mb-12 uppercase">Tern<span class="text-t_red">Audit.</span></h2>
-        <div class="p-12 bg-t_bg2 border border-t_border rounded-[3rem] text-left">
-          <div class="grid md:grid-cols-3 gap-8 mb-12">
-            <div><h4 class="font-bold mb-2">Evidence Graph</h4><p class="text-sm text-slate-500">Conflict visualization.</p></div>
-            <div><h4 class="font-bold mb-2">Veto Trace</h4><p class="text-sm text-slate-500">Identify -1 sources.</p></div>
-            <div><h4 class="font-bold mb-2">Resolution</h4><p class="text-sm text-slate-500">Formal path guidance.</p></div>
+        <p class="font-mono text-t_red text-xs tracking-widest uppercase mb-4">Governance & Observability</p>
+        <h2 class="text-7xl font-black text-white mb-12 uppercase leading-none">Tern<span class="text-t_red">Audit.</span></h2>
+        <p class="text-xl text-slate-400 mb-20 max-w-2xl mx-auto">The "Black Box" for triadic decisions. Understand why your agent held, committed, or vetoed with forensic precision.</p>
+        <div class="glass-card rounded-[3.5rem] p-16 text-left shadow-[0_0_100px_rgba(255,77,77,0.05)] border-t_red/10 relative">
+          <div class="grid md:grid-cols-3 gap-12 mb-16">
+            <div><h4 class="text-white font-black text-sm uppercase mb-4 tracking-widest">Evidence Graph</h4><p class="text-xs text-slate-500 leading-relaxed">Visualize the conflict between expert vectors in real-time. Trace confidence drift.</p></div>
+            <div><h4 class="text-white font-black text-sm uppercase mb-4 tracking-widest">Veto Trace</h4><p class="text-xs text-slate-500 leading-relaxed">Identify which specific expert triggered the -1 state and why. No silent overrides.</p></div>
+            <div><h4 class="text-white font-black text-sm uppercase mb-4 tracking-widest">Resolution Path</h4><p class="text-xs text-slate-500 leading-relaxed">Receive formal guidance on what evidence is needed to break a State 0 equilibrium.</p></div>
           </div>
-          <div class="bg-black p-8 rounded-2xl border border-t_red/20 font-mono text-t_red">
-            $ tern-audit --analyze trace_884.json<br/>
-            VERDICT: -1 (BLOCK) | Reason: Hard Safety Veto override.
+          <div class="bg-black rounded-3xl p-10 border border-t_red/20 font-mono text-sm relative group overflow-hidden">
+            <div class="text-t_red font-bold mb-4">$ tern-audit --analyze trace_884.json</div>
+            <div class="space-y-2 text-slate-400">
+              <div class="flex gap-4"><span>↳ Expert[Safety]:</span> <span class="text-t_red font-bold">-1 (0.98 conf)</span></div>
+              <div class="flex gap-4"><span>↳ Expert[Logic]:</span> <span class="text-t_teal font-bold">+1 (0.82 conf)</span></div>
+              <div class="mt-6 p-4 bg-t_red/10 border-l-4 border-t_red text-white font-black uppercase tracking-widest">Verdict: -1 (REJECT) | Reason: Hard Safety Veto override.</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE 4: PRICING -->
+    <!-- PAGE 4: PRICING (Fully Restored Tiers) -->
     <div class="slide-page bg-t_bg2">
       <div class="max-w-7xl mx-auto px-6 py-20">
-        <div class="text-center mb-16">
-          <h2 class="text-6xl font-black mb-6">OPEN CORE. <span class="text-t_teal">PROTECTED EDGE.</span></h2>
-          <p class="text-slate-400">Syntax is free. High-performance inference funds research.</p>
+        <div class="text-center mb-24">
+          <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Deployment Model</p>
+          <h2 class="text-7xl font-black text-white mb-8 uppercase leading-none">Open Core. <span class="text-t_teal">Protected Edge.</span></h2>
+          <p class="text-xl text-slate-400 max-w-3xl mx-auto">The syntax is public infrastructure. The high-performance inference engine funds RFI-IRFOS operations and community grants.</p>
         </div>
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="p-10 bg-t_bg3 rounded-[2.5rem] border border-t_border flex flex-col">
-            <h3 class="text-xl font-bold mb-4">OPEN CORE</h3>
-            <div class="text-4xl font-black mb-8">FREE</div>
-            <ul class="text-sm text-slate-500 space-y-3 mb-10 flex-grow">
-              <li>✓ Compiler + VM</li>
-              <li>✓ CLI + LSP</li>
-              <li>✓ Package Manager</li>
+        <div class="grid md:grid-cols-3 gap-8 items-stretch">
+          <div class="bg-t_bg3 p-12 rounded-[3rem] border border-t_border flex flex-col hover:border-white/20 transition-all">
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-8 border border-white/10 self-start px-4 py-1 rounded-full">Tier 1</div>
+            <h3 class="text-3xl font-black text-white mb-2 uppercase">Open Core</h3>
+            <p class="text-t_teal text-xs font-mono mb-8">LGPL-3.0-or-later</p>
+            <div class="text-4xl font-black text-white mb-12 uppercase tracking-tighter italic">Free</div>
+            <ul class="space-y-4 mb-12 flex-grow text-sm text-slate-400 font-medium">
+              <li class="flex items-center gap-3">✓ ternlang-core (compiler + VM)</li>
+              <li class="flex items-center gap-3">✓ ternlang-cli & LSP</li>
+              <li class="flex items-center gap-3">✓ ternpkg manager</li>
+              <li class="flex items-center gap-3">✓ 300+ open .tern examples</li>
             </ul>
-            <button class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl font-bold">GITHUB</button>
+            <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" class="block w-full text-center py-5 bg-white/5 border border-white/10 rounded-2xl text-white font-black hover:bg-white/10 transition-all uppercase tracking-widest text-xs">Explore Source</a>
           </div>
-          <div class="p-10 bg-t_bg rounded-[2.5rem] border-2 border-t_blue flex flex-col scale-105 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-t_blue">COMMERCIAL</h3>
-            <div class="text-4xl font-black mb-8">€24.99</div>
-            <ul class="text-sm text-slate-300 space-y-3 mb-10 flex-grow">
-              <li>★ 20 MCP Tools</li>
-              <li>★ 3-Layer Memory</li>
-              <li>★ Context Compression</li>
-              <li>★ Full MoE-13 Stack</li>
+          <div class="bg-t_bg p-12 rounded-[3rem] border-2 border-t_blue relative flex flex-col scale-105 shadow-[0_0_100px_rgba(74,144,226,0.1)] h-full">
+            <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-t_blue text-white text-[10px] font-black px-6 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-xl">Commercial Window</div>
+            <h3 class="text-3xl font-black text-white mb-2 uppercase">Restricted API</h3>
+            <p class="text-t_blue text-xs font-mono mb-8">BSL 1.1 (Converts 2030)</p>
+            <div class="text-4xl font-black text-white mb-12 uppercase tracking-tighter italic">€24.99<span class="text-slate-500 text-sm font-normal">/MO</span></div>
+            <ul class="space-y-4 mb-12 flex-grow text-sm text-slate-200 font-medium leading-relaxed">
+              <li class="flex items-center gap-3 font-bold">★ 20 MCP tools (full stack)</li>
+              <li class="flex items-center gap-3">✓ Server-side 3-layer memory</li>
+              <li class="flex items-center gap-3">✓ MoE-13 consolidation</li>
+              <li class="flex items-center gap-3">✓ Ternary context compression</li>
+              <li class="flex items-center gap-3">✓ 10,000 high-mass API calls</li>
             </ul>
-            <a href="https://buy.stripe.com/00w5kFgpigajfyB37a7N604" class="w-full py-4 bg-t_blue text-white rounded-2xl font-bold text-center">SUBSCRIBE</a>
+            <a href="https://buy.stripe.com/00w5kFgpigajfyB37a7N604" class="block w-full text-center py-5 bg-t_blue text-white font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-t_blue/20 uppercase tracking-widest text-xs">Subscribe Now</a>
           </div>
-          <div class="p-10 bg-black rounded-[2.5rem] border border-t_border flex flex-col">
-            <h3 class="text-xl font-bold mb-4">ENTERPRISE</h3>
-            <div class="text-4xl font-black mb-8">QUOTE</div>
-            <ul class="text-sm text-slate-500 space-y-3 mb-10 flex-grow">
-              <li>~ Custom FPGA</li>
-              <li>~ High-throughput SLA</li>
-              <li>~ Cluster Nodes</li>
+          <div class="bg-black p-12 rounded-[3rem] border border-t_border flex flex-col hover:border-white/20 transition-all">
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-8 border border-white/10 self-start px-4 py-1 rounded-full">Tier 3</div>
+            <h3 class="text-3xl font-black text-white mb-2 uppercase tracking-tight leading-none">Enterprise</h3>
+            <p class="text-t_red text-xs font-mono mb-8 italic">Proprietary Node Cluster</p>
+            <div class="text-4xl font-black text-white mb-12 uppercase tracking-tighter italic">Quote</div>
+            <ul class="space-y-4 mb-12 flex-grow text-sm text-slate-400 font-medium">
+              <li class="flex items-center gap-3">~ Custom FPGA implementations</li>
+              <li class="flex items-center gap-3">~ High-throughput dedicated SLA</li>
+              <li class="flex items-center gap-3">~ On-premise agent clusters</li>
             </ul>
-            <button class="w-full py-4 border border-white/10 rounded-2xl font-bold">CONTACT</button>
+            <a href="mailto:rfi.irfos@gmail.com" class="block w-full text-center py-5 border border-white/10 rounded-2xl text-white font-black hover:bg-white/5 transition-all uppercase tracking-widest text-xs">Contact Sales</a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE 5: BENCHMARKS -->
+    <!-- PAGE 5: BENCHMARKS (Hardware & Compression Tables) -->
     <div class="slide-page bg-black">
-      <div class="max-w-5xl mx-auto px-6 py-20 text-center">
-        <h2 class="text-6xl font-black mb-12 uppercase">SPARSE <span class="text-t_blue">SPEED.</span></h2>
-        <div class="bg-t_bg3 p-12 rounded-[3rem] border border-t_border text-left">
-          <div class="space-y-10">
-            <div class="space-y-2">
-              <div class="flex justify-between text-xs font-mono text-slate-500 uppercase"><span>Sparsity 0.50</span><span>2.4x Speedup</span></div>
-              <div class="h-2 w-full bg-black rounded-full overflow-hidden"><div class="h-full bg-t_blue" style="width: 65%"></div></div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-xs font-mono text-slate-500 uppercase"><span>Sparsity 0.85</span><span>12.8x Speedup</span></div>
-              <div class="h-2 w-full bg-black rounded-full overflow-hidden"><div class="h-full bg-t_blue" style="width: 85%"></div></div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-xs font-mono text-slate-500 uppercase"><span>Sparsity 0.99</span><span>122.3x Speedup</span></div>
-              <div class="h-2 w-full bg-black rounded-full overflow-hidden"><div class="h-full bg-t_blue shadow-[0_0_10px_#4A90E2]" style="width: 100%"></div></div>
+      <div class="max-w-6xl mx-auto px-6 py-20">
+        <div class="text-center mb-24">
+          <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Hardware Alignment</p>
+          <h2 class="text-7xl font-black text-white mb-8 uppercase leading-none italic">Sparsity <span class="text-t_teal">Yield.</span></h2>
+          <p class="text-xl text-slate-400 max-w-3xl mx-auto">Balanced ternary hardware achieves native sparsity. When a trit is 0, the BET VM bypasses arithmetic cycles entirely.</p>
+        </div>
+
+        <!-- Hardware Matrix -->
+        <div class="glass-card rounded-[3.5rem] overflow-hidden shadow-2xl mb-20">
+          <div class="p-8 bg-t_bg2 border-b border-white/5 flex items-center justify-between">
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Inference Throughput (TSPARSE_MATMUL)</span>
+            <div class="flex gap-6">
+              <div class="flex items-center gap-2"><div class="w-2 h-2 bg-t_teal rounded-full shadow-[0_0_10px_#00f5c4]"></div><span class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Ternary Yield</span></div>
+              <div class="flex items-center gap-2"><div class="w-2 h-2 bg-slate-700 rounded-full"></div><span class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Binary Dense</span></div>
             </div>
           </div>
+          <div class="p-12 overflow-x-auto">
+            <table class="w-full text-left font-mono text-sm">
+              <thead class="text-slate-500 uppercase text-[10px] tracking-widest">
+                <tr class="border-b border-white/5"><th class="pb-6">Matrix Sparsity</th><th class="pb-6 text-center">32²</th><th class="pb-6 text-center">128²</th><th class="pb-6 text-center">512²</th><th class="pb-6 text-center">Speedup</th></tr>
+              </thead>
+              <tbody class="divide-y divide-white/5 text-slate-300">
+                <tr class="hover:bg-white/5 transition-colors"><td class="py-6">0.25 density</td><td class="py-6 text-center">6.3x</td><td class="py-6 text-center">26.4x</td><td class="py-6 text-center">53.1x</td><td class="py-6 text-center text-t_teal">Moderate</td></tr>
+                <tr class="bg-t_teal/5 border-l-4 border-l-t_teal"><td class="py-6 pl-4 font-bold text-white">0.50 density ★</td><td class="py-6 text-center">6.0x</td><td class="py-6 text-center italic text-t_teal font-bold">28.0x</td><td class="py-6 text-center font-bold text-t_teal">86.0x</td><td class="py-6 text-center font-black text-t_teal uppercase tracking-widest">Goldilocks</td></tr>
+                <tr class="hover:bg-white/5 transition-colors"><td class="py-6">0.99 density</td><td class="py-6 text-center">1.8x</td><td class="py-6 text-center">13.1x</td><td class="py-6 text-center">122.3x</td><td class="py-6 text-center text-white font-black">Absolute</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Memory Compression Table -->
+        <div class="text-center mb-16"><h3 class="text-3xl font-black text-white uppercase italic">Context <span class="text-t_teal">Pruning.</span></h3></div>
+        <div class="overflow-x-auto rounded-[2rem] border border-t_border shadow-2xl">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-t_bg3 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <tr><th class="p-8">Content Type</th><th class="p-8 text-center">Original</th><th class="p-8 text-center">Compressed</th><th class="p-8 text-center">Ratio</th><th class="p-8 text-center">Yield</th></tr>
+            </thead>
+            <tbody class="divide-y divide-white/5 text-slate-300">
+              <tr class="hover:bg-white/5 transition-colors"><td class="p-8 font-medium">Session Memory Entries ★</td><td class="p-8 text-center">4,200 B</td><td class="p-8 text-center text-t_teal font-bold tracking-widest">1,470 B</td><td class="p-8 text-center italic">0.35x</td><td class="p-8 text-center text-t_teal font-black uppercase">65% Saved</td></tr>
+              <tr class="hover:bg-white/5 transition-colors"><td class="p-8 font-medium">Technical Documentation</td><td class="p-8 text-center">3,800 B</td><td class="p-8 text-center text-white font-bold tracking-widest">3,040 B</td><td class="p-8 text-center italic">0.80x</td><td class="p-8 text-center">20% Saved</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
   </div>
 
+  <!-- Footer (Restored Clean View) -->
+  <footer class="relative z-10 bg-black py-20 px-6 border-t border-t_border text-center">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-wrap justify-center gap-12 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-12">
+        <a href="#" onclick="showPage(0)" class="hover:text-t_blue transition-all">Home</a>
+        <a href="#" onclick="showPage(4)" class="hover:text-t_blue transition-all">Pricing</a>
+        <a href="#" onclick="showPage(5)" class="hover:text-t_blue transition-all">Benchmarks</a>
+        <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack" class="hover:text-white transition-all">Source</a>
+      </div>
+      <p class="text-slate-600 text-[10px] font-black tracking-widest uppercase">
+        &copy; 2026 RFI-IRFOS &middot; GRAZ, AT &middot; SOVEREIGN INTELLIGENCE STACK
+      </p>
+    </div>
+  </footer>
+
+  <!-- Logic Scripts (Restored) -->
   <script>
+    const transInput = document.getElementById('trans-input');
+    const transOutput = document.getElementById('trans-output');
+    const transInsight = document.getElementById('trans-insight');
+    const transBtn = document.getElementById('trans-run-btn');
+
+    const TERN_RULES = [
+      { regex: /bool/g, repl: 'trit', note: 'BINARY BOOL -> TRIADIC TRIT' },
+      { regex: /true/g, repl: 'affirm', note: 'TRUE -> +1 (AFFIRM)' },
+      { regex: /false/g, repl: 'reject', note: 'FALSE -> -1 (REJECT)' },
+      { regex: /null|undefined/g, repl: 'tend', note: 'EMPTY -> 0 (TEND)' },
+      { regex: /if\s*\((.*)\)\s*\{/g, repl: 'match $1 {', note: 'IF -> EXHAUSTIVE MATCH' }
+    ];
+
+    function translate() {
+      let code = transInput.value;
+      if (!code.trim()) return;
+      transBtn.textContent = '...';
+      const insights = new Set();
+      let translated = code;
+      TERN_RULES.forEach(rule => { if (rule.regex.test(translated)) { translated = translated.replace(rule.regex, rule.repl); insights.add(rule.note); } });
+      setTimeout(() => {
+        transOutput.textContent = translated;
+        transInsight.innerHTML = Array.from(insights).map(note => `<div class="p-4 bg-t_bg border border-t_border rounded-xl">✓ ${note}</div>`).join('') || '<div class="p-4 bg-t_bg border border-t_border rounded-xl tracking-widest">PURE TRIADIC LOGIC</div>';
+        transBtn.textContent = 'TRANSLATE TO .TERN';
+      }, 400);
+    }
+
     function showPage(index) {
       document.getElementById('page-slider').style.transform = `translateX(-${index * 100}vw)`;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    // Simple stub for UI
-    function translate() {
-      const input = document.getElementById('trans-input').value;
-      document.getElementById('trans-output').textContent = "// Migrating to Ternlang...\nmatch logic {\n  affirm => { return 1; }\n  tend => { return 0; }\n  reject => { return -1; }\n}";
+
+    // Interactive Engine Logic
+    const SCENARIOS = [
+      { label: 'DEPLOY TONIGHT?', evidence: [0.7, 0.8, 0.5, -0.2, 0.9, 0.6] },
+      { label: 'APPROVE LOAN?', evidence: [0.5, -0.6, 0.4, -0.5, 0.3, -0.4, 0.5, -0.5] },
+      { label: 'ROLLBACK?', evidence: [-0.8, -0.7, -0.9, -0.3, -0.6] }
+    ];
+    let activeScenario = 0;
+    function runDeliberation() {
+      const feed = document.getElementById('round-feed');
+      feed.innerHTML = '<div class="text-t_teal uppercase tracking-widest mb-4">Starting Convergence...</div>';
+      let scalar = 0; let round = 0;
+      const interval = setInterval(() => {
+        const ev = SCENARIOS[activeScenario].evidence[round % SCENARIOS[activeScenario].evidence.length];
+        scalar = 0.3 * ev + 0.7 * scalar; round++;
+        const el = document.createElement('div'); el.className = 'py-1 opacity-80';
+        el.innerHTML = `ROUND ${round}: SIG=${ev > 0 ? '+' : ''}${ev} -> SCALAR=${(scalar >= 0 ? '+' : '') + scalar.toFixed(4)}`;
+        feed.appendChild(el); feed.scrollTop = feed.scrollHeight;
+        if (Math.abs(scalar) > 0.33 || round >= 10) {
+          clearInterval(interval);
+          setVerdict(scalar);
+        }
+      }, 300);
     }
+    function setVerdict(s) {
+      const state = document.getElementById('verdict-state');
+      const label = document.getElementById('verdict-label');
+      if (s > 0.33) { state.innerText = '+1'; state.className = 'text-3xl font-black text-t_blue'; label.innerText = 'AFFIRM'; }
+      else if (s < -0.33) { state.innerText = '-1'; state.className = 'text-3xl font-black text-t_red'; label.innerText = 'REJECT'; }
+      else { state.innerText = '0'; state.className = 'text-3xl font-black text-t_teal'; label.innerText = 'TEND'; }
+    }
+    document.getElementById('deliberate-btn').onclick = runDeliberation;
+    document.getElementById('scenario-btns').onclick = e => { if (e.target.dataset.s) { activeScenario = e.target.dataset.s; document.querySelectorAll('.scenario-pill').forEach(p => p.classList.remove('active')); e.target.classList.add('active'); } };
+
+    // Canvas Matrix
+    const canvas = document.getElementById('ternary-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function res() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    window.onresize = res; res();
+    const nodes = Array.from({ length: 50 }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5), vy: (Math.random() - 0.5) }));
+    function ani() {
+      ctx.clearRect(0, 0, w, h);
+      nodes.forEach(n => {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > w) n.vx *= -1; if (n.y < 0 || n.y > h) n.vy *= -1;
+        ctx.fillStyle = '#4A90E2'; ctx.beginPath(); ctx.arc(n.x, n.y, 1, 0, Math.PI * 2); ctx.fill();
+      });
+      requestAnimationFrame(ani);
+    }
+    ani();
+
+    // Reveal Observer
+    const rev = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); }));
+    document.querySelectorAll('.reveal').forEach(e => rev.observe(e));
   </script>
 </body>
 </html>
