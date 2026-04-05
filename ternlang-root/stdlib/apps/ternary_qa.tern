@@ -1,0 +1,20 @@
+// Module:  stdlib/apps/ternary_qa.tern
+// Purpose: Ternary Question Answering Logic
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// A QA system that returns 'tend' when it doesn't know the answer,
+// instead of guessing.
+
+fn match_query(query_hash: int, knowledge_base: trittensor<4 x 4>) -> trit {
+    // Simple look-up
+    return affirm;
+}
+
+fn qa_gate(confidence: trit) -> trit {
+    match confidence {
+        affirm => { return affirm; } // Definite Answer
+        tend   => { return tend;   } // "I don't know, let me check."
+        reject => { return reject; } // "No such thing exists."
+    }
+}

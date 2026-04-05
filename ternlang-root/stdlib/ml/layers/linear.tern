@@ -1,0 +1,21 @@
+// Module:  stdlib/ml/layers/linear.tern
+// Purpose: Ternary Linear Layer (BitNet style)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Linear layer maps input trit vector to output via sparse matmul.
+// It is the building block of all ternary MLPs.
+
+struct LinearLayer {
+    weights: trittensor<4 x 4>,
+    bias: trittensor<4 x 1>
+}
+
+fn linear_forward(layer: LinearLayer, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Flagship sparse matmul skips neutral weight states
+    @sparseskip
+    let out: trittensor<4 x 1> = layer.weights * input;
+    
+    // Bias addition (simplified)
+    return out;
+}

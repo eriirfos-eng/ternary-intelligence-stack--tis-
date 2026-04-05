@@ -1,0 +1,27 @@
+// Module:  stdlib/reasoning/contradiction.tern
+// Purpose: Handling Logical Contradiction in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In binary logic, A AND NOT A is a crash or a false.
+// In ternary, consensus(affirm, reject) = tend. 
+// Contradiction is not an error; it is a request for more information.
+
+fn identify_contradiction(a: trit, b: trit) -> trit {
+    if a == affirm {
+        if b == reject {
+            return affirm; // Contradiction detected
+        }
+    }
+    if a == reject {
+        if b == affirm {
+            return affirm; // Contradiction detected
+        }
+    }
+    return reject; // No contradiction
+}
+
+fn resolve_via_tend(a: trit, b: trit) -> trit {
+    // If they contradict, the result is 'tend' (hold for more data).
+    return consensus(a, b);
+}
