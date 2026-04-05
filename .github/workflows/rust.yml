@@ -14,10 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ternlang-root
-
     steps:
     - uses: actions/checkout@v4
 
@@ -32,8 +28,8 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-          ternlang-root/target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('ternlang-root/Cargo.lock') }}
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-
 
     - name: Build all crates
@@ -55,6 +51,5 @@ jobs:
 
     - name: Deploy to Fly.io
       run: flyctl deploy --remote-only --app ternlang-api
-      working-directory: ternlang-root
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
