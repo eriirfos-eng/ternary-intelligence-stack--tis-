@@ -322,13 +322,20 @@ impl SemanticAnalyzer {
             Expr::StringLiteral(_) => Ok(Type::String),
             Expr::Ident(name)      => self.lookup_var(name),
 
-            Expr::BinaryOp { lhs, rhs, .. } => {
+            Expr::BinaryOp { op, lhs, rhs } => {
                 let l = self.infer_expr_type(lhs)?;
                 let r = self.infer_expr_type(rhs)?;
-                if l != r {
-                    return Err(SemanticError::TypeMismatch { expected: l, found: r });
+                match op {
+                    BinOp::Less | BinOp::Greater | BinOp::Equal | BinOp::NotEqual | BinOp::And | BinOp::Or => {
+                        Ok(Type::Trit)
+                    }
+                    _ => {
+                        if l != r {
+                            return Err(SemanticError::TypeMismatch { expected: l, found: r });
+                        }
+                        Ok(l)
+                    }
                 }
-                Ok(l)
             }
 
             Expr::UnaryOp { expr, .. } => self.infer_expr_type(expr),

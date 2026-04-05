@@ -157,6 +157,7 @@ impl<'a> Parser<'a> {
             Token::Or                      => 0,
             Token::And                     => 1,
             Token::Equal | Token::NotEqual => 2,
+            Token::LAngle | Token::RAngle  => 2, // Comparisons
             Token::Plus  | Token::Minus    => 3,
             Token::Star                    => 4,
             _ => -1,
@@ -172,38 +173,49 @@ impl<'a> Parser<'a> {
             Token::NotEqual => BinOp::NotEqual,
             Token::And      => BinOp::And,
             Token::Or       => BinOp::Or,
+            Token::LAngle   => BinOp::Less,
+            Token::RAngle   => BinOp::Greater,
             _ => unreachable!(),
         }
     }
 
-    /// Parse unary prefix expressions, then wrap with postfix (field access, `?`).
+    /// Parse unary prefix expressions, then wrap with postfix (field access, indexing, `?`).
     fn parse_unary_expr(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.parse_primary_expr()?;
         loop {
-            if let Ok(Token::Dot) = self.peek_token() {
-                // Postfix: `.field` chain
-                self.next_token()?; // consume `.`
-                let field = match self.next_token()? {
-                    Token::Ident(n) => n,
-                    t => return Err(ParseError::ExpectedToken("field name".into(), format!("{:?}", t))),
-                };
-                expr = Expr::FieldAccess { object: Box::new(expr), field };
-            } else if let Ok(Token::UncertainBranch) = self.peek_token() {
-                // Postfix `?` — ternary error propagation.
-                // Disambiguate from `if cond ? { }`: if the token after `?` is `{`, this
-                // `?` belongs to the enclosing if/while statement — don't consume it.
-                let mut lookahead = self.lex.clone();
-                lookahead.next(); // skip `?`
-                let after_q = lookahead.next();
-                let is_uncertain_branch = matches!(after_q, Some(Ok(Token::LBrace)));
-                if !is_uncertain_branch {
-                    self.next_token()?; // consume `?`
-                    expr = Expr::Propagate { expr: Box::new(expr) };
-                } else {
-                    break;
+            match self.peek_token()? {
+                Token::Dot => {
+                    self.next_token()?; // consume `.`
+                    let field = match self.next_token()? {
+                        Token::Ident(n) => n,
+                        t => return Err(ParseError::ExpectedToken("field name".into(), format!("{:?}", t))),
+                    };
+                    expr = Expr::FieldAccess { object: Box::new(expr), field };
                 }
-            } else {
-                break;
+                Token::LBracket => {
+                    self.next_token()?; // consume `[`
+                    let row = self.parse_expr()?;
+                    self.expect(Token::Comma)?;
+                    let col = self.parse_expr()?;
+                    self.expect(Token::RBracket)?;
+                    expr = Expr::Index { object: Box::new(expr), row: Box::new(row), col: Box::new(col) };
+                }
+                Token::UncertainBranch => {
+                    // Postfix `?` — ternary error propagation.
+                    // Disambiguate from `if cond ? { }`: if the token after `?` is `{`, this
+                    // `?` belongs to the enclosing if/while statement — don't consume it.
+                    let mut lookahead = self.lex.clone();
+                    lookahead.next(); // skip `?`
+                    let after_q = lookahead.next();
+                    let is_uncertain_branch = matches!(after_q, Some(Ok(Token::LBrace)));
+                    if !is_uncertain_branch {
+                        self.next_token()?; // consume `?`
+                        expr = Expr::Propagate { expr: Box::new(expr) };
+                    } else {
+                        break;
+                    }
+                }
+                _ => break,
             }
         }
         Ok(expr)
@@ -356,13 +368,31 @@ impl<'a> Parser<'a> {
             Token::If => {
                 self.next_token()?;
                 let condition = self.parse_expr()?;
-                self.expect(Token::UncertainBranch)?;
-                let on_pos  = Box::new(self.parse_block()?);
-                self.expect(Token::Else)?;
-                let on_zero = Box::new(self.parse_block()?);
-                self.expect(Token::Else)?;
-                let on_neg  = Box::new(self.parse_block()?);
-                Ok(Stmt::IfTernary { condition, on_pos, on_zero, on_neg })
+                if let Ok(Token::UncertainBranch) = self.peek_token() {
+                    self.next_token()?;
+                    let on_pos  = Box::new(self.parse_block()?);
+                    self.expect(Token::Else)?;
+                    let on_zero = Box::new(self.parse_block()?);
+                    self.expect(Token::Else)?;
+                    let on_neg  = Box::new(self.parse_block()?);
+                    Ok(Stmt::IfTernary { condition, on_pos, on_zero, on_neg })
+                } else {
+                    // Binary if: if cond { A } else { B }
+                    // Maps to IfTernary(cond, A, B, B)
+                    let then_branch = Box::new(self.parse_block()?);
+                    let else_branch = if let Ok(Token::Else) = self.peek_token() {
+                        self.next_token()?;
+                        Box::new(self.parse_block()?)
+                    } else {
+                        Box::new(Stmt::Block(vec![]))
+                    };
+                    Ok(Stmt::IfTernary {
+                        condition,
+                        on_pos: then_branch,
+                        on_zero: else_branch.clone(),
+                        on_neg: else_branch,
+                    })
+                }
             }
 
             Token::Match => {
@@ -376,7 +406,10 @@ impl<'a> Parser<'a> {
                             let slice = self.lex.slice();
                             slice.parse::<i8>().map_err(|_| ParseError::InvalidTrit(slice.to_string()))?
                         }
-                        t => return Err(ParseError::ExpectedToken("trit literal".into(), format!("{:?}", t))),
+                        Token::Affirm => 1,
+                        Token::Tend   => 0,
+                        Token::Reject => -1,
+                        t => return Err(ParseError::ExpectedToken("trit pattern (1, 0, -1, or affirm, tend, reject)".into(), format!("{:?}", t))),
                     };
                     self.expect(Token::FatArrow)?;
                     let stmt = self.parse_stmt()?;
@@ -415,17 +448,29 @@ impl<'a> Parser<'a> {
                 Ok(Stmt::ForIn { var, iter, body })
             }
 
-            // while <condition> ? { on_pos } else { on_zero } else { on_neg }
+            // while <condition> [?] { on_pos } [else { on_zero } else { on_neg }]
             Token::While => {
                 self.next_token()?;
                 let condition = self.parse_expr()?;
-                self.expect(Token::UncertainBranch)?;
-                let on_pos  = Box::new(self.parse_block()?);
-                self.expect(Token::Else)?;
-                let on_zero = Box::new(self.parse_block()?);
-                self.expect(Token::Else)?;
-                let on_neg  = Box::new(self.parse_block()?);
-                Ok(Stmt::WhileTernary { condition, on_pos, on_zero, on_neg })
+                if let Ok(Token::UncertainBranch) = self.peek_token() {
+                    self.next_token()?;
+                    let on_pos  = Box::new(self.parse_block()?);
+                    self.expect(Token::Else)?;
+                    let on_zero = Box::new(self.parse_block()?);
+                    self.expect(Token::Else)?;
+                    let on_neg  = Box::new(self.parse_block()?);
+                    Ok(Stmt::WhileTernary { condition, on_pos, on_zero, on_neg })
+                } else {
+                    // Binary while: while cond { body }
+                    // Maps to WhileTernary(cond, body, Break, Break)
+                    let body = Box::new(self.parse_block()?);
+                    Ok(Stmt::WhileTernary {
+                        condition,
+                        on_pos: body,
+                        on_zero: Box::new(Stmt::Break),
+                        on_neg: Box::new(Stmt::Break),
+                    })
+                }
             }
 
             // loop { body }
@@ -466,18 +511,29 @@ impl<'a> Parser<'a> {
             Token::LBrace => self.parse_block(),
 
             _ => {
-                // Could be: expr; OR field assignment: ident.field = value;
+                // Could be: expr; OR assignment: ident.field = value; OR ident[row, col] = value;
                 let expr = self.parse_expr()?;
 
-                // Check for field assignment: expr was `ident.field`, next is `=`
+                // Check for assignment
                 if let Ok(Token::Assign) = self.peek_token() {
-                    if let Expr::FieldAccess { object, field } = expr {
-                        if let Expr::Ident(obj_name) = *object {
-                            self.next_token()?; // consume `=`
-                            let value = self.parse_expr()?;
-                            self.expect(Token::Semicolon)?;
-                            return Ok(Stmt::FieldSet { object: obj_name, field, value });
+                    match expr {
+                        Expr::FieldAccess { object, field } => {
+                            if let Expr::Ident(obj_name) = *object {
+                                self.next_token()?; // consume `=`
+                                let value = self.parse_expr()?;
+                                self.expect(Token::Semicolon)?;
+                                return Ok(Stmt::FieldSet { object: obj_name, field, value });
+                            }
                         }
+                        Expr::Index { object, row, col } => {
+                            if let Expr::Ident(obj_name) = *object {
+                                self.next_token()?; // consume `=`
+                                let value = self.parse_expr()?;
+                                self.expect(Token::Semicolon)?;
+                                return Ok(Stmt::IndexSet { object: obj_name, row: *row, col: *col, value });
+                            }
+                        }
+                        _ => {}
                     }
                     return Err(ParseError::UnexpectedToken("invalid assignment target".into()));
                 }

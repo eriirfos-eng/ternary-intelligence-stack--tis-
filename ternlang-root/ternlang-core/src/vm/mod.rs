@@ -71,6 +71,8 @@ pub enum Opcode {
     Tret = 0x11,         // Return: pop call stack, jump back
     TnodeId = 0x12,      // Phase 5.1: Push current node address to stack
     TpushStr = 0x13,     // Phase 5.1: Push string literal
+    Tless    = 0x14,     // Integer less-than: pop b, pop a → push trit(a < b)
+    Tgreater = 0x15,     // Integer greater-than: pop b, pop a → push trit(a > b)
     Thalt = 0x00,
 }
 
@@ -523,6 +525,28 @@ impl BetVm {
                 }
                 0x12 => { // TNODEID — push local node address
                     self.stack.push(Value::String(self.node_id.clone()));
+                }
+                0x14 => { // TLESS — integer less-than: pop b, pop a → push trit(a < b)
+                    let b = self.stack.pop().unwrap_or(Value::Int(0));
+                    let a = self.stack.pop().unwrap_or(Value::Int(0));
+                    let result = match (a, b) {
+                        (Value::Int(x), Value::Int(y)) => {
+                            if x < y { Trit::Affirm } else if x == y { Trit::Tend } else { Trit::Reject }
+                        }
+                        _ => Trit::Tend,
+                    };
+                    self.stack.push(Value::Trit(result));
+                }
+                0x15 => { // TGREATER — integer greater-than: pop b, pop a → push trit(a > b)
+                    let b = self.stack.pop().unwrap_or(Value::Int(0));
+                    let a = self.stack.pop().unwrap_or(Value::Int(0));
+                    let result = match (a, b) {
+                        (Value::Int(x), Value::Int(y)) => {
+                            if x > y { Trit::Affirm } else if x == y { Trit::Tend } else { Trit::Reject }
+                        }
+                        _ => Trit::Tend,
+                    };
+                    self.stack.push(Value::Trit(result));
                 }
                 // ─────────────────────────────────────────────────────────────────
 

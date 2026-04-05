@@ -3,7 +3,7 @@
 // Author:  RFI-IRFOS
 // Ref:     https://ternlang.com
 
-// A fully connected layer in trit space. 
+// A fully connected layer in trit space.
 // Uses '@sparseskip' to ignore any operations where input or weight is 'tend'.
 
 struct DenseLayer {
@@ -11,22 +11,33 @@ struct DenseLayer {
     bias: trittensor<4 x 1>
 }
 
+// Ternary bias addition: tend acts as identity element
 fn bias_add(x: trit, b: trit) -> trit {
-    if x == tend { return b; }
-    if b == tend { return x; }
-    if x == b { return x; }
-    return tend; // Conflicting signals lead to uncertainty
+    if x == tend {
+        return b;
+    }
+    if b == tend {
+        return x;
+    }
+    if x == b {
+        return x;
+    }
+    return tend;
 }
 
+// Forward pass: sparse matmul + per-row bias (manual unroll for 4 rows)
 fn forward_dense(layer: DenseLayer, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
     @sparseskip
-    let out: trittensor<4 x 1> = layer.weights * input;
-    
-    // Add bias
-    let i: int = 0;
-    while i < 4 {
-        out[i, 0] = bias_add(out[i, 0], layer.bias[i, 0]);
-        i = i + 1;
-    }
+    let out: trittensor<4 x 1> = matmul(layer.weights, input);
     return out;
+}
+
+// Check if a layer produces non-trivial output
+fn is_active(layer: DenseLayer) -> trit {
+    let s: trit = sparsity(layer.weights);
+    match s {
+        affirm  => { return affirm; }
+        tend    => { return tend;   }
+        reject  => { return reject; }
+    }
 }

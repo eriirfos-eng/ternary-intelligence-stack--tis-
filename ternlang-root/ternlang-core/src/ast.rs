@@ -38,6 +38,12 @@ pub enum Expr {
     Await {
         target: Box<Expr>,
     },
+    /// tensor[row, col] indexing (Phase 4.1)
+    Index {
+        object: Box<Expr>,
+        row: Box<Expr>,
+        col: Box<Expr>,
+    },
     /// nodeid — returns the current node's address (Phase 5.1)
     NodeId,
     /// expr? — ternary error propagation.
@@ -55,6 +61,8 @@ pub enum BinOp {
     Mul,
     Equal,
     NotEqual,
+    Less,
+    Greater,
     And,
     Or,
 }
@@ -120,6 +128,13 @@ pub enum Stmt {
     FieldSet {
         object: String,
         field: String,
+        value: Expr,
+    },
+    /// tensor[row, col] = value;
+    IndexSet {
+        object: String,
+        row: Expr,
+        col: Expr,
         value: Expr,
     },
 }

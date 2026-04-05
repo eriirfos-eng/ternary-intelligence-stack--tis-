@@ -33,6 +33,7 @@ RUN for crate in ternlang-core ternlang-codegen ternlang-ml ternlang-cli \
 RUN cargo fetch
 
 # Now copy the real source
+COPY stdlib/                stdlib/
 COPY ternlang-core/src      ternlang-core/src
 COPY ternlang-core/stdlib   ternlang-core/stdlib
 COPY ternlang-codegen/src   ternlang-codegen/src

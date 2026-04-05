@@ -245,13 +245,19 @@ impl KeyStore {
 
 // ─── App state ───────────────────────────────────────────────────────────────
 
-#[derive(Clone)]
+/// Three-layer memory blob: working / session / core arrays of MemEntry.
+type MemBlob = serde_json::Map<String, Value>;
+/// Per-key server-side memory store.
+type MemStore = Arc<std::sync::RwLock<std::collections::HashMap<String, MemBlob>>>;
+
 struct AppState {
     admin_key:              String,
     keys:                   Arc<KeyStore>,
     version:                &'static str,
     stripe_webhook_secret:  String,
     resend_api_key:         String,
+    /// Server-side three-layer memory, keyed by API key string.
+    memory_store:           MemStore,
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -1265,33 +1271,38 @@ async fn mcp_server_card() -> Json<Value> {
     Json(json!({
         "name":        "ternlang",
         "displayName": "Ternlang — Ternary Intelligence Stack",
-        "version":     "0.2.0",
-        "description": "The only MCP server built on balanced ternary logic. Adds a third decision state — hold (trit=0) — that binary AI agents cannot express natively. Includes a live BET VM compiler, 13-expert MoE deliberation engine, BitNet-style weight quantizer, and multi-dimensional safety gate. Used by AI agents that need to route 'I need more data' as a first-class outcome rather than forcing a premature yes/no.",
+        "version":     "0.3.0",
+        "description": "The most principled AI reasoning server on MCP. Ternlang adds a third logical state — hold (trit=0) — that binary agents cannot express. Where others force yes/no, Ternlang surfaces 'I need more data' as a first-class outcome. Includes: 20 tools across free + premium tiers; 13-expert MoE deliberation (Mixture-of-Experts with dual-key synergistic routing); server-side three-layer memory (working → session → core) with ternary attention and automatic MoE-backed consolidation; ternary context compression (strip tend-noise, keep signal); live BET VM that runs .tern programs in balanced ternary; BitNet-style weight quantizer; multi-dimensional safety gate; and ternary fact-check, plan, and triage tools. First programming language + MCP server to ship a native ISO-registered ternary ISA (BET-ISA-SPEC). GitHub Linguist language detection live.",
         "homepage":    "https://ternlang.com",
-        "icon":        "https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/ternlang-root/ternlang-web/favicon.svg",
-        "repository":  "https://github.com/eriirfos-eng/ternary-intelligence-stack",
+        "icon":        "https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack--tis-/main/ternlang-root/ternlang-web/favicon.svg",
+        "repository":  "https://github.com/eriirfos-eng/ternary-intelligence-stack--tis-",
         "protocol":    "2024-11-05",
         "transport":   "http",
         "endpoint":    "https://ternlang.com/mcp",
         "auth":        { "type": "none" },
-        "tags":        ["ai", "reasoning", "decision", "ternary", "safety", "ml", "deliberation"],
+        "tags":        ["ai", "reasoning", "decision", "ternary", "memory", "moe", "safety", "ml", "deliberation", "compression", "balanced-ternary", "programming-language", "compiler"],
         "configSchema": {
             "type": "object",
             "properties": {
                 "apiKey": {
                     "type": "string",
-                    "title": "Ternlang API Key (optional)",
-                    "description": "All 10 MCP tools are free with no key. An API key unlocks the full REST API: all 13 MoE experts, SSE streaming, 10k calls/month, production SLA. Get a key at https://ternlang.com/pricing"
+                    "title": "Ternlang API Key (optional — Tier 2, €25/month)",
+                    "description": "Core 10 MCP tools are free with no key. Premium key unlocks 10 additional tools: server-side three-layer memory with ternary attention, ternary context compression, full MoE-13 deliberation, ternary planning/triage/factcheck, and 10k REST API calls/month. Get a key at https://ternlang.com/pricing"
                 }
             },
             "required": []
         },
-        "tools": [
+        "free_tools": [
             "trit_decide", "trit_consensus", "trit_eval", "ternlang_run",
             "quantize_weights", "sparse_benchmark", "moe_orchestrate",
             "moe_deliberate", "trit_action_gate", "trit_upgrade"
         ],
-        "highlight": "moe_orchestrate — 13-expert Mixture-of-Experts deliberation (3-expert preview free; full 13 via REST API key)"
+        "premium_tools": [
+            "trit_compress", "trit_triage", "trit_plan", "trit_factcheck",
+            "moe_full", "trit_mem_write", "trit_mem_read", "trit_mem_consolidate",
+            "trit_mem_stats", "trit_mem_compress"
+        ],
+        "highlight": "Three-layer memory (working/session/core) with ternary attention + MoE-13 consolidation — the first MCP server with stateful AI memory backed by balanced ternary logic"
     }))
 }
 
@@ -1305,9 +1316,11 @@ async fn mcp_info() -> Json<Value> {
         "transport":   "http",
         "endpoint":    "https://ternlang.com/mcp",
         "usage":       "POST JSON-RPC 2.0 — methods: initialize, tools/list, tools/call",
-        "tools":       10,
-        "auth":        "none — all 10 MCP tools are free",
-        "highlight":   "moe_orchestrate: 13-expert MoE deliberation (3-expert preview free)",
+        "tools":       20,
+        "free_tools":  10,
+        "premium_tools": 10,
+        "auth":        "free: no key required | premium: X-Ternlang-Key header (€25/month)",
+        "highlight":   "server-side 3-layer memory (working/session/core) + ternary attention + MoE-13 deliberation + ternary compression",
         "upgrade":     "https://ternlang.com/pricing",
     }))
 }
@@ -1333,9 +1346,30 @@ struct McpRpcRequest {
     params:  Option<Value>,
 }
 
-async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
+const MCP_PREMIUM_TOOLS: &[&str] = &[
+    "trit_compress", "trit_triage", "trit_plan", "trit_factcheck",
+    "moe_full", "trit_mem_write", "trit_mem_read", "trit_mem_consolidate",
+    "trit_mem_stats", "trit_mem_compress",
+];
+
+async fn mcp_handler(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+    Json(req): Json<McpRpcRequest>,
+) -> Json<Value> {
     let id     = req.id.unwrap_or(Value::Null);
     let params = req.params.unwrap_or(Value::Object(Default::default()));
+
+    // Resolve premium access: check X-Ternlang-Key header
+    let raw_key = headers.get("x-ternlang-key")
+        .or_else(|| headers.get("X-Ternlang-Key"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+    let is_premium = if raw_key.is_empty() {
+        false
+    } else {
+        matches!(state.keys.validate_and_bump(raw_key).await, KeyCheckResult::Valid(_))
+    };
 
     let result: Value = match req.method.as_str() {
 
@@ -1346,8 +1380,8 @@ async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
                 "capabilities": { "tools": {} },
                 "serverInfo": {
                     "name":        "ternlang-mcp",
-                    "version":     "0.2.0",
-                    "description": "The only MCP server built on balanced ternary logic. Adds hold (trit=0) as a first-class decision outcome. Includes live BET VM, 13-expert MoE deliberation, BitNet quantization, and multi-dimensional safety gate.",
+                    "version":     "0.3.0",
+                    "description": "Ternlang — 20 MCP tools across free + premium tiers. Adds hold (trit=0) as a first-class AI decision outcome. Server-side 3-layer memory with ternary attention, MoE-13 deliberation, ternary compression, live BET VM, and multi-dimensional safety gate.",
                     "homepage":    "https://ternlang.com",
                     "pricing":     "https://ternlang.com/pricing",
                 }
@@ -1369,8 +1403,22 @@ async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
                     "error": { "code": -32602, "message": "missing tool name" }
                 })),
             };
+            // Gate premium tools
+            if MCP_PREMIUM_TOOLS.contains(&tool_name.as_str()) && !is_premium {
+                return Json(json!({
+                    "jsonrpc": "2.0", "id": id,
+                    "error": {
+                        "code": -32001,
+                        "message": format!(
+                            "'{}' is a premium tool. Pass a valid X-Ternlang-Key header (Tier 2+). Get a key at https://ternlang.com/pricing",
+                            tool_name
+                        )
+                    }
+                }));
+            }
             let tool_params = &params["arguments"];
-            match mcp_dispatch_tool(&tool_name, tool_params) {
+            let mem = Arc::clone(&state.memory_store);
+            match mcp_dispatch_tool(&tool_name, tool_params, raw_key, &mem) {
                 Ok(res) => json!({
                     "jsonrpc": "2.0", "id": id,
                     "result": {
@@ -1395,7 +1443,7 @@ async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
 
 // ─── MCP tool dispatch ────────────────────────────────────────────────────────
 
-fn mcp_dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
+fn mcp_dispatch_tool(name: &str, params: &Value, api_key: &str, mem: &MemStore) -> Result<Value, String> {
     let mut result = match name {
         "trit_decide"      => mcp_trit_decide(params),
         "trit_consensus"   => mcp_trit_consensus(params),
@@ -1405,8 +1453,19 @@ fn mcp_dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
         "sparse_benchmark" => mcp_sparse_benchmark(params),
         "moe_orchestrate"  => mcp_moe_orchestrate(params),
         "moe_deliberate"   => mcp_moe_deliberate(params),
-        "trit_action_gate" => mcp_trit_action_gate(params),
-        "trit_upgrade"     => mcp_trit_upgrade(),
+        "trit_action_gate"     => mcp_trit_action_gate(params),
+        "trit_upgrade"         => mcp_trit_upgrade(),
+        // ── Premium tools (key validated by mcp_handler before reaching here) ──
+        "trit_compress"        => mcp_trit_compress(params),
+        "trit_triage"          => mcp_trit_triage(params),
+        "trit_plan"            => mcp_trit_plan(params),
+        "trit_factcheck"       => mcp_trit_factcheck(params),
+        "moe_full"             => mcp_moe_full(params),
+        "trit_mem_write"       => mcp_trit_mem_write(params, api_key, mem),
+        "trit_mem_read"        => mcp_trit_mem_read(params, api_key, mem),
+        "trit_mem_consolidate" => mcp_trit_mem_consolidate(params, api_key, mem),
+        "trit_mem_stats"       => mcp_trit_mem_stats(api_key, mem),
+        "trit_mem_compress"    => mcp_trit_mem_compress(params, api_key, mem),
         _ => Err(format!("unknown tool: {}", name)),
     }?;
 
@@ -1749,6 +1808,686 @@ fn mcp_trit_upgrade() -> Result<Value, String> {
         ],
 
         "quick_start": "Add header X-Ternlang-Key: <your-key> to any POST https://ternlang.com/api/* request.",
+        "premium_mcp_tools": [
+            "trit_compress", "trit_triage", "trit_plan", "trit_factcheck",
+            "moe_full", "trit_mem_write", "trit_mem_read", "trit_mem_consolidate",
+        ],
+        "premium_mcp_note": "Premium MCP tools require X-Ternlang-Key header directly in your MCP calls. Same key as the REST API.",
+    }))
+}
+
+// ─── Helpers: ternary text scoring ────────────────────────────────────────────
+
+/// Word-level overlap score ∈ [0, 1] between two strings.
+fn word_overlap(a: &str, b: &str) -> f32 {
+    let a_words: std::collections::HashSet<&str> = a.split_whitespace()
+        .map(|w| w.trim_matches(|c: char| !c.is_alphanumeric()))
+        .filter(|w| w.len() > 2)
+        .collect();
+    let b_words: std::collections::HashSet<&str> = b.split_whitespace()
+        .map(|w| w.trim_matches(|c: char| !c.is_alphanumeric()))
+        .filter(|w| w.len() > 2)
+        .collect();
+    if a_words.is_empty() || b_words.is_empty() { return 0.0; }
+    let intersection = a_words.intersection(&b_words).count();
+    intersection as f32 / a_words.len().max(b_words.len()) as f32
+}
+
+/// Score → trit: > 0.4 = +1, 0.15..0.4 = 0, < 0.15 = -1
+fn score_to_trit(s: f32) -> i8 {
+    if s > 0.4 { 1 } else if s >= 0.15 { 0 } else { -1 }
+}
+
+/// First sentence of a string (for compression summaries).
+fn first_sentence(s: &str) -> &str {
+    s.find(['.', '!', '?']).map(|i| &s[..=i]).unwrap_or(s).trim()
+}
+
+/// Information density: unique tokens / total tokens.
+fn info_density(s: &str) -> f32 {
+    let words: Vec<&str> = s.split_whitespace().collect();
+    if words.is_empty() { return 0.0; }
+    let unique: std::collections::HashSet<&str> = words.iter().copied().collect();
+    unique.len() as f32 / words.len() as f32
+}
+
+// ─── Premium tool: trit_compress ──────────────────────────────────────────────
+
+fn mcp_trit_compress(params: &Value) -> Result<Value, String> {
+    let chunks: Vec<&str> = params["chunks"].as_array()
+        .ok_or("chunks must be an array of strings")?
+        .iter()
+        .map(|v| v.as_str().unwrap_or(""))
+        .collect();
+    if chunks.is_empty() { return Err("chunks cannot be empty".into()); }
+    let query = params["query"].as_str().unwrap_or("");
+
+    let mut kept = 0usize;
+    let mut compressed = 0usize;
+    let mut dropped = 0usize;
+
+    let manifest: Vec<Value> = chunks.iter().enumerate().map(|(i, chunk)| {
+        let score = if query.is_empty() {
+            info_density(chunk)
+        } else {
+            word_overlap(query, chunk)
+        };
+        let trit = score_to_trit(score);
+        let (action, compressed_form): (&str, Option<&str>) = match trit {
+            1  => { kept      += 1; ("keep_verbatim",  None) }
+            0  => { compressed+= 1; ("compress",       Some(first_sentence(chunk))) }
+            _  => { dropped   += 1; ("drop",           None) }
+        };
+        json!({
+            "index":           i,
+            "trit":            trit,
+            "label":           if trit==1 {"affirm"} else if trit==0 {"tend"} else {"reject"},
+            "action":          action,
+            "score":           (score * 1000.0).round() / 1000.0,
+            "compressed_form": compressed_form,
+        })
+    }).collect();
+
+    let total = chunks.len();
+    let savings_pct = ((dropped + compressed / 2) as f32 / total as f32 * 100.0).round();
+    Ok(json!({
+        "manifest":        manifest,
+        "total_chunks":    total,
+        "kept_verbatim":   kept,
+        "compressed":      compressed,
+        "dropped":         dropped,
+        "estimated_savings_pct": savings_pct,
+        "reconstruction_note": "Reconstruct by: keep +1 verbatim; expand 0 from compressed_form; omit -1.",
+    }))
+}
+
+// ─── Premium tool: trit_triage ────────────────────────────────────────────────
+
+fn mcp_trit_triage(params: &Value) -> Result<Value, String> {
+    let chunks = params["chunks"].as_array()
+        .ok_or("chunks must be an array of {id, text} objects")?;
+    let query = params["query"].as_str().ok_or("query is required")?;
+    if chunks.is_empty() { return Err("chunks cannot be empty".into()); }
+
+    let mut scored: Vec<(f32, Value)> = chunks.iter().map(|c| {
+        let id   = c["id"].as_str().unwrap_or("?");
+        let text = c["text"].as_str().unwrap_or("");
+        let score = word_overlap(query, text);
+        let trit  = score_to_trit(score);
+        (score, json!({
+            "id":         id,
+            "trit":       trit,
+            "label":      if trit==1 {"affirm"} else if trit==0 {"tend"} else {"reject"},
+            "relevance":  (score * 1000.0).round() / 1000.0,
+            "action":     if trit==1 {"include"} else if trit==0 {"maybe"} else {"exclude"},
+        }))
+    }).collect();
+
+    scored.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+    let results: Vec<Value> = scored.into_iter().map(|(_, v)| v).collect();
+    let include_count = results.iter().filter(|v| v["trit"].as_i64()==Some(1)).count();
+
+    Ok(json!({
+        "results":        results,
+        "query":          query,
+        "include_count":  include_count,
+        "note": "Sort order: highest relevance first. Include affirm (+1), use judgement on tend (0), exclude reject (-1).",
+    }))
+}
+
+// ─── Premium tool: trit_plan ─────────────────────────────────────────────────
+
+fn mcp_trit_plan(params: &Value) -> Result<Value, String> {
+    let goal  = params["goal"].as_str().ok_or("goal is required")?;
+    let steps: Vec<&str> = params["steps"].as_array()
+        .ok_or("steps must be an array of strings")?
+        .iter().map(|v| v.as_str().unwrap_or("")).collect();
+    let constraints: Vec<&str> = params["constraints"].as_array()
+        .map(|a| a.iter().map(|v| v.as_str().unwrap_or("")).collect())
+        .unwrap_or_default();
+    if steps.is_empty() { return Err("steps cannot be empty".into()); }
+
+    let plan: Vec<Value> = steps.iter().enumerate().map(|(i, step)| {
+        // Check constraint violations first
+        let violated: Vec<&str> = constraints.iter()
+            .filter(|c| word_overlap(step, c) > 0.3)
+            .copied().collect();
+        if !violated.is_empty() {
+            return json!({
+                "index": i, "step": step, "trit": -1, "label": "reject",
+                "confidence": 0.0,
+                "reasoning": format!("Conflicts with constraint: '{}'", violated[0]),
+                "flag": "constraint_violation",
+            });
+        }
+        let goal_score  = word_overlap(goal, step);
+        let trit        = score_to_trit(goal_score);
+        let (reasoning, flag): (String, Option<&str>) = match trit {
+            1  => (format!("Clearly advances goal (relevance {:.2})", goal_score), None),
+            0  => (format!("Partial alignment (relevance {:.2}). Needs clarification before executing.", goal_score), Some("needs_evidence")),
+            _  => (format!("Low goal alignment (relevance {:.2}). Consider removing or rephrasing.", goal_score), Some("low_value")),
+        };
+        json!({
+            "index": i, "step": step, "trit": trit,
+            "label": if trit==1 {"affirm"} else if trit==0 {"tend"} else {"reject"},
+            "confidence": (goal_score * 1000.0).round() / 1000.0,
+            "reasoning": reasoning, "flag": flag,
+        })
+    }).collect();
+
+    let ready    = plan.iter().filter(|s| s["trit"].as_i64()==Some(1)).count();
+    let hold_    = plan.iter().filter(|s| s["trit"].as_i64()==Some(0)).count();
+    let blocked  = plan.iter().filter(|s| s["trit"].as_i64()==Some(-1)).count();
+    Ok(json!({
+        "goal": goal, "plan": plan,
+        "summary": { "ready": ready, "needs_evidence": hold_, "blocked": blocked },
+        "note": "Execute affirm (+1) steps. Gather more information for tend (0) steps before proceeding. Remove or rethink reject (-1) steps.",
+    }))
+}
+
+// ─── Premium tool: trit_factcheck ────────────────────────────────────────────
+
+fn mcp_trit_factcheck(params: &Value) -> Result<Value, String> {
+    let claims: Vec<&str> = params["claims"].as_array()
+        .ok_or("claims must be an array of strings")?
+        .iter().map(|v| v.as_str().unwrap_or("")).collect();
+    let context = params["context"].as_str().unwrap_or("");
+    if claims.is_empty() { return Err("claims cannot be empty".into()); }
+
+    const HEDGES: &[&str] = &[
+        "might", "could", "possibly", "perhaps", "maybe", "likely", "unlikely",
+        "seems", "appears", "suggests", "reportedly", "allegedly", "may",
+    ];
+    const ABSOLUTES: &[&str] = &[
+        "always", "never", "all", "every", "none", "definitely", "certainly",
+        "impossible", "guaranteed", "proven", "fact",
+    ];
+
+    let verdicts: Vec<Value> = claims.iter().enumerate().map(|(i, claim)| {
+        let lower = claim.to_lowercase();
+        let has_hedge    = HEDGES.iter().any(|h| lower.contains(h));
+        let has_absolute = ABSOLUTES.iter().any(|a| lower.contains(a));
+
+        let (trit, label, reasoning) = if !context.is_empty() {
+            let overlap = word_overlap(claim, context);
+            if overlap > 0.4 {
+                (1i8, "affirm", "Context supports this claim.".to_string())
+            } else if overlap > 0.15 {
+                (0i8, "tend", "Partial context overlap — needs additional verification.".to_string())
+            } else if has_absolute {
+                (-1i8, "reject", format!("Absolute statement ('{}') with no contextual support.", claim.split_whitespace().find(|w| ABSOLUTES.iter().any(|a| w.to_lowercase().contains(a))).unwrap_or("?")))
+            } else {
+                (0i8, "tend", "Not addressed in provided context — external source needed.".to_string())
+            }
+        } else if has_hedge {
+            (0i8, "tend", "Hedged claim — not verifiable without a source.".to_string())
+        } else if has_absolute {
+            (0i8, "tend", "Absolute claim — requires citation before accepting.".to_string())
+        } else {
+            (0i8, "tend", "No context provided. Treat as unverified.".to_string())
+        };
+
+        json!({
+            "index": i, "claim": claim, "trit": trit, "label": label, "reasoning": reasoning,
+        })
+    }).collect();
+
+    let affirmed = verdicts.iter().filter(|v| v["trit"].as_i64()==Some(1)).count();
+    let held     = verdicts.iter().filter(|v| v["trit"].as_i64()==Some(0)).count();
+    let rejected = verdicts.iter().filter(|v| v["trit"].as_i64()==Some(-1)).count();
+    Ok(json!({
+        "verdicts": verdicts,
+        "summary": { "affirmed": affirmed, "needs_verification": held, "rejected": rejected },
+        "note": "tend (0) = needs external source or more context. reject (-1) = contradicted by context.",
+    }))
+}
+
+// ─── Premium tool: moe_full (all 13 experts, no preview cap) ─────────────────
+
+fn mcp_moe_full(params: &Value) -> Result<Value, String> {
+    let query = params["query"].as_str().ok_or("query must be a string")?;
+    let evidence: Vec<f32> = match params["evidence"].as_array() {
+        Some(arr) => arr.iter()
+            .map(|v| v.as_f64().ok_or("evidence values must be numbers").map(|f| f as f32))
+            .collect::<Result<_,_>>()?,
+        None => vec![0.0f32; 6],
+    };
+    let mut orch  = TernMoeOrchestrator::with_standard_experts();
+    let result    = orch.orchestrate(query, &evidence);
+    let trit_label = match result.trit { 1 => "affirm", -1 => "reject", _ => "tend" };
+
+    let verdicts: Vec<Value> = result.verdicts.iter().map(|v| json!({
+        "expert_id": v.expert_id, "expert_name": v.expert_name,
+        "trit": v.trit, "confidence": (v.confidence*1000.0).round()/1000.0,
+        "reasoning": v.reasoning,
+    })).collect();
+    let pair_info = result.pair.as_ref().map(|p| json!({
+        "expert_a": p.expert_a, "expert_b": p.expert_b,
+        "relevance": (p.relevance*1000.0).round()/1000.0,
+        "synergy":   (p.synergy *1000.0).round()/1000.0,
+        "combined":  (p.combined*1000.0).round()/1000.0,
+    }));
+    Ok(json!({
+        "trit": result.trit, "label": trit_label,
+        "confidence":    (result.confidence*1000.0).round()/1000.0,
+        "held":          result.held,
+        "safety_vetoed": result.safety_vetoed,
+        "temperature":   (result.temperature*1000.0).round()/1000.0,
+        "prompt_hint":   result.prompt_hint,
+        "triad_field": {
+            "synergy_weight": (result.triad_field.synergy_weight*1000.0).round()/1000.0,
+            "field":          result.triad_field.field.raw,
+            "is_amplifying":  result.triad_field.is_amplifying(),
+        },
+        "routing_pair": pair_info,
+        "verdicts":     verdicts,
+        "experts_total": result.verdicts.len(),
+        "mode": "full_premium",
+    }))
+}
+
+// ─── Premium tool: three-layer memory ────────────────────────────────────────
+//
+// Server-side design (premium keys): memory is stored in AppState.memory_store,
+// keyed by API key. No state blob needed in the request.
+//
+// Fallback (no key): stateless blob mode — caller passes and receives "state".
+//
+// Schema per key: { "v": 2, "working": [...], "session": [...], "core": [...] }
+// Each entry: { "k": "key", "v": "value", "trit": i8, "ts": u64, "ttl": u64 }
+//
+// Layer semantics:
+//   working  — hot context, current turn   (LRU-256, TTL 1h,  evicts on consolidate)
+//   session  — session flow / routing      (LRU-128, TTL 24h, promotes affirm to core)
+//   core     — identity anchors / vetoes   (unlimited, never evicts automatically)
+//
+// Ternary attention on read:
+//   score = key_overlap*0.35 + value_overlap*0.55 + trit_bias*0.10
+//   trit_bias = (entry_trit + 1) / 2   → maps -1→0, 0→0.5, +1→1
+//   result trit: score>0.45→affirm, 0.20–0.45→tend, <0.20→reject (excluded)
+//
+// Ternary compression on session/core writes:
+//   Split value by sentence boundaries; score each sentence by info_density.
+//   density>0.50 → keep verbatim; 0.25–0.50 → keep first phrase; <0.25 → drop.
+
+const WORKING_TTL: u64  = 3_600;     // 1h
+const SESSION_TTL: u64  = 86_400;    // 24h
+const WORKING_CAP: usize = 256;
+const SESSION_CAP: usize = 128;
+
+fn mem_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default().as_secs()
+}
+
+fn mem_load(api_key: &str, mem: &MemStore, params: &Value) -> MemBlob {
+    if !api_key.is_empty() {
+        // Server-side: ignore params state blob
+        mem.read().unwrap()
+            .get(api_key).cloned()
+            .unwrap_or_default()
+    } else {
+        // Stateless fallback: use blob from params
+        params["state"].as_object().cloned().unwrap_or_default()
+    }
+}
+
+fn mem_save(api_key: &str, mem: &MemStore, blob: MemBlob) {
+    if !api_key.is_empty() {
+        mem.write().unwrap().insert(api_key.to_string(), blob);
+    }
+}
+
+fn mem_layer_mut<'a>(state: &'a mut MemBlob, layer: &str) -> &'a mut Vec<Value> {
+    state.entry(layer.to_string())
+        .or_insert_with(|| json!([]))
+        .as_array_mut()
+        .expect("layer must be array")
+}
+
+/// Ternary compression: strip low-information sentences from a value string.
+/// Returns the compressed string (may be shorter than input).
+fn trit_compress_text(text: &str) -> String {
+    let sentences: Vec<&str> = text.split(". ").collect();
+    let mut out = Vec::new();
+    for sentence in &sentences {
+        let s = sentence.trim();
+        if s.is_empty() { continue; }
+        let d = info_density(s);
+        if d > 0.50 {
+            out.push(s.to_string());
+        } else if d > 0.25 {
+            // Keep first phrase (up to first comma or 10 words)
+            let first_phrase: String = s.split(',').next()
+                .unwrap_or(s)
+                .split_whitespace().take(10)
+                .collect::<Vec<_>>().join(" ");
+            if !first_phrase.is_empty() { out.push(first_phrase); }
+        }
+        // d <= 0.25: drop (tend/noise)
+    }
+    out.join(". ")
+}
+
+/// Ternary attention score for a memory entry against a query.
+fn trit_attention(query: &str, entry: &Value) -> f32 {
+    let k = entry["k"].as_str().unwrap_or("");
+    let v = entry["v"].as_str().unwrap_or("");
+    let entry_trit = entry["trit"].as_i64().unwrap_or(0) as f32;
+    let trit_bias = (entry_trit + 1.0) / 2.0;  // -1→0, 0→0.5, +1→1
+
+    let key_overlap   = word_overlap(query, k);
+    let value_overlap = word_overlap(query, v);
+    key_overlap * 0.35 + value_overlap * 0.55 + trit_bias * 0.10
+}
+
+fn mcp_trit_mem_write(params: &Value, api_key: &str, mem: &MemStore) -> Result<Value, String> {
+    let layer = params["layer"].as_str().ok_or("layer must be 'working', 'session', or 'core'")?;
+    if !["working","session","core"].contains(&layer) {
+        return Err(format!("invalid layer '{}'. Use 'working', 'session', or 'core'.", layer));
+    }
+    let key   = params["key"].as_str().ok_or("key is required")?;
+    let raw_value = params["value"].as_str().ok_or("value is required")?;
+    let trit  = params["trit"].as_i64().unwrap_or(1).clamp(-1, 1) as i8;
+    let ttl   = params["ttl_secs"].as_u64().unwrap_or(match layer {
+        "working" => WORKING_TTL, "session" => SESSION_TTL, _ => u64::MAX
+    });
+
+    // Ternary compression for session/core layers (strip tend-noise sentences)
+    let (stored_value, compressed) = if layer != "working" {
+        let c = trit_compress_text(raw_value);
+        let changed = c.len() < raw_value.len();
+        (c, changed)
+    } else {
+        (raw_value.to_string(), false)
+    };
+
+    let mut state = mem_load(api_key, mem, params);
+    state.insert("v".into(), json!(2));
+
+    let entries = mem_layer_mut(&mut state, layer);
+    entries.retain(|e| e["k"].as_str() != Some(key));
+    let cap = match layer { "working" => WORKING_CAP, "session" => SESSION_CAP, _ => usize::MAX };
+    while entries.len() >= cap { entries.remove(0); }
+    entries.push(json!({
+        "k": key, "v": stored_value, "trit": trit,
+        "ts": mem_now(), "ttl": ttl,
+        "compressed": compressed,
+    }));
+
+    let counts = json!({
+        "working": state.get("working").and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+        "session": state.get("session").and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+        "core":    state.get("core"   ).and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+    });
+    let server_side = !api_key.is_empty();
+    let state_blob  = if server_side { Value::Null } else { json!(state.clone()) };
+    mem_save(api_key, mem, state);
+
+    Ok(json!({
+        "written":     { "layer": layer, "key": key, "trit": trit, "compressed": compressed },
+        "counts":      counts,
+        "server_side": server_side,
+        "state":       state_blob,  // null when server_side=true
+    }))
+}
+
+fn mcp_trit_mem_read(params: &Value, api_key: &str, mem: &MemStore) -> Result<Value, String> {
+    let query  = params["query"].as_str().ok_or("query is required")?;
+    let layers_raw = params["layers"].as_array();
+    let target_layers: Vec<&str> = layers_raw
+        .map(|a| a.iter().filter_map(|v| v.as_str()).collect())
+        .unwrap_or_else(|| vec!["working", "session", "core"]);
+
+    let state = mem_load(api_key, mem, params);
+    let now   = mem_now();
+
+    let mut results: Vec<(f32, Value)> = Vec::new();
+    for layer in &target_layers {
+        let entries = match state.get(*layer).and_then(|v| v.as_array()) {
+            Some(a) => a,
+            None    => continue,
+        };
+        for entry in entries {
+            let ts  = entry["ts"].as_u64().unwrap_or(0);
+            let ttl = entry["ttl"].as_u64().unwrap_or(u64::MAX);
+            if now.saturating_sub(ts) > ttl { continue; } // expired
+
+            // Ternary attention score (replaces plain word_overlap)
+            let score = trit_attention(query, entry);
+            // Attention thresholds: >0.45=affirm, 0.20–0.45=tend, <0.20=reject (excluded)
+            if score < 0.20 { continue; }
+            let attn_trit = if score > 0.45 { 1i8 } else { 0i8 };
+
+            results.push((score, json!({
+                "layer":       layer,
+                "key":         entry["k"],
+                "value":       entry["v"],
+                "entry_trit":  entry["trit"],
+                "attn_trit":   attn_trit,
+                "attn_label":  if attn_trit == 1 { "affirm" } else { "tend" },
+                "relevance":   (score * 1000.0).round() / 1000.0,
+                "age_secs":    now.saturating_sub(ts),
+            })));
+        }
+    }
+    results.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+    let hits: Vec<Value> = results.into_iter().map(|(_, v)| v).collect();
+    let affirm_count = hits.iter().filter(|h| h["attn_trit"].as_i64() == Some(1)).count();
+    Ok(json!({
+        "results":     hits,
+        "query":       query,
+        "hits":        hits.len(),
+        "affirm_hits": affirm_count,
+        "server_side": !api_key.is_empty(),
+    }))
+}
+
+fn mcp_trit_mem_consolidate(params: &Value, api_key: &str, mem: &MemStore) -> Result<Value, String> {
+    let mut state = mem_load(api_key, mem, params);
+    if state.is_empty() { return Err("no memory state found — write some entries first".into()); }
+    let now = mem_now();
+
+    let mut promoted_to_session = 0usize;
+    let mut promoted_to_core    = 0usize;
+    let mut evicted             = 0usize;
+    let mut moe_resolved        = 0usize;
+
+    // ── 1. Working → evict expired, promote affirm to session ─────────────────
+    let working: Vec<Value> = state.get("working")
+        .and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    let mut new_working  = Vec::new();
+    let mut new_promotes = Vec::new();
+    for entry in &working {
+        let ts  = entry["ts"].as_u64().unwrap_or(0);
+        let ttl = entry["ttl"].as_u64().unwrap_or(WORKING_TTL);
+        if now.saturating_sub(ts) > ttl { evicted += 1; continue; }
+        if entry["trit"].as_i64() == Some(1) {
+            // Compress value before promoting to session
+            let compressed = trit_compress_text(entry["v"].as_str().unwrap_or(""));
+            let mut promoted = entry.clone();
+            if let Some(obj) = promoted.as_object_mut() {
+                obj.insert("ttl".into(),        json!(SESSION_TTL));
+                obj.insert("ts".into(),         json!(now));
+                obj.insert("v".into(),          json!(compressed));
+                obj.insert("compressed".into(), json!(true));
+            }
+            new_promotes.push(promoted);
+            promoted_to_session += 1;
+        } else {
+            new_working.push(entry.clone());
+        }
+    }
+
+    // ── 2. Session → evict expired, promote affirm at half-life to core ───────
+    let session: Vec<Value> = state.get("session")
+        .and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    let all_session: Vec<Value> = session.into_iter().chain(new_promotes).collect();
+    let mut new_session   = Vec::new();
+    let mut core_promotes = Vec::new();
+    for entry in &all_session {
+        let ts  = entry["ts"].as_u64().unwrap_or(0);
+        let ttl = entry["ttl"].as_u64().unwrap_or(SESSION_TTL);
+        if now.saturating_sub(ts) > ttl { evicted += 1; continue; }
+        if entry["trit"].as_i64() == Some(1) && now.saturating_sub(ts) > SESSION_TTL / 2 {
+            // MoE-backed resolution: re-run the key through MoE to get canonical trit
+            let k = entry["k"].as_str().unwrap_or("");
+            let mut orch = TernMoeOrchestrator::with_standard_experts();
+            let moe_result = orch.orchestrate(k, &[0.0f32; 6]);
+            let canonical_trit = moe_result.trit;
+
+            let mut promoted = entry.clone();
+            if let Some(obj) = promoted.as_object_mut() {
+                obj.insert("trit".into(),     json!(canonical_trit));
+                obj.insert("moe_resolved".into(), json!(true));
+            }
+            core_promotes.push(promoted);
+            promoted_to_core += 1;
+            moe_resolved     += 1;
+        } else {
+            new_session.push(entry.clone());
+        }
+    }
+
+    // ── 3. Core — merge promotions, upsert by key (never evicts) ─────────────
+    let mut core: Vec<Value> = state.get("core")
+        .and_then(|v| v.as_array()).cloned().unwrap_or_default();
+    for entry in &core_promotes {
+        let key = entry["k"].as_str().unwrap_or("");
+        core.retain(|e| e["k"].as_str() != Some(key));
+        core.push(entry.clone());
+    }
+
+    state.insert("working".into(), json!(new_working));
+    state.insert("session".into(), json!(new_session));
+    state.insert("core".into(),    json!(core));
+    state.insert("v".into(),       json!(2));
+
+    let counts = json!({
+        "working": new_working.len(),
+        "session": new_session.len(),
+        "core":    core.len(),
+    });
+    let server_side = !api_key.is_empty();
+    let state_blob  = if server_side { Value::Null } else { json!(state.clone()) };
+    mem_save(api_key, mem, state);
+
+    Ok(json!({
+        "consolidation": {
+            "evicted":             evicted,
+            "promoted_to_session": promoted_to_session,
+            "promoted_to_core":    promoted_to_core,
+            "moe_resolved":        moe_resolved,
+        },
+        "counts":      counts,
+        "server_side": server_side,
+        "state":       state_blob,
+    }))
+}
+
+// ─── Premium tool: trit_mem_stats ────────────────────────────────────────────
+
+fn mcp_trit_mem_stats(api_key: &str, mem: &MemStore) -> Result<Value, String> {
+    if api_key.is_empty() { return Err("trit_mem_stats requires a premium API key".into()); }
+    let state = mem.read().unwrap().get(api_key).cloned().unwrap_or_default();
+    let now   = mem_now();
+
+    let layer_stats = |layer: &str| {
+        let entries = state.get(layer).and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        let count   = entries.len();
+        let mut affirm = 0usize; let mut tend = 0usize; let mut reject = 0usize;
+        let mut oldest = u64::MAX; let mut newest = 0u64;
+        let mut expired = 0usize;
+        for e in &entries {
+            match e["trit"].as_i64() {
+                Some(1)  => affirm  += 1,
+                Some(0)  => tend    += 1,
+                Some(-1) => reject  += 1,
+                _        => {}
+            }
+            let ts  = e["ts"].as_u64().unwrap_or(now);
+            let ttl = e["ttl"].as_u64().unwrap_or(u64::MAX);
+            if now.saturating_sub(ts) > ttl { expired += 1; }
+            if ts < oldest { oldest = ts; }
+            if ts > newest { newest = ts; }
+        }
+        json!({
+            "count":      count,
+            "expired":    expired,
+            "live":       count.saturating_sub(expired),
+            "trit_dist":  { "affirm": affirm, "tend": tend, "reject": reject },
+            "oldest_secs": if oldest == u64::MAX { 0 } else { now.saturating_sub(oldest) },
+            "newest_secs": now.saturating_sub(newest),
+        })
+    };
+
+    Ok(json!({
+        "working": layer_stats("working"),
+        "session": layer_stats("session"),
+        "core":    layer_stats("core"),
+        "total_entries": {
+            "working": state.get("working").and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+            "session": state.get("session").and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+            "core":    state.get("core"   ).and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0),
+        },
+        "note": "Run trit_mem_consolidate to evict expired entries and promote affirm entries up the layers.",
+    }))
+}
+
+// ─── Premium tool: trit_mem_compress ─────────────────────────────────────────
+//
+// Applies ternary compression to a specific memory layer in-place:
+// re-runs trit_compress_text on every entry's value, drops reject-trit entries
+// if `drop_reject` is set, and reports the byte savings.
+
+fn mcp_trit_mem_compress(params: &Value, api_key: &str, mem: &MemStore) -> Result<Value, String> {
+    if api_key.is_empty() { return Err("trit_mem_compress requires a premium API key".into()); }
+    let layer = params["layer"].as_str().ok_or("layer must be 'working', 'session', or 'core'")?;
+    if !["working","session","core"].contains(&layer) {
+        return Err(format!("invalid layer '{}'", layer));
+    }
+    let drop_reject = params["drop_reject"].as_bool().unwrap_or(false);
+
+    let mut state = mem.read().unwrap().get(api_key).cloned().unwrap_or_default();
+    let entries: Vec<Value> = state.get(layer).and_then(|v| v.as_array()).cloned().unwrap_or_default();
+
+    let mut original_bytes: usize = 0;
+    let mut compressed_bytes: usize = 0;
+    let mut dropped = 0usize;
+    let mut new_entries = Vec::new();
+
+    for mut entry in entries {
+        if drop_reject && entry["trit"].as_i64() == Some(-1) {
+            dropped += 1;
+            continue;
+        }
+        if let Some(v) = entry["v"].as_str() {
+            original_bytes += v.len();
+            let c = trit_compress_text(v);
+            compressed_bytes += c.len();
+            if let Some(obj) = entry.as_object_mut() {
+                obj.insert("v".into(),          json!(c));
+                obj.insert("compressed".into(), json!(true));
+            }
+        }
+        new_entries.push(entry);
+    }
+
+    state.insert(layer.to_string(), json!(new_entries));
+    mem.write().unwrap().insert(api_key.to_string(), state);
+
+    let saved = original_bytes.saturating_sub(compressed_bytes);
+    let ratio  = if original_bytes > 0 { compressed_bytes as f32 / original_bytes as f32 } else { 1.0 };
+    Ok(json!({
+        "layer":             layer,
+        "entries_processed": new_entries.len(),
+        "entries_dropped":   dropped,
+        "original_bytes":    original_bytes,
+        "compressed_bytes":  compressed_bytes,
+        "saved_bytes":       saved,
+        "compression_ratio": (ratio * 1000.0).round() / 1000.0,
+        "note": format!("{}% size reduction via ternary sparsity compression.", (100.0 - ratio*100.0).round() as u32),
     }))
 }
 
@@ -1866,9 +2605,57 @@ fn mcp_tools_manifest() -> Value {
         },
         {
           "name": "trit_upgrade",
-          "description": "Returns a structured map of what is available free via MCP vs what unlocks with a Tier 2 or Tier 3 API key: full MoE-13 experts, SSE streaming, 10k REST calls/month, production SLA, and all 12 REST endpoints. Call this tool when a user asks 'what can I do with ternlang?' or 'how do I get more out of this?'",
+          "description": "Returns a structured map of what is available free via MCP vs what unlocks with a Tier 2 API key (€25/month): full MoE-13 experts, SSE streaming, server-side three-layer memory (working/session/core), ternary context compression, 10k REST calls/month, and production SLA. Call this tool when a user asks 'what can I do with ternlang?' or 'how do I get more out of this?'",
           "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
           "inputSchema": { "type": "object", "properties": {} }
+        },
+        {
+          "name": "trit_mem_write",
+          "description": "Write a memory entry to one of three layers: working (hot context, TTL 1h), session (flow patterns, TTL 24h), or core (identity anchors, never evicted). Annotate each entry with a trit confidence score (+1 affirm / 0 tend / -1 reject). Session and core writes are automatically compressed via ternary sparsity (low-information sentences stripped). Premium: memory is stored server-side — no state blob required.",
+          "annotations": { "readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": false },
+          "inputSchema": { "type": "object", "required": ["layer","key","value"],
+            "properties": {
+              "layer":    { "type": "string",  "enum": ["working","session","core"], "description": "Memory layer to write into." },
+              "key":      { "type": "string",  "description": "Entry key (used for attention matching on read)." },
+              "value":    { "type": "string",  "description": "Entry value (text content)." },
+              "trit":     { "type": "integer", "enum": [-1,0,1], "description": "Confidence trit: +1 affirm, 0 tend/uncertain, -1 reject. Affects promotion and attention weighting." },
+              "ttl_secs": { "type": "integer", "description": "Optional TTL override in seconds. Defaults: working=3600, session=86400, core=never." }
+            }
+          }
+        },
+        {
+          "name": "trit_mem_read",
+          "description": "Read from three-layer memory using ternary attention. Each entry is scored: attention = key_overlap×0.35 + value_overlap×0.55 + trit_bias×0.10. Returns entries sorted by relevance. Attention trit: >0.45=affirm (highly relevant), 0.20–0.45=tend (partial match). Expired entries are automatically excluded. Premium: reads from server-side store keyed to your API key.",
+          "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
+          "inputSchema": { "type": "object", "required": ["query"],
+            "properties": {
+              "query":  { "type": "string", "description": "Natural language query. Matched against all entry keys and values using ternary attention." },
+              "layers": { "type": "array",  "items": {"type":"string","enum":["working","session","core"]}, "description": "Which layers to search. Defaults to all three." }
+            }
+          }
+        },
+        {
+          "name": "trit_mem_consolidate",
+          "description": "Run the three-layer memory consolidation cycle: (1) evict expired working entries; (2) promote affirm working entries to session with ternary compression; (3) promote long-lived affirm session entries to core with MoE-13 trit resolution; (4) upsert into core. Returns promotion counts and updated layer sizes. Call periodically (e.g. end of conversation turn) to maintain memory hygiene.",
+          "annotations": { "readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": false },
+          "inputSchema": { "type": "object", "properties": {} }
+        },
+        {
+          "name": "trit_mem_stats",
+          "description": "Return statistics for all three memory layers: entry counts, trit distribution (affirm/tend/reject), expired-but-not-yet-evicted entries, oldest and newest entry ages. Useful for debugging memory health and deciding when to consolidate.",
+          "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
+          "inputSchema": { "type": "object", "properties": {} }
+        },
+        {
+          "name": "trit_mem_compress",
+          "description": "Apply ternary sparsity compression to an entire memory layer in-place. Strips low-information sentences (density < 0.25) from every entry's value, keeps high-signal sentences verbatim, and truncates medium-density sentences to their first phrase. Optionally drops all reject-trit entries. Returns original vs compressed byte counts and compression ratio.",
+          "annotations": { "readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
+          "inputSchema": { "type": "object", "required": ["layer"],
+            "properties": {
+              "layer":       { "type": "string",  "enum": ["working","session","core"], "description": "Layer to compress." },
+              "drop_reject": { "type": "boolean", "description": "If true, also drop all entries with trit=-1 (reject). Defaults to false." }
+            }
+          }
         }
     ]})
 }
@@ -2065,6 +2852,7 @@ async fn main() {
         version: "0.1.0",
         stripe_webhook_secret,
         resend_api_key,
+        memory_store: Arc::new(std::sync::RwLock::new(std::collections::HashMap::new())),
     });
 
     let cors = CorsLayer::new()

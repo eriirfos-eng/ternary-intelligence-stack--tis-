@@ -11,13 +11,8 @@ struct TritGPT {
 }
 
 fn causal_mask_trit(seq_len: int) -> trittensor<4 x 4> {
-    // Returns a mask where future tokens are 'tend' (invisible)
-    let mask: trittensor<4 x 4> = {
-        [affirm, tend, tend, tend],
-        [affirm, affirm, tend, tend],
-        [affirm, affirm, affirm, tend],
-        [affirm, affirm, affirm, affirm]
-    };
+    // Returns a zero-initialized mask (future tokens default to tend/0)
+    let mask: trittensor<4 x 4>;
     return mask;
 }
 
@@ -32,6 +27,6 @@ fn next_token_trit(logits: trittensor<4 x 1>) -> trit {
 
 fn generate_trit(model: TritGPT, prompt: trittensor<4 x 1>) -> trit {
     @sparseskip
-    let out: trittensor<4 x 1> = model.w * prompt;
+    let out: trittensor<4 x 1> = matmul(model.w, prompt);
     return next_token_trit(out);
 }

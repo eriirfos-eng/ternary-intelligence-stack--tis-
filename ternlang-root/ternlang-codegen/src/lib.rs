@@ -220,6 +220,12 @@ impl CTranspiler {
                 self.push(&format!("{object}.{field} = {val};\n"));
             }
             Stmt::Decorated { stmt, .. } => self.emit_stmt(stmt),
+            Stmt::IndexSet { object, row, col, value } => {
+                let r = self.emit_expr(row);
+                let c = self.emit_expr(col);
+                let val = self.emit_expr(value);
+                self.push(&format!("{object}[{r}][{c}] = {val};\n"));
+            }
         }
     }
 
@@ -243,6 +249,8 @@ impl CTranspiler {
                     BinOp::NotEqual => format!("trit_neg(trit_consensus({l}, {r}))"),
                     BinOp::And      => format!("trit_mul({l}, {r})"),
                     BinOp::Or       => format!("trit_consensus({l}, {r})"),
+                    BinOp::Less     => format!("(({l}) < ({r}) ? 1 : (({l}) == ({r}) ? 0 : -1))"),
+                    BinOp::Greater  => format!("(({l}) > ({r}) ? 1 : (({l}) == ({r}) ? 0 : -1))"),
                 }
             }
 
@@ -293,6 +301,12 @@ impl CTranspiler {
                 format!("/* await {t} — actor model not implemented in C backend */ 0")
             }
             Expr::NodeId => "/* nodeid */ 0".into(),
+            Expr::Index { object, row, col } => {
+                let obj = self.emit_expr(object);
+                let r = self.emit_expr(row);
+                let c = self.emit_expr(col);
+                format!("{obj}[{r}][{c}]")
+            }
         }
     }
 

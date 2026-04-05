@@ -158,6 +158,15 @@ impl BytecodeEmitter {
                 }
                 // Unknown field — emit nothing (will be a runtime no-op).
             }
+            Stmt::IndexSet { object, row, col, value } => {
+                if let Some(&reg) = self.symbols.get(object) {
+                    self.code.push(0x09); self.code.push(reg); // TLOAD tensor ref
+                    self.emit_expr(row);
+                    self.emit_expr(col);
+                    self.emit_expr(value);
+                    self.code.push(0x23); // TSET
+                }
+            }
             Stmt::IfTernary { condition, on_pos, on_zero, on_neg } => {
                 self.emit_expr(condition);
                 
@@ -444,6 +453,8 @@ impl BytecodeEmitter {
                     BinOp::NotEqual => { self.code.push(0x0e); self.code.push(0x04); } // TCONS then TNEG
                     BinOp::And      => self.code.push(0x03), // TMUL (ternary AND = multiply)
                     BinOp::Or       => self.code.push(0x0e), // TCONS (ternary OR = consensus)
+                    BinOp::Less     => self.code.push(0x14), // TLESS  (a < b → affirm/tend/reject)
+                    BinOp::Greater  => self.code.push(0x15), // TGREATER (a > b → affirm/tend/reject)
                 }
             }
             Expr::UnaryOp { op, expr } => {
@@ -522,6 +533,12 @@ impl BytecodeEmitter {
                 // Fallback: push hold
                 self.code.push(0x01);
                 self.code.extend(pack_trits(&[Trit::Tend]));
+            }
+            Expr::Index { object, row, col } => {
+                self.emit_expr(object);
+                self.emit_expr(row);
+                self.emit_expr(col);
+                self.code.push(0x22); // TIDX
             }
             Expr::Propagate { expr } => {
                 // Evaluate inner expression → stack: [val]
