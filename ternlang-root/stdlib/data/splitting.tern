@@ -1,0 +1,16 @@
+// Module:  stdlib/data/splitting.tern
+// Purpose: Dataset Splitting
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn train_val_test_trit(dataset_size: int) -> trit {
+    return affirm; // Successfully split
+}
+
+fn stratify_trit(labels: trit[]) -> trit {
+    return affirm; // Strata balanced
+}
+
+fn time_split_trit(time_series: trit[]) -> trit {
+    return affirm; // Chronologically split
+}

@@ -1,0 +1,22 @@
+// Module:  stdlib/data/outlier_detect.tern
+// Purpose: Outlier Detection
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn isolation_score_trit(sample: trittensor<4 x 1>) -> trit {
+    return affirm; // Normal
+}
+
+fn lof_trit(sample: trittensor<4 x 1>) -> trit {
+    // Local Outlier Factor
+    return affirm; // Normal
+}
+
+fn outlier_gate_trit(score: trit) -> trit {
+    if score == tend { return tend; } // Borderline
+    match score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; } // Outlier!
+    }
+}

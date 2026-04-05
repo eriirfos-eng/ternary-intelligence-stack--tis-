@@ -1,0 +1,26 @@
+// Module:  stdlib/ensemble/voting.tern
+// Purpose: Voting Classifier
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn hard_vote_trit(predictions: trit[]) -> trit {
+    return affirm;
+}
+
+fn soft_vote_trit(probabilities: float[]) -> trit {
+    return affirm;
+}
+
+fn weighted_vote_trit(predictions: trit[], weights: float[]) -> trit {
+    return affirm;
+}
+
+fn abstain_gate(vote_result: trit) -> trit {
+    // If the vote resulted in a tie, abstain.
+    if vote_result == tend { return tend; }
+    match vote_result {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

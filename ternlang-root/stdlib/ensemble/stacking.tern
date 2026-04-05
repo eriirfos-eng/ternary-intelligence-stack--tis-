@@ -1,0 +1,29 @@
+// Module:  stdlib/ensemble/stacking.tern
+// Purpose: Stacking Ensemble
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+struct StackEnsemble {
+    meta_model: trittensor<4 x 4>
+}
+
+fn level1_predict_trit(input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    let out: trittensor<4 x 1> = { [affirm], [tend], [reject], [affirm] };
+    return out;
+}
+
+fn meta_learner_trit(ensemble: StackEnsemble, level1_feats: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let out: trittensor<4 x 1> = ensemble.meta_model * level1_feats;
+    let pred: trit = out[0, 0];
+    match pred {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn stack_forward_trit(ensemble: StackEnsemble, input: trittensor<4 x 1>) -> trit {
+    let l1: trittensor<4 x 1> = level1_predict_trit(input);
+    return meta_learner_trit(ensemble, l1);
+}

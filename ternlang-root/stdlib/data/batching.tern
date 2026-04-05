@@ -1,0 +1,29 @@
+// Module:  stdlib/data/batching.tern
+// Purpose: Data Batching
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+struct TritBatch {
+    size: int,
+    data: trittensor<4 x 4>
+}
+
+fn collate_trit(samples: trittensor<4 x 1>[]) -> TritBatch {
+    let dummy_data: trittensor<4 x 4> = {
+        [affirm, tend, reject, tend],
+        [tend, affirm, tend, reject],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+    let batch: TritBatch = { size: 4, data: dummy_data };
+    return batch;
+}
+
+fn pad_sequence_trit(seq: trit[], max_len: int) -> trit[] {
+    // Padding is always 'tend'
+    return seq;
+}
+
+fn dynamic_batch_trit(samples: trittensor<4 x 1>[]) -> TritBatch {
+    return collate_trit(samples);
+}

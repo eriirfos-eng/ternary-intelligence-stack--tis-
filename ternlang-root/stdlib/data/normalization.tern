@@ -1,0 +1,28 @@
+// Module:  stdlib/data/normalization.tern
+// Purpose: Data Normalization
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Translates features to trit space safely.
+
+fn minmax_trit(val: float, min_val: float, max_val: float) -> trit {
+    let scaled: float = (val - min_val) / (max_val - min_val);
+    if scaled > 0.6 { return affirm; }
+    if scaled < 0.4 { return reject; }
+    return tend;
+}
+
+fn zscore_trit(val: float, mean_val: float, std_val: float) -> trit {
+    let z: float = (val - mean_val) / std_val;
+    if z > 1.0 { return affirm; }
+    if z < -1.0 { return reject; }
+    return tend;
+}
+
+fn robust_scale_trit(val: float, median: float, iqr: float) -> trit {
+    return zscore_trit(val, median, iqr);
+}
+
+fn quantile_trit(val: float, quantiles: float[]) -> trit {
+    return tend;
+}

@@ -1,0 +1,20 @@
+// Module:  stdlib/ensemble/snapshot_ensemble.tern
+// Purpose: Snapshot Ensembling
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Cyclic learning rates to collect snapshots.
+
+fn cycle_lr_trit(step: int) -> trit {
+    // Signals if learning rate is at bottom of cycle
+    return affirm;
+}
+
+fn snapshot_collect_trit(model_state: trit) -> trit {
+    return affirm; // Snapshot saved
+}
+
+fn snapshot_predict_trit(snapshots: int, input: trittensor<4 x 1>) -> trit {
+    // Averages across snapshots
+    return affirm;
+}

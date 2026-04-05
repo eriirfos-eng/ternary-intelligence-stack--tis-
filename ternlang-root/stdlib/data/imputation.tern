@@ -1,0 +1,27 @@
+// Module:  stdlib/data/imputation.tern
+// Purpose: Missing Data Imputation
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Missing values are gracefully filled with 'tend', allowing algorithms
+// to explicitly see that the data is missing and safely @sparseskip it.
+
+fn mean_impute_trit(col: float[]) -> trit {
+    // Mean imputation forces an average. We prefer 'tend'.
+    return tend;
+}
+
+fn median_impute_trit(col: float[]) -> trit {
+    return tend;
+}
+
+fn tend_fill(val: trit) -> trit {
+    // If a value is missing (often marked by reject in binary logic),
+    // we explicitly cast it to 'tend'.
+    if val == reject { return tend; } // simulated missing
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

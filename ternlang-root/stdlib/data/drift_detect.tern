@@ -1,0 +1,26 @@
+// Module:  stdlib/data/drift_detect.tern
+// Purpose: Data Drift Detection
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If drift is detected, the system flags 'tend' (monitor) before fully failing (reject).
+
+fn covariate_drift_trit(train_dist: trit[], live_dist: trit[]) -> trit {
+    let diff: float = 0.1; // simulated
+    if diff > 0.2 { return reject; } // Drift!
+    if diff > 0.05 { return tend; } // Monitor
+    return affirm; // Stable
+}
+
+fn label_drift_trit(train_labels: trit[], live_labels: trit[]) -> trit {
+    return affirm;
+}
+
+fn drift_gate_trit(drift_status: trit) -> trit {
+    if drift_status == tend { return tend; } // Signal alert
+    match drift_status {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

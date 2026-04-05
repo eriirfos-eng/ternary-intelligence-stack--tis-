@@ -1,0 +1,29 @@
+// Module:  stdlib/ensemble/bagging.tern
+// Purpose: Bagging Ensemble
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If the bagged ensemble cannot reach a consensus, it outputs 'tend'.
+
+struct BagEnsemble {
+    model_count: int
+}
+
+fn bootstrap_train_trit(ensemble: BagEnsemble, data: trit[]) -> trit {
+    return affirm;
+}
+
+fn bag_predict_trit(ensemble: BagEnsemble, input: trittensor<4 x 1>) -> trit {
+    let votes_affirm: int = 5;
+    let votes_reject: int = 5;
+    // Tie
+    if votes_affirm == votes_reject {
+        return tend; // Ensemble split
+    }
+    return affirm; // Simplified
+}
+
+fn variance_trit(predictions: trit[]) -> trit {
+    // Are the models in agreement?
+    return tend; // Some disagreement
+}

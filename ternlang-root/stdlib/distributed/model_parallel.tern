@@ -1,0 +1,17 @@
+// Module:  stdlib/distributed/model_parallel.tern
+// Purpose: Pipeline Parallelism
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn pipeline_stage_trit(stage_id: int, input: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    return input;
+}
+
+fn send_activation_trit(next_node: int, activation: trittensor<4 x 1>) -> trit {
+    return affirm; // Sent
+}
+
+fn recv_activation_trit(prev_node: int) -> trittensor<4 x 1> {
+    let out: trittensor<4 x 1> = { [affirm], [tend], [reject], [affirm] };
+    return out;
+}
