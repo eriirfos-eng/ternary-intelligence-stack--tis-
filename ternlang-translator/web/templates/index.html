@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TernTranslator | Local Code Migration Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            t_bg: '#05050A',
+            t_bg2: '#0D0D16',
+            t_bg3: '#151522',
+            t_teal: '#00d4aa',
+            t_blue: '#4a9eff',
+            t_muted: '#7a7d99',
+            t_border: '#232336'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #05050A; color: #dde0f0; }
+    .glass-card {
+      background: linear-gradient(145deg, rgba(21, 21, 34, 0.8) 0%, rgba(13, 13, 22, 0.4) 100%);
+      border: 1px solid #232336;
+      backdrop-filter: blur(8px);
+    }
+    textarea:focus { outline: none; border-color: #00d4aa; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #05050A; }
+    ::-webkit-scrollbar-thumb { background: #232336; border-radius: 4px; }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center justify-center p-6">
+
+  <div class="max-w-6xl w-full">
+    <header class="text-center mb-12">
+      <div class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Local Tool &middot; Ternary Intelligence Stack</div>
+      <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+        Tern<span class="text-t_teal">Translator</span>
+      </h1>
+      <p class="text-t_muted text-lg">Migrate binary logic to balanced ternary syntax instantly.</p>
+    </header>
+
+    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
+      <!-- Toolbar -->
+      <div class="flex flex-col md:flex-row border-b border-t_border bg-t_bg2 px-6 py-4 items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-t_muted font-mono text-xs uppercase tracking-widest">Source:</span>
+          <select id="trans-lang" class="bg-t_bg border border-t_border text-t_teal font-mono text-xs px-3 py-1.5 rounded">
+            <option value="python">Python</option>
+            <option value="rust">Rust</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+            <option value="javascript">JavaScript</option>
+          </select>
+        </div>
+        
+        <label class="cursor-pointer bg-t_bg3 border border-t_border text-t_muted hover:text-white px-4 py-1.5 rounded font-mono text-xs transition-colors">
+          📁 Upload File
+          <input type="file" id="trans-upload" class="hidden" accept=".py,.rs,.java,.cpp,.js,.ts,.html">
+        </label>
+
+        <button id="trans-run-btn" class="md:ml-auto px-8 py-2 bg-t_teal text-black font-mono font-bold rounded hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,212,170,0.2)]">
+          ⚡ Translate to .tern
+        </button>
+      </div>
+
+      <!-- Editor Grid -->
+      <div class="grid md:grid-cols-2 h-[500px]">
+        <div class="border-r border-t_border flex flex-col">
+          <div class="bg-t_bg3 px-6 py-2 border-b border-t_border font-mono text-[10px] text-t_muted uppercase tracking-widest">Input (Binary Logic)</div>
+          <textarea id="trans-input" class="flex-1 bg-t_bg p-6 font-mono text-sm text-gray-300 resize-none" placeholder="Paste your source code here..."></textarea>
+        </div>
+        <div class="flex flex-col bg-[#070710]">
+          <div class="bg-t_bg3 px-6 py-2 border-b border-t_border font-mono text-[10px] text-t_teal uppercase tracking-widest">Output (Triadic .tern)</div>
+          <div id="trans-output" class="flex-1 p-6 font-mono text-sm text-t_teal overflow-auto whitespace-pre"></div>
+        </div>
+      </div>
+
+      <!-- Insight Pane -->
+      <div class="bg-t_bg3 border-t border-t_border p-8">
+        <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+          <span class="text-t_blue">ℹ</span> Triadic Logic Insights
+        </h4>
+        <div id="trans-insight" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs text-t_muted leading-relaxed">
+          <div class="p-4 bg-t_bg border border-t_border rounded-lg italic">Awaiting input for analysis...</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-8 text-center text-t_muted font-mono text-[10px] uppercase tracking-[0.2em]">
+      &copy; 2026 RFI-IRFOS &middot; Balanced Ternary Systems
+    </footer>
+  </div>
+
+  <script>
+    const transInput = document.getElementById('trans-input');
+    const transOutput = document.getElementById('trans-output');
+    const transInsight = document.getElementById('trans-insight');
+    const transBtn = document.getElementById('trans-run-btn');
+    const transUpload = document.getElementById('trans-upload');
+
+    const TERN_RULES = [
+      { regex: /bool/g, repl: 'trit', note: 'Mapped binary bool to triadic trit.' },
+      { regex: /true/g, repl: 'affirm', note: 'Mapped true to +1 (affirm).' },
+      { regex: /false/g, repl: 'reject', note: 'Mapped false to -1 (reject).' },
+      { regex: /None|null|undefined/g, repl: 'tend', note: 'Mapped null/empty to 0 (tend).' },
+      { regex: /if\s*\((.*)\)\s*\{/g, repl: 'match $1 {', note: 'Converted if-statement to exhaustive match block.' },
+      { regex: /if\s+(.*):/g, repl: 'match $1 {', note: 'Python-style if converted to match.' },
+      { regex: /else\s*\{|else:/g, repl: 'tend => { // auto-injected safety hold\n    }\n    reject => {', note: 'Injected state 0 (tend) for logic exhaustiveness.' },
+      { regex: /return\s+1|return\s+True/gi, repl: 'return affirm', note: 'Normalised positive return.' },
+      { regex: /return\s+0|return\s+False/gi, repl: 'return reject', note: 'Normalised negative return.' },
+      { regex: /void|def|fn/g, repl: 'fn', note: 'Unified function declaration.' },
+    ];
+
+    function translate() {
+      let code = transInput.value;
+      if (!code.trim()) return;
+
+      transBtn.disabled = true;
+      transBtn.textContent = '⏳ Thinking...';
+      
+      const insights = new Set();
+      let translated = code;
+
+      TERN_RULES.forEach(rule => {
+        if (rule.regex.test(translated)) {
+          translated = translated.replace(rule.regex, rule.repl);
+          insights.add(rule.note);
+        }
+      });
+
+      if (!translated.includes('fn main')) {
+        translated = "// Translated to Ternlang\n\n" + translated;
+      }
+
+      setTimeout(() => {
+        transOutput.textContent = translated;
+        transInsight.innerHTML = Array.from(insights).map(note => 
+          `<div class="p-4 bg-t_bg border border-t_border rounded-xl flex items-start gap-3 transition-all hover:border-t_teal/30">
+            <span class="text-t_teal mt-0.5">✓</span>
+            <span class="text-gray-300">${note}</span>
+          </div>`
+        ).join('') || '<div class="p-4 bg-t_bg border border-t_border rounded-lg">Pure logic detected. Minimal triadic mapping required.</div>';
+        
+        transBtn.disabled = false;
+        transBtn.textContent = '⚡ Translate to .tern';
+        transOutput.scrollTop = 0;
+      }, 500);
+    }
+
+    transBtn.addEventListener('click', translate);
+
+    transUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        transInput.value = e.target.result;
+        translate();
+      };
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+</html>
