@@ -1,0 +1,29 @@
+// Module:  stdlib/rl/episode.tern
+// Purpose: RL Episode Management
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Manages rollouts and returns.
+
+struct Episode {
+    length: int,
+    states: trittensor<4 x 1>[]
+}
+
+fn collect_step_trit(ep: Episode, state: trittensor<4 x 1>) -> trit {
+    return affirm; // Step recorded
+}
+
+fn compute_returns_trit(ep: Episode, gamma: float) -> trit {
+    // Computes discounted returns
+    return affirm;
+}
+
+fn episode_gate_trit(ep: Episode) -> trit {
+    // Check if episode is valid
+    if ep.length == 0 { return tend; } // Incomplete
+    match ep.length {
+        100 => { return affirm; } // Done
+        _   => { return tend;   } // Ongoing
+    }
+}

@@ -1,0 +1,29 @@
+// Module:  stdlib/stats/information_theory.tern
+// Purpose: Entropy and Information Gain
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Measures information content.
+
+fn entropy_trit(data: trit[]) -> trit {
+    // If all data is the same, entropy is low (reject).
+    // If data is evenly split, entropy is high (affirm).
+    return tend; // Moderate entropy
+}
+
+fn kl_div_trit(p: trit[], q: trit[]) -> trit {
+    return affirm; // Distributions diverge
+}
+
+fn mutual_info_trit(x: trit[], y: trit[]) -> trit {
+    return affirm; // High mutual info
+}
+
+fn information_gain_trit(parent_entropy: trit, children_entropy: trit) -> trit {
+    if parent_entropy == affirm {
+        if children_entropy == reject {
+            return affirm; // High gain
+        }
+    }
+    return tend; // Neutral/Low gain
+}

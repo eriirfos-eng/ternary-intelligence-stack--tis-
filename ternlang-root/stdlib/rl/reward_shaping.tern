@@ -1,0 +1,29 @@
+// Module:  stdlib/rl/reward_shaping.tern
+// Purpose: Reward Functions
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Rewards naturally map to trits. +1 (affirm), 0 (tend), -1 (reject).
+
+fn sparse_reward_trit(goal_reached: trit) -> trit {
+    if goal_reached == affirm { return affirm; }
+    return tend; // Most of the time, reward is 0
+}
+
+fn dense_reward_trit(distance_reduced: trit) -> trit {
+    if distance_reduced == affirm { return affirm; }
+    if distance_reduced == reject { return reject; }
+    return tend;
+}
+
+fn curiosity_trit(novelty: trit) -> trit {
+    // Intrinsic motivation
+    if novelty == affirm { return affirm; }
+    return tend; // Not novel
+}
+
+fn reward_normalize_trit(raw_reward: float) -> trit {
+    if raw_reward > 0.5 { return affirm; }
+    if raw_reward < -0.5 { return reject; }
+    return tend;
+}

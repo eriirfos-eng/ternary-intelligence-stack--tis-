@@ -1,0 +1,25 @@
+// Module:  stdlib/stats/confidence_interval.tern
+// Purpose: Confidence Intervals
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If the interval contains zero, we lack confidence, returning 'tend'.
+
+fn ci_trit(mean: float, error_margin: float) -> trit {
+    let lower: float = mean - error_margin;
+    let upper: float = mean + error_margin;
+    
+    if lower > 0.0 { return affirm; } // Strictly positive
+    if upper < 0.0 { return reject; } // Strictly negative
+    return tend; // Contains zero
+}
+
+fn bootstrap_ci_trit(data: trit[]) -> trit {
+    // Simulated bootstrap
+    return tend;
+}
+
+fn coverage_trit(true_val: trit, ci_estimate: trit) -> trit {
+    if true_val == ci_estimate { return affirm; }
+    return reject;
+}

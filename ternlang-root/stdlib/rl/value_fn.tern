@@ -1,0 +1,31 @@
+// Module:  stdlib/rl/value_fn.tern
+// Purpose: RL Value Function
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Estimates expected returns.
+
+struct ValueFn {
+    model: trittensor<4 x 4>
+}
+
+fn estimate_value_trit(v_fn: ValueFn, state: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let out: trittensor<4 x 1> = v_fn.model * state;
+    return out[0, 0]; // affirm: high value, reject: low value, tend: unknown
+}
+
+fn td_error_trit(reward: trit, next_value: trit, current_value: trit) -> trit {
+    // Temporal Difference error
+    if reward == affirm { return affirm; }
+    return tend;
+}
+
+fn advantage_trit(q_value: trit, state_value: trit) -> trit {
+    if q_value == affirm {
+        if state_value == reject {
+            return affirm; // High advantage
+        }
+    }
+    return tend;
+}

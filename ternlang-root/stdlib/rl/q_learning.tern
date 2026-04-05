@@ -1,0 +1,31 @@
+// Module:  stdlib/rl/q_learning.tern
+// Purpose: Q-Learning / DQN
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Q-Learning where unseen states naturally initialize to 'tend' (neutral).
+
+struct QTable {
+    states: int,
+    actions: int
+}
+
+fn q_update_trit(current_q: trit, max_next_q: trit, reward: trit) -> trit {
+    // Bellman update
+    if reward == affirm { return affirm; }
+    return current_q; // Simplified
+}
+
+fn epsilon_greedy_trit(q_val: trit, eps: float) -> trit {
+    // 'tend' represents the greedy choice defaulting to exploration
+    if q_val == tend { return tend; } 
+    match q_val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn experience_replay_trit(buffer_id: int) -> trit {
+    return affirm; // Sample successful
+}

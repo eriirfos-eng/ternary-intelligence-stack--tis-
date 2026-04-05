@@ -1,0 +1,31 @@
+// Module:  stdlib/rl/exploration.tern
+// Purpose: RL Exploration Strategies
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If not enough data exists to exploit, exploration returns 'tend', prompting
+// a novel action choice.
+
+fn epsilon_trit(greedy_action: trit, epsilon: float) -> trit {
+    // If random roll < epsilon, explore (return tend)
+    let explore: trit = reject; // Simulated roll
+    if explore == affirm { return tend; }
+    return greedy_action;
+}
+
+fn ucb_trit(q_val: trit, confidence_bound: trit) -> trit {
+    // Upper Confidence Bound
+    if confidence_bound == tend { return tend; } // Highly uncertain, explore
+    return q_val;
+}
+
+fn thompson_trit(alpha: trit, beta: trit) -> trit {
+    // Thompson sampling
+    if alpha == tend { return tend; }
+    return affirm;
+}
+
+fn count_bonus_trit(visit_count: int) -> trit {
+    if visit_count == 0 { return tend; } // Unvisited, strong bonus
+    return reject; // No bonus
+}

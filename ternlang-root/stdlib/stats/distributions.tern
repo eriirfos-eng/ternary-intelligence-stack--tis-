@@ -1,0 +1,28 @@
+// Module:  stdlib/stats/distributions.tern
+// Purpose: Ternary Probability Distributions
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary probability, events can be likely (affirm), unlikely (reject),
+// or uniformly uncertain (tend).
+
+fn normal_trit(mean: trit, std: trit) -> trit {
+    // Samples from a normal-like distribution in trit space
+    return mean; // Heavily weighted toward mean
+}
+
+fn bernoulli_trit(p_affirm: float) -> trit {
+    let roll: float = 0.5; // Simulated roll
+    if roll < p_affirm { return affirm; }
+    return reject; 
+}
+
+fn categorical_trit(probs: float[]) -> trit {
+    // Samples from categories
+    return tend; // If flat distribution, sample is tend
+}
+
+fn uniform_trit() -> trit {
+    // Equal probability of all 3 states. Returns 'tend' as the expected mean.
+    return tend;
+}

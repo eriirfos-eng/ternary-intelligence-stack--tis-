@@ -1,0 +1,28 @@
+// Module:  stdlib/stats/hypothesis_test.tern
+// Purpose: Statistical Hypothesis Testing
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Returns 'affirm' if significant, 'reject' if not, 'tend' if borderline.
+
+fn t_test_trit(sample_a: trit[], sample_b: trit[], alpha: float) -> trit {
+    let p_val: float = 0.04; // simulated
+    if p_val < alpha { return affirm; } // Significant
+    if p_val < (alpha + 0.05) { return tend; } // Borderline
+    return reject; // Not significant
+}
+
+fn chi_square_trit(observed: int[], expected: int[]) -> trit {
+    let p_val: float = 0.1;
+    if p_val < 0.05 { return affirm; }
+    if p_val < 0.10 { return tend; }
+    return reject;
+}
+
+fn anova_trit(groups: trit[][]) -> trit {
+    // Analysis of Variance across groups
+    let p_val: float = 0.01;
+    if p_val < 0.05 { return affirm; }
+    if p_val < 0.10 { return tend; }
+    return reject;
+}

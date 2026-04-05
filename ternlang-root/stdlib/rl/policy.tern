@@ -1,0 +1,33 @@
+// Module:  stdlib/rl/policy.tern
+// Purpose: RL Policy Gradient
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary policies, 'tend' represents a hold or exploration action.
+
+struct TritPolicy {
+    model: trittensor<4 x 4>
+}
+
+fn select_action_trit(policy: TritPolicy, state: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let logits: trittensor<4 x 1> = policy.model * state;
+    
+    let best_action: trit = logits[0, 0];
+    match best_action {
+        affirm => { return affirm; } // Take action A
+        tend   => { return tend;   } // Wait / Explore
+        reject => { return reject; } // Take action B
+    }
+}
+
+fn policy_gradient_trit(log_prob: trit, advantage: trit) -> trit {
+    // Loss is scaled by advantage
+    if advantage == affirm { return affirm; } // Reinforce
+    return reject; // Discourage
+}
+
+fn entropy_regularize_trit(policy_out: trit) -> trit {
+    if policy_out == tend { return affirm; } // High entropy
+    return tend; // Low entropy
+}

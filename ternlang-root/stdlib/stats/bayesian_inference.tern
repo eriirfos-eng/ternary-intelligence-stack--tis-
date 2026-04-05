@@ -1,0 +1,26 @@
+// Module:  stdlib/stats/bayesian_inference.tern
+// Purpose: Basic Bayesian Inference
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Bayesian updates in trit space.
+
+fn prior_trit() -> trit {
+    return tend; // Uninformative prior
+}
+
+fn likelihood_trit(data: trit, hypothesis: trit) -> trit {
+    if data == hypothesis { return affirm; }
+    return reject;
+}
+
+fn posterior_trit(prior: trit, likelihood: trit) -> trit {
+    if prior == tend { return likelihood; }
+    if likelihood == tend { return prior; }
+    if prior == likelihood { return prior; }
+    return tend; // Conflicting evidence
+}
+
+fn update_belief_trit(current_belief: trit, new_evidence: trit) -> trit {
+    return posterior_trit(current_belief, new_evidence);
+}

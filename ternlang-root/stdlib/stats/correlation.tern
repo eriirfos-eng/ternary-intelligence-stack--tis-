@@ -1,0 +1,30 @@
+// Module:  stdlib/stats/correlation.tern
+// Purpose: Statistical Correlation Measures
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If correlation is ambiguous, returns 'tend'.
+
+fn pearson_trit(x: trit[], y: trit[]) -> trit {
+    // Linear correlation
+    let r: float = 0.8; // simulated
+    if r > 0.5 { return affirm; } // Positive
+    if r < -0.5 { return reject; } // Negative
+    return tend; // Weak/No correlation
+}
+
+fn spearman_trit(x: trit[], y: trit[]) -> trit {
+    // Rank correlation
+    let rho: float = 0.1;
+    if rho > 0.5 { return affirm; }
+    if rho < -0.5 { return reject; }
+    return tend;
+}
+
+fn kendall_trit(x: trit[], y: trit[]) -> trit {
+    // Tau correlation
+    let tau: float = -0.7;
+    if tau > 0.5 { return affirm; }
+    if tau < -0.5 { return reject; }
+    return tend;
+}

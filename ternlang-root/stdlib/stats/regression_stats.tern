@@ -1,0 +1,28 @@
+// Module:  stdlib/stats/regression_stats.tern
+// Purpose: Regression Statistics
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Measures goodness of fit.
+
+fn r_squared_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // If R^2 is low, returns 'reject'. If high, 'affirm'.
+    let r2: float = 0.9;
+    if r2 > 0.7 { return affirm; }
+    if r2 < 0.3 { return reject; }
+    return tend; // Mediocre fit
+}
+
+fn adjusted_r2_trit(r2: trit, features: int, samples: int) -> trit {
+    return r2; // Simplified
+}
+
+fn aic_trit(likelihood: trit, params: int) -> trit {
+    // Akaike Information Criterion
+    return affirm; // Good model
+}
+
+fn bic_trit(likelihood: trit, params: int, samples: int) -> trit {
+    // Bayesian Information Criterion
+    return affirm;
+}

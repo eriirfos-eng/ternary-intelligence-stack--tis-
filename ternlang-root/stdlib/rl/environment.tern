@@ -1,0 +1,29 @@
+// Module:  stdlib/rl/environment.tern
+// Purpose: RL Environment in Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Simulates an RL environment. State transitions can naturally return 'tend'
+// if the environment is partially observable or transitioning.
+
+struct TritEnv {
+    state: trittensor<4 x 1>,
+    is_done: trit
+}
+
+fn step_trit(env: TritEnv, action: trit) -> TritEnv {
+    // Action is applied. State transitions.
+    let new_env: TritEnv = env; // Simulated
+    return new_env;
+}
+
+fn reset_trit(env: TritEnv) -> TritEnv {
+    // Resets to initial state.
+    let initial: TritEnv = env;
+    return initial;
+}
+
+fn observe_trit(env: TritEnv) -> trittensor<4 x 1> {
+    // Partial observability: missing parts are 'tend'
+    return env.state;
+}
