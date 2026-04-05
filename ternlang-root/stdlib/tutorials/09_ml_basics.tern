@@ -1,0 +1,46 @@
+// Module: 09_ml_basics.tern
+// Purpose: Building a minimal 2-layer Ternary Neural Network
+// Author: RFI-IRFOS
+
+// This example builds a simple 2-layer neural network from scratch using 
+// 'trittensor' objects.
+
+fn main() {
+    // 1. Layer 1 Weights (4x4) and Input (4x1)
+    let weights_l1: trittensor<4 x 4> = {
+        [affirm, tend, reject, tend],
+        [tend, affirm, tend, reject],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+
+    let input_vec: trittensor<4 x 1> = {
+        [affirm], [tend], [reject], [tend]
+    };
+
+    // 2. Layer 1: Forward Pass with Sparse Skip
+    @sparseskip
+    let layer_1_out: trittensor<4 x 1> = weights_l1 * input_vec;
+
+    // 3. Layer 2: Weights (2x4) and output
+    let weights_l2: trittensor<2 x 4> = {
+        [affirm, tend, affirm, tend],
+        [reject, tend, reject, tend]
+    };
+
+    // 4. Layer 2: Forward Pass
+    @sparseskip
+    let output_vec: trittensor<2 x 1> = weights_l2 * layer_1_out;
+
+    // 5. Interpreting results
+    // Let's check the first output node
+    let final_res: trit = output_vec[0, 0];
+
+    match final_res {
+        affirm => { print("Neural network output: Affirm (+1)"); }
+        tend   => { print("Neural network output: Tend (0)"); }
+        reject => { print("Neural network output: Reject (-1)"); }
+    }
+    
+    print("Minimal 2-layer TNN inference complete.");
+}

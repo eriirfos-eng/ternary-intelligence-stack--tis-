@@ -1,0 +1,50 @@
+// Module: 08_multi_agent.tern
+// Purpose: Multi-agent coordination and 'Personalities'
+// Author: RFI-IRFOS
+
+// This example spawns 3 agents with different 'personalities' 
+// and asks them all the same question.
+
+// 1. Always returns 'affirm' (+1)
+agent Optimist {
+    fn handle(msg: trit) -> trit {
+        return affirm;
+    }
+}
+
+// 2. Always returns 'reject' (-1)
+agent Pessimist {
+    fn handle(msg: trit) -> trit {
+        return reject;
+    }
+}
+
+// 3. Returns the input unchanged
+agent Realist {
+    fn handle(msg: trit) -> trit {
+        return msg;
+    }
+}
+
+fn main() {
+    // 4. Spawning all three
+    let op = spawn Optimist;
+    let pe = spawn Pessimist;
+    let re = spawn Realist;
+
+    // 5. Sending the same signal 'tend' (neutral)
+    let req_op = send op(tend);
+    let req_pe = send pe(tend);
+    let req_re = send re(tend);
+
+    // 6. Collecting the results
+    let res_op: trit = await req_op;
+    let res_pe: trit = await req_pe;
+    let res_re: trit = await req_re;
+
+    match res_op { affirm => { print("Optimist: It's a YES."); } _ => {} }
+    match res_pe { reject => { print("Pessimist: It's a NO."); } _ => {} }
+    match res_re { tend   => { print("Realist: It's still neutral."); } _ => {} }
+    
+    print("Multi-agent spread completed. Different perspectives on 'tend'.");
+}

@@ -1,0 +1,51 @@
+// Module: 10_attention.tern
+// Purpose: Implementation of Ternary Attention (Q, K, V)
+// Author: RFI-IRFOS
+
+// Attention mechanisms (Q, K, V) are the core of modern Transformer models.
+// Ternary attention is naturally sparse, making it extremely efficient.
+
+fn main() {
+    // 1. Defining Query (Q), Key (K), and Value (V) tensors
+    let Q: trittensor<2 x 4> = {
+        [affirm, tend, reject, tend],
+        [tend, affirm, tend, reject]
+    };
+
+    let K: trittensor<2 x 4> = {
+        [affirm, reject, tend, affirm],
+        [tend, affirm, reject, tend]
+    };
+
+    let V: trittensor<2 x 4> = {
+        [affirm, affirm, tend, reject],
+        [reject, reject, tend, affirm]
+    };
+
+    // 2. Score Calculation: Dot Product (Q, K_transposed)
+    // For 2x4 and 4x2, this results in a 2x2 score matrix
+    let K_T: trittensor<4 x 2> = {
+        [affirm, tend],
+        [reject, affirm],
+        [tend, reject],
+        [affirm, tend]
+    };
+
+    @sparseskip
+    let scores: trittensor<2 x 2> = Q * K_T;
+
+    // 3. Final Attention: Multiply scores by V
+    // For 2x2 and 2x4, this results in 2x4 output
+    @sparseskip
+    let attention_output: trittensor<2 x 4> = scores * V;
+
+    // 4. Interpreting results
+    // Results show where the 'attention' is focused within the three states.
+    let head_focus: trit = attention_output[0, 0];
+    
+    match head_focus {
+        affirm => { print("Head Focus (0,0): Affirm (+1) - Strong association."); }
+        tend   => { print("Head Focus (0,0): Tend (0) - No association."); }
+        reject => { print("Head Focus (0,0): Reject (-1) - Strong negative association."); }
+    }
+}

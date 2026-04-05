@@ -1,0 +1,50 @@
+// Module: 07_agents.tern
+// Purpose: Introduction to Agents, Mailboxes, and Concurrency
+// Author: RFI-IRFOS
+
+// Agents in ternlang are isolated processes that communicate via messages.
+// They are spawned using 'spawn', messages are sent with 'send', 
+// and results are awaited with 'await'.
+
+// 1. Defining an Echo agent
+agent EchoAgent {
+    fn handle(msg: trit) -> trit {
+        // Just return the received message back to the sender
+        return msg;
+    }
+}
+
+// 2. Defining a Transform agent
+agent LogicAgent {
+    fn handle(msg: trit) -> trit {
+        // Transforms: tend (neutral) becomes affirm (positive)
+        match msg {
+            tend => { return affirm; }
+            _    => { return msg; }
+        }
+    }
+}
+
+fn main() {
+    // 3. Spawning agents
+    let echo = spawn EchoAgent;
+    let logic = spawn LogicAgent;
+
+    // 4. Sending messages (non-blocking)
+    let req1 = send echo(affirm);
+    let req2 = send logic(tend);
+
+    // 5. Awaiting results (blocking)
+    let res1: trit = await req1;
+    let res2: trit = await req2;
+
+    match res1 {
+        affirm => { print("EchoAgent: Received affirm."); }
+        _      => { print("EchoAgent: Unexpected response."); }
+    }
+
+    match res2 {
+        affirm => { print("LogicAgent: 'tend' transformed to 'affirm'."); }
+        _      => { print("LogicAgent: Unexpected response."); }
+    }
+}

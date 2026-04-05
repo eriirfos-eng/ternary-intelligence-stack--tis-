@@ -1,0 +1,49 @@
+// Module: 06_structs.tern
+// Purpose: Defining and using 'struct' types for complex data
+// Author: RFI-IRFOS
+
+// Structs are the primary way to group related data in ternlang.
+// Every field must have an explicit type (trit, int, float, or another struct).
+
+// 1. A basic TritSignal struct
+struct TritSignal {
+    strength: trit,
+    confidence: trit,
+    noise: trit
+}
+
+// 2. A nested struct example
+struct SensorNode {
+    id: int,
+    signal: TritSignal
+}
+
+fn main() {
+    // 3. Creating a struct instance
+    let s: TritSignal = {
+        strength: affirm,
+        confidence: tend,
+        noise: reject
+    };
+
+    // 4. Accessing and updating fields
+    let conf: trit = s.confidence;
+
+    match conf {
+        affirm => { print("Confidence: High"); }
+        tend   => { print("Confidence: Uncertain"); }
+        reject => { print("Confidence: Low"); }
+    }
+
+    // 5. Updating a field
+    s.confidence = affirm;
+    print("Confidence updated to High (affirm).");
+
+    // 6. Using a nested struct
+    let node: SensorNode = {
+        id: 1,
+        signal: s
+    };
+
+    print("Sensor node initialized with signal strength.");
+}
