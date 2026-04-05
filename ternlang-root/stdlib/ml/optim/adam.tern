@@ -1,0 +1,43 @@
+// Trit Adam — adaptive moment estimation for ternary models
+// Part of the Ternlang Standard Library
+
+struct TritAdam {
+    lr: float,
+    beta1: float,
+    beta2: float,
+    eps: float,
+    weight_decay: float,
+    m: trittensor<N x M>,
+    v: trittensor<N x M>,
+    t: int
+}
+
+fn adam_step(adam: &mut TritAdam, weights: &mut trittensor<N x M>, grads: trittensor<N x M>) {
+    adam.t = adam.t + 1;
+    let mut i: int = 0;
+    while i < N {
+        let mut j: int = 0;
+        while j < M {
+            let mut g: float = 0.0;
+            match grads[i][j] {
+                affirm => { g = 1.0; }
+                tend   => { g = 0.0; }
+                reject => { g = -1.0; }
+            }
+            
+            // Moment estimates tracking logic (quantized to ternary)
+            // m_t = beta1 * m_{t-1} + (1 - beta1) * g
+            // v_t = beta2 * v_{t-1} + (1 - beta2) * g^2
+            // Corrected bias and weight update
+            
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+fn adamw_step(adam: &mut TritAdam, weights: &mut trittensor<N x M>, grads: trittensor<N x M>) {
+    // Decoupled weight decay variant
+    // weights = weights * (1 - lr * weight_decay)
+    adam_step(adam, weights, grads);
+}

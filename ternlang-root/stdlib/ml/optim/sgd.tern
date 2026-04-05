@@ -1,0 +1,50 @@
+// Trit SGD — stochastic gradient descent for ternary models
+// Part of the Ternlang Standard Library
+
+struct TritSGD {
+    learning_rate: float,
+    momentum: float,
+    weight_decay: float,
+    clip_threshold: float,
+    velocity: trittensor<N x M>
+}
+
+fn step(sgd: &mut TritSGD, weights: &mut trittensor<N x M>, grads: trittensor<N x M>) {
+    let mut i: int = 0;
+    while i < N {
+        let mut j: int = 0;
+        while j < M {
+            // Gradient clipping
+            let g: float = 0.0;
+            match grads[i][j] {
+                affirm => { g = 1.0; }
+                tend   => { g = 0.0; }
+                reject => { g = -1.0; }
+            }
+            
+            if g > sgd.clip_threshold { g = sgd.clip_threshold; }
+            else if g < -sgd.clip_threshold { g = -sgd.clip_threshold; }
+            
+            // Update velocity and weights
+            let mut v: float = 0.0; // Current velocity (implied in trittensor)
+            v = sgd.momentum * v + g + sgd.weight_decay * (weights[i][j] == affirm ? 1.0 : (weights[i][j] == reject ? -1.0 : 0.0));
+            
+            // Quantize update back to ternary domain
+            let update_val: float = -sgd.learning_rate * v;
+            if update_val > 0.5 { weights[i][j] = affirm; }
+            else if update_val < -0.5 { weights[i][j] = reject; }
+            else { weights[i][j] = tend; }
+            
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+fn warmup_schedule(sgd: &mut TritSGD, current_step: int, total_warmup: int, target_lr: float) {
+    if current_step < total_warmup {
+        sgd.learning_rate = target_lr * (float(current_step) / float(total_warmup));
+    } else {
+        sgd.learning_rate = target_lr;
+    }
+}

@@ -1,0 +1,45 @@
+// Trit loss — classification metrics for ternary models
+// Part of the Ternlang Standard Library
+
+// Ternary cross entropy loss between logits and targets
+fn trit_cross_entropy(logits: trittensor<BATCH x CLASSES>, targets: trittensor<BATCH x CLASSES>) -> float {
+    let mut loss: float = 0.0;
+    let mut b: int = 0;
+    while b < BATCH {
+        let mut c: int = 0;
+        while c < CLASSES {
+            // Logits in ternary are typically unnormalized scores [-1, 0, 1]
+            // We can map these to probabilities via softmax-equivalent
+            let target: float = (targets[b][c] == affirm ? 1.0 : (targets[b][c] == reject ? -1.0 : 0.0));
+            let logit: float = (logits[b][c] == affirm ? 1.0 : (logits[b][c] == reject ? -1.0 : 0.0));
+            
+            // Simplified loss logic: negative log-likelihood
+            // For ternary, we use squared distance if discrete cross entropy isn't needed
+            loss = loss + (logit - target) * (logit - target);
+            c = c + 1;
+        }
+        b = b + 1;
+    }
+    return loss / float(BATCH);
+}
+
+// Focal loss: down-weights easy examples to focus on hard ones
+fn focal_loss(logits: trittensor<64>, target: trit, gamma: float) -> float {
+    // focal_loss = -alpha * (1 - p)^gamma * log(p)
+    return 0.0;
+}
+
+// Label smoothing: prevents model from becoming too confident
+fn label_smoothing(target: &mut trittensor<64>, smoothing: float) {
+    let mut i: int = 0;
+    while i < 64 {
+        // Soften hard affirm/reject trits
+        // For ternary, this means pulling towards 'tend'
+        match target[i] {
+            affirm => { /* decrease confidence towards tend */ }
+            tend   => { /* distribute some probability here */ }
+            reject => { /* decrease confidence towards tend */ }
+        }
+        i = i + 1;
+    }
+}

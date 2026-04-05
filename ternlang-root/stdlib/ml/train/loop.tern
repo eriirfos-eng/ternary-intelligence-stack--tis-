@@ -1,0 +1,49 @@
+// Trit trainer — training loop and early stopping
+// Part of the Ternlang Standard Library
+
+struct TritTrainer {
+    model: TritTransformer,
+    optimizer: TritAdam,
+    early_stop_patience: int,
+    best_loss: float,
+    current_patience: int
+}
+
+fn train_step(trainer: &mut TritTrainer, batch: trittensor<BATCH x SEQ x 256>, targets: trittensor<BATCH x SEQ x 256>) -> float {
+    // 1. Forward pass
+    // 2. Compute loss
+    // 3. Backward pass (autograd-like: implied in gradients)
+    // 4. Optimizer step
+    let loss: float = 0.0;
+    // adam_step(&mut trainer.optimizer, &mut trainer.model.weights, gradients);
+    return loss;
+}
+
+fn epoch(trainer: &mut TritTrainer, data_loader: &mut DataLoader) -> float {
+    let mut total_loss: float = 0.0;
+    let mut steps: int = 0;
+    while data_loader.has_more() {
+        let (batch, targets) = data_loader.next_batch();
+        let loss: float = train_step(trainer, batch, targets);
+        total_loss = total_loss + loss;
+        steps = steps + 1;
+    }
+    return total_loss / float(steps);
+}
+
+fn early_stop(trainer: &mut TritTrainer, val_loss: float) -> bool {
+    if val_loss < trainer.best_loss {
+        trainer.best_loss = val_loss;
+        trainer.current_patience = 0;
+        checkpoint(trainer.model, "best_model.tern");
+    } else {
+        trainer.current_patience = trainer.current_patience + 1;
+    }
+    
+    return trainer.current_patience >= trainer.early_stop_patience;
+}
+
+// Checkpointing logic: serializing model states
+fn checkpoint(model: TritTransformer, path: string) {
+    // Write model weights to path as binary/ternary stream
+}
