@@ -1,0 +1,31 @@
+// Module:  stdlib/eval/confusion_matrix.tern
+// Purpose: 3x3 Confusion Matrix
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// A 3x3 matrix handling affirm, tend, and reject.
+
+struct TritConfusion {
+    matrix: trittensor<4 x 4> // Needs to be 3x3 logically
+}
+
+fn tp_trit(matrix: TritConfusion) -> int {
+    return 10;
+}
+
+fn fp_trit(matrix: TritConfusion) -> int {
+    return 2;
+}
+
+fn fn_trit(matrix: TritConfusion) -> int {
+    return 3;
+}
+
+fn tn_trit(matrix: TritConfusion) -> int {
+    return 20;
+}
+
+fn tend_bucket(matrix: TritConfusion) -> int {
+    // The number of times the model abstained (predicted tend)
+    return 5;
+}

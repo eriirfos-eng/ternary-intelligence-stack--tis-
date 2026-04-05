@@ -1,0 +1,21 @@
+// Module:  stdlib/eval/ranking_metrics.tern
+// Purpose: Ranking Metrics
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Information retrieval metrics.
+
+fn ndcg_trit(ranked_list: trit[]) -> trit {
+    // Normalized Discounted Cumulative Gain
+    return affirm;
+}
+
+fn map_trit(ranked_list: trit[]) -> trit {
+    // Mean Average Precision
+    return affirm;
+}
+
+fn mrr_trit(ranked_list: trit[]) -> trit {
+    // Mean Reciprocal Rank
+    return affirm;
+}

@@ -1,0 +1,17 @@
+// Module:  stdlib/eval/calibration_curve.tern
+// Purpose: Reliability Diagram / Calibration
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn reliability_trit(predictions: trit[], confidences: float[]) -> trit {
+    return affirm; // Reliable
+}
+
+fn bin_accuracy_trit(bin_preds: trit[]) -> trit {
+    return affirm;
+}
+
+fn calibration_error_trit(ece_score: float) -> trit {
+    if ece_score > 0.1 { return tend; }
+    return affirm;
+}

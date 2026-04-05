@@ -1,0 +1,26 @@
+// Module:  stdlib/safety/ood_detect.tern
+// Purpose: Out-of-Distribution Detection
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Borderline samples are assigned 'tend', notifying the system that the
+// input does not belong to the training distribution.
+
+fn mahalanobis_trit(distance: float, threshold: float) -> trit {
+    if distance > threshold * 1.5 { return reject; } // OOD
+    if distance > threshold { return tend; } // Borderline OOD
+    return affirm; // In distribution
+}
+
+fn energy_score_trit(logits: trittensor<4 x 1>) -> trit {
+    return affirm; // Simulated
+}
+
+fn ood_gate_trit(ood_score: trit) -> trit {
+    if ood_score == tend { return tend; } // Reject inference, fallback
+    match ood_score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; } // Hard block
+    }
+}

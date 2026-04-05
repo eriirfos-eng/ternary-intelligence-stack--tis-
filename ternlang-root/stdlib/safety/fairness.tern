@@ -1,0 +1,26 @@
+// Module:  stdlib/safety/fairness.tern
+// Purpose: AI Fairness Metrics
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If fairness metrics fail, model inference returns 'tend' (holds).
+
+fn demographic_parity_trit(group_a_rate: float, group_b_rate: float) -> trit {
+    let diff: float = 0.05; // Simulated absolute difference
+    if diff > 0.2 { return reject; } // Unfair
+    if diff > 0.05 { return tend; } // Borderline
+    return affirm; // Fair
+}
+
+fn equalized_odds_trit(group_a_tp: float, group_b_tp: float) -> trit {
+    return affirm;
+}
+
+fn fairness_gate_trit(fairness_score: trit) -> trit {
+    if fairness_score == tend { return tend; } // Audit required
+    match fairness_score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

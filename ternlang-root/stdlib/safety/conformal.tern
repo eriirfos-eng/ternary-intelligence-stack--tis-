@@ -1,0 +1,24 @@
+// Module:  stdlib/safety/conformal.tern
+// Purpose: Conformal Prediction
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// If the prediction set from conformal prediction includes multiple conflicting classes,
+// it naturally returns 'tend', forcing the system to ask for clarification.
+
+fn nonconformity_trit(score: float, threshold: float) -> trit {
+    if score > threshold { return reject; } // Non-conforming
+    return affirm; // Conforming
+}
+
+fn prediction_set_trit(scores: float[], threshold: float) -> trit {
+    // If the set contains both affirm and reject classes, return tend.
+    let count: int = 2; // simulated size
+    if count > 1 { return tend; } // Ambiguous set
+    return affirm;
+}
+
+fn coverage_guarantee_trit(coverage: float, target: float) -> trit {
+    if coverage >= target { return affirm; }
+    return reject;
+}

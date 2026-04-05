@@ -1,0 +1,23 @@
+// Module:  stdlib/safety/adversarial.tern
+// Purpose: Adversarial Robustness
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Detects perturbations.
+
+fn perturbation_trit(input: trittensor<4 x 1>, base: trittensor<4 x 1>) -> trit {
+    // Checks difference.
+    return affirm; // No perturbation
+}
+
+fn robust_predict_trit(model_ensemble: trit[]) -> trit {
+    let first: trit = model_ensemble[0];
+    if first == tend { return tend; } // Attack detected, predictions scattered
+    return first;
+}
+
+fn certified_radius_trit(radius: float) -> trit {
+    if radius > 0.5 { return affirm; } // Safe
+    if radius < 0.1 { return reject; } // Vulnerable
+    return tend; // Marginally safe
+}

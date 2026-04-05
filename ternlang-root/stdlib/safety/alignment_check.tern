@@ -1,0 +1,27 @@
+// Module:  stdlib/safety/alignment_check.tern
+// Purpose: Constitutional AI Alignment
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Checks if an action aligns with constitutional principles.
+
+fn value_alignment_trit(action: trit, principle: trit) -> trit {
+    if action == principle { return affirm; } // Aligned
+    if action == tend { return tend; } // Action is ambiguous
+    return reject; // Misaligned
+}
+
+fn constraint_check_trit(state: trit, bounds: trit) -> trit {
+    if state == bounds { return affirm; }
+    return reject;
+}
+
+fn refusal_gate_trit(alignment_score: trit) -> trit {
+    // If alignment is tend, we refuse gracefully
+    if alignment_score == tend { return tend; }
+    match alignment_score {
+        affirm => { return affirm; } // Proceed
+        tend   => { return tend;   } // Escalate
+        reject => { return reject; } // Block
+    }
+}

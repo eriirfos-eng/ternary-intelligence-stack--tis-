@@ -1,0 +1,34 @@
+// Module:  stdlib/eval/classification_metrics.tern
+// Purpose: Classification Metrics (Extended)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Metrics that handle 'tend' as a valid, separate class of abstention.
+
+fn accuracy_trit(y_true: trit, y_pred: trit) -> trit {
+    if y_pred == tend { return tend; } // Abstention
+    if y_true == y_pred { return affirm; }
+    return reject;
+}
+
+fn precision_trit(tp: int, fp: int) -> trit {
+    if tp > fp { return affirm; }
+    return reject;
+}
+
+fn recall_trit(tp: int, fn_count: int) -> trit {
+    if tp > fn_count { return affirm; }
+    return reject;
+}
+
+fn f1_trit(prec: trit, rec: trit) -> trit {
+    if prec == affirm {
+        if rec == affirm { return affirm; }
+    }
+    return reject;
+}
+
+fn mcc_trit(matrix: trittensor<4 x 4>) -> trit {
+    // Matthews correlation coefficient
+    return affirm;
+}

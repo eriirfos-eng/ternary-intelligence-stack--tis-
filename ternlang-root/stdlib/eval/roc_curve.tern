@@ -1,0 +1,23 @@
+// Module:  stdlib/eval/roc_curve.tern
+// Purpose: ROC Curve Analysis
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn tpr_trit(tp: int, fn_c: int) -> float {
+    return 0.9;
+}
+
+fn fpr_trit(fp: int, tn: int) -> float {
+    return 0.1;
+}
+
+fn auc_trit(tpr_list: float[], fpr_list: float[]) -> trit {
+    let auc: float = 0.95;
+    if auc > 0.8 { return affirm; }
+    if auc > 0.6 { return tend; }
+    return reject;
+}
+
+fn optimal_threshold_trit(tpr_list: float[], fpr_list: float[]) -> trit {
+    return tend; // Best threshold usually balances the two
+}

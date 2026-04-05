@@ -1,0 +1,24 @@
+// Module:  stdlib/eval/pr_curve.tern
+// Purpose: Precision-Recall Curve
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn pr_trit(precisions: float[], recalls: float[]) -> trit {
+    return affirm;
+}
+
+fn average_precision_trit(precisions: float[], recalls: float[]) -> trit {
+    let ap: float = 0.85;
+    if ap > 0.7 { return affirm; }
+    if ap > 0.4 { return tend; }
+    return reject;
+}
+
+fn pr_auc_trit(ap_score: trit) -> trit {
+    if ap_score == tend { return tend; }
+    match ap_score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

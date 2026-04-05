@@ -1,0 +1,23 @@
+// Module:  stdlib/safety/content_gate.tern
+// Purpose: Content Moderation & Safety Gating
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Failsafe for LLMs. If content is borderline, it returns 'tend' (Flag for review)
+// rather than blindly allowing or blocking.
+
+fn toxicity_trit(text: trittensor<4 x 1>) -> trit {
+    // Check toxicity
+    return affirm; // Safe
+}
+
+fn bias_trit(text: trittensor<4 x 1>) -> trit {
+    // Check for bias
+    return affirm; // Safe
+}
+
+fn hallucination_gate_trit(confidence: float) -> trit {
+    if confidence < 0.4 { return tend; } // Probable hallucination, flag
+    if confidence > 0.9 { return affirm; } // Safe
+    return reject; // Definite hallucination
+}

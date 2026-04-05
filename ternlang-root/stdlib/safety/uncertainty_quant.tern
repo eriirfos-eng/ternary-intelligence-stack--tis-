@@ -1,0 +1,23 @@
+// Module:  stdlib/safety/uncertainty_quant.tern
+// Purpose: Uncertainty Quantification
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Decomposes uncertainty into aleatoric (data) and epistemic (model).
+
+fn aleatoric_trit(noise_level: float) -> trit {
+    if noise_level > 0.5 { return tend; } // Irreducible noise
+    return affirm; // Clear signal
+}
+
+fn epistemic_trit(model_variance: float) -> trit {
+    if model_variance > 0.3 { return tend; } // Model is unsure, needs data
+    return affirm;
+}
+
+fn total_uncertainty_trit(alea: trit, epis: trit) -> trit {
+    if alea == tend { return tend; }
+    if epis == tend { return tend; }
+    if alea == epis { return affirm; }
+    return reject; // Error in calculation
+}

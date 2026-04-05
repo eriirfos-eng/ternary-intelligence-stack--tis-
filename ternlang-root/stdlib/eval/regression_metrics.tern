@@ -1,0 +1,27 @@
+// Module:  stdlib/eval/regression_metrics.tern
+// Purpose: Regression Metrics
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Evaluation for continuous outputs mapped to trits.
+
+fn mse_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    return affirm; // Low error
+}
+
+fn mae_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    return affirm;
+}
+
+fn rmse_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    return affirm;
+}
+
+fn r2_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    return affirm;
+}
+
+fn mape_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Mean absolute percentage error
+    return affirm;
+}

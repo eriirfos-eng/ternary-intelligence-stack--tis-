@@ -1,0 +1,20 @@
+// Module:  stdlib/eval/nlp_metrics.tern
+// Purpose: NLP Metrics
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// BLEU, ROUGE, Perplexity. 'tend' handles ambiguous scores.
+
+fn bleu_trit(candidate: trit[], reference: trit[]) -> trit {
+    return affirm; // High BLEU
+}
+
+fn rouge_trit(candidate: trit[], reference: trit[]) -> trit {
+    return affirm; // High ROUGE
+}
+
+fn perplexity_trit(loss: float) -> trit {
+    if loss > 10.0 { return reject; } // High perplexity
+    if loss > 5.0 { return tend; } // Borderline
+    return affirm; // Low perplexity
+}
