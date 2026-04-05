@@ -1,0 +1,51 @@
+// Ternlang Tutorial 08: Societal Logic & Governance
+// Modeling ethical gatekeeping and multi-agent governance.
+
+import societal.ethics.deliberation;
+import societal.governance.policy;
+
+pub fn main() {
+    // ── 1. Ethics: Moral Gatekeeping ───────────────────────────────────────
+    let benefit: float = 0.85;
+    let risk: float = 0.45;
+    let is_illegal: bool = false;
+    
+    // Assess the primary moral permission
+    let moral_status: trit = deliberation.moral_assessment(benefit, risk, is_illegal);
+    println!("Moral Assessment Status: {}", moral_status);
+    
+    // ── 2. Governance: Multi-Agent Consensus ───────────────────────────────
+    // Simulate a voting committee of 27 agents
+    let mut committee_votes: trittensor<27> = trittensor<27>::zero();
+    
+    // Majority supports, but one legal expert signals a potential violation
+    let mut i: int = 0;
+    while i < 15 { committee_votes[i] = affirm; i = i + 1; }
+    while i < 26 { committee_votes[i] = tend; i = i + 1; }
+    committee_votes[26] = reject; // The Legal Veto
+    
+    // In a STRICT policy, the single reject -1 should block the proposal
+    let strict_result: trit = policy.triadic_vote_consensus(committee_votes, true);
+    println!("Strict Policy Vote Result: {}", strict_result);
+    
+    // In a LAX policy, the consensus might still be a hold or a pass
+    let lax_result: trit = policy.triadic_vote_consensus(committee_votes, false);
+    println!("Lax Policy Vote Result: {}", lax_result);
+
+    // ── 3. Collective Arbitration ──────────────────────────────────────────
+    // Final routing based on ethics and committee outcome
+    let final_decision: trit = policy.arbitration_path_select(moral_status, strict_result, lax_result);
+    println!("Final Societal Decision: {}", final_decision);
+    
+    match final_decision {
+        affirm => {
+            println!("Status: APPROVED. Proposal aligns with ethical and governance norms.");
+        }
+        tend => {
+            println!("Status: PENDING. Consensus marginal. Hold for human arbitration.");
+        }
+        reject => {
+            println!("Status: BLOCKED. Proposal violates ethical axioms or governance vetos.");
+        }
+    }
+}

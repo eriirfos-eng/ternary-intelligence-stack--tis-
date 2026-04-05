@@ -1,0 +1,153 @@
+// Ternlang Advanced Uncertainty & Ambiguity Module
+// Domain: reasoning.uncertainty_ext
+// Version: 1.1.0
+// Description: Advanced metrics for measuring triadic logical tension and deliberation states.
+
+/**
+ * @fn triadic_tension
+ * Measures the "tension" between affirm (+1) and reject (-1) signals.
+ * A high tension score indicates a direct conflict that state 0 (tend) must resolve.
+ */
+pub fn triadic_tension(stream: trittensor<64>) -> float {
+    let mut pos: int = 0;
+    let mut neg: int = 0;
+    let mut i: int = 0;
+    while i < 64 {
+        if stream[i] == affirm { pos = pos + 1; }
+        if stream[i] == reject { neg = neg + 1; }
+        i = i + 1;
+    }
+    
+    if pos + neg == 0 { return 0.0; }
+    
+    // tension = min(pos, neg) / max(pos, neg)
+    let f_pos: float = float(pos);
+    let f_neg: float = float(neg);
+    if f_pos > f_neg { return f_neg / f_pos; }
+    return f_pos / f_neg;
+}
+
+/**
+ * @fn resolve_ambiguity
+ * Given a list of expert verdicts, determines if the system should collapse to a decision 
+ * or remain in stasis (tend).
+ */
+pub fn resolve_ambiguity(verdicts: trittensor<13>, threshold: float) -> trit {
+    let mut consensus_val: trit = consensus_all(verdicts);
+    let mut confidence: float = compute_mass(verdicts);
+    
+    if confidence > threshold {
+        return consensus_val;
+    }
+    
+    return tend; // Not enough mass to break stasis
+}
+
+/**
+ * @fn compute_mass
+ * Computes the "decisive mass" of a trit stream (ratio of non-zero trits).
+ */
+pub fn compute_mass(stream: trittensor<13>) -> float {
+    let mut engaged: int = 0;
+    let mut i: int = 0;
+    while i < 13 {
+        if stream[i] != tend { engaged = engaged + 1; }
+        i = i + 1;
+    }
+    return float(engaged) / 13.0;
+}
+
+/**
+ * @fn confidence_decay
+ * Applies a temporal decay to a confidence score.
+ * Useful for provisional memories that lose certainty over time.
+ */
+pub fn confidence_decay(initial_conf: float, elapsed_sec: int, half_life: float) -> float {
+    let t: float = float(elapsed_sec);
+    return initial_conf * exp(-0.693 * t / half_life);
+}
+
+/**
+ * @fn is_stable_attractor
+ * Determines if a hold state (0) is a "stable attractor" (balanced signals) 
+ * or a "transient state" (insufficient data).
+ */
+pub fn is_stable_attractor(verdicts: trittensor<13>) -> trit {
+    let tension: float = triadic_tension_small(verdicts);
+    let mass: float = compute_mass(verdicts);
+    
+    // If high mass and high tension -> Stable hold (Logic Equilibrium)
+    if mass > 0.6 && tension > 0.7 { return affirm; }
+    
+    // If low mass -> Transient hold (Missing Evidence)
+    if mass < 0.3 { return reject; }
+    
+    return tend;
+}
+
+// Internal helpers
+fn triadic_tension_small(stream: trittensor<13>) -> float {
+    let mut pos: int = 0;
+    let mut neg: int = 0;
+    let mut i: int = 0;
+    while i < 13 {
+        if stream[i] == affirm { pos = pos + 1; }
+        if stream[i] == reject { neg = neg + 1; }
+        i = i + 1;
+    }
+    if pos + neg == 0 { return 0.0; }
+    let f_pos: float = float(pos);
+    let f_neg: float = float(neg);
+    if f_pos > f_neg { return f_neg / f_pos; }
+    return f_pos / f_neg;
+}
+
+fn consensus_all(stream: trittensor<13>) -> trit {
+    let mut res: trit = stream[0];
+    let mut i: int = 1;
+    while i < 13 {
+        res = consensus(res, stream[i]);
+        i = i + 1;
+    }
+    return res;
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Detecting logical deadlock
+let deadlock = is_stable_attractor(moe_signals);
+if deadlock == affirm {
+    request_human_arbitration();
+}
+
+Example 2: Confidence decay for sensor data
+let current_conf = confidence_decay(last_conf, time_since_update, 300.0);
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "uncertainty_mass" {
+    let mut stream: trittensor<13> = trittensor<13>::zero();
+    stream[0] = affirm;
+    stream[1] = reject;
+    assert(compute_mass(stream) > 0.1);
+}
+
+test "uncertainty_tension" {
+    let mut stream: trittensor<64> = trittensor<64>::zero();
+    stream[0] = affirm;
+    stream[1] = reject;
+    assert_eq!(triadic_tension(stream), 1.0);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "ambiguity_resolution_perf" {
+    let mut i = 0;
+    let stream = trittensor<13>::zero();
+    while i < 2000 {
+        resolve_ambiguity(stream, 0.5);
+        i = i + 1;
+    }
+}

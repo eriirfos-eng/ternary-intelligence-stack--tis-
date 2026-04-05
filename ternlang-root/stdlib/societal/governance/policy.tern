@@ -1,0 +1,114 @@
+// Ternlang Societal Governance & Policy Module
+// Domain: societal.governance.policy
+// Version: 1.0.0
+// Description: Multi-agent arbitration, voting, and collective decision logic.
+
+/**
+ * @fn triadic_vote_consensus
+ * Aggregates a stream of N triadic votes into a single collective outcome.
+ * Uses strict consensus logic: any reject -1 vetoes the outcome if policy is strict.
+ */
+pub fn triadic_vote_consensus(votes: trittensor<27>, is_strict: bool) -> trit {
+    let mut i: int = 0;
+    let mut res: trit = votes[0];
+    
+    while i < 27 {
+        if is_strict && votes[i] == reject { return reject; }
+        res = consensus(res, votes[i]);
+        i = i + 1;
+    }
+    return res;
+}
+
+/**
+ * @fn weighted_arbitration
+ * Resolves a conflict between two agents based on their authority weights.
+ */
+pub fn weighted_arbitration(v1: trit, w1: float, v2: trit, w2: float) -> trit {
+    // If signals are the same, no arbitration needed
+    if v1 == v2 { return v1; }
+    
+    // Higher weight wins
+    if w1 > w2 * 1.5 { return v1; }
+    if w2 > w1 * 1.5 { return v2; }
+    
+    // If weights are comparable, return a hold (0)
+    return tend;
+}
+
+/**
+ * @fn proposal_status
+ * Maps proposal state based on support and opposition mass.
+ * returns: affirm (Passed), tend (Pending/Review), reject (Failed/Vetoed)
+ */
+pub fn proposal_status(support: float, opposition: float, quorum: float) -> trit {
+    if support + opposition < quorum { return tend; } // Insufficient votes
+    
+    if opposition > support { return reject; }
+    if support > 2.0 * opposition { return affirm; }
+    
+    return tend; // Contested / Marginal
+}
+
+/**
+ * @fn collective_veto_check
+ * Detects if a threshold of agents have signaled a veto.
+ */
+pub fn collective_veto_check(votes: trittensor<27>, threshold: int) -> bool {
+    let mut rejects: int = 0;
+    let mut i: int = 0;
+    while i < 27 {
+        if votes[i] == reject { rejects = rejects + 1; }
+        i = i + 1;
+    }
+    return rejects >= threshold;
+}
+
+/**
+ * @fn arbitration_path_select
+ * High-level routing for a contested proposal.
+ * returns: affirm (Go), tend (Review), reject (Abort)
+ */
+pub fn arbitration_path_select(expert_v: trit, legal_v: trit, community_v: trit) -> trit {
+    // Expert or Legal veto is a hard block
+    if expert_v == reject || legal_v == reject { return reject; }
+    
+    // Otherwise, follow standard consensus of all three
+    return consensus(consensus(expert_v, legal_v), community_v);
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: DAO Proposal voting
+let result = triadic_vote_consensus(ballot_box, true);
+execute_proposal(result);
+
+Example 2: Conflict resolution between Safety and Utility agents
+let decision = weighted_arbitration(safety_v, 0.95, utility_v, 0.70);
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "governance_voting_strict" {
+    let mut votes: trittensor<27> = trittensor<27>::zero();
+    votes[0] = affirm;
+    votes[1] = reject;
+    assert_eq!(triadic_vote_consensus(votes, true), reject);
+}
+
+test "governance_arbitration_weight" {
+    assert_eq!(weighted_arbitration(affirm, 0.9, reject, 0.1), affirm);
+    assert_eq!(weighted_arbitration(affirm, 0.5, reject, 0.5), tend);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "vote_consensus_latency" {
+    let mut i = 0;
+    let votes = trittensor<27>::zero();
+    while i < 3000 {
+        triadic_vote_consensus(votes, false);
+        i = i + 1;
+    }
+}

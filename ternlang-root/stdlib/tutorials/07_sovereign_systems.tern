@@ -1,0 +1,47 @@
+// Ternlang Tutorial 07: Sovereign Systems
+// Building a resilient sovereign node with triadic routing and security.
+
+import systems.network.routing;
+import systems.security.zero_trust;
+
+pub fn main() {
+    // ── 1. Network Path Assessment ─────────────────────────────────────────
+    let rtt: float = 45.0;
+    let packet_loss: float = 0.0;
+    let queue: float = 15.0;
+    
+    let latency_status: trit = routing.assess_path_latency(rtt, 50.0);
+    let congestion_status: trit = routing.congestion_trit(packet_loss, queue, 100.0);
+    
+    println!("Network Latency: {}", latency_status);
+    println!("Network Congestion: {}", congestion_status);
+
+    // ── 2. Security Trust Assessment ───────────────────────────────────────
+    let device_health: trit = affirm; // Device is secure
+    let auth_conf: float = 0.75;      // Moderate authentication confidence
+    
+    let trust_level: trit = zero_trust.session_trust_assessment(auth_conf, device_health);
+    println!("Session Trust Level: {}", trust_level);
+    
+    // ── 3. Sovereign Access Gate ───────────────────────────────────────────
+    // Request access to a sensitive resource (e.g. Sovereign Key)
+    let is_sensitive: trit = affirm; 
+    let context_safe: trit = latency_status; // We only allow access if network is healthy
+    
+    let access_decision: trit = zero_trust.access_policy_gate(trust_level, is_sensitive, context_safe);
+    println!("Access Decision: {}", access_decision);
+
+    // ── 4. Final Routing & Action ──────────────────────────────────────────
+    match access_decision {
+        affirm => {
+            println!("Status: ACCESS GRANTED. Executing command over secure path.");
+        }
+        tend => {
+            println!("Status: MFA REQUIRED. Challenging user for secondary evidence.");
+            // In a real system, we'd trigger an MFA challenge here
+        }
+        reject => {
+            println!("Status: ACCESS DENIED. Network/Security constraints violated.");
+        }
+    }
+}

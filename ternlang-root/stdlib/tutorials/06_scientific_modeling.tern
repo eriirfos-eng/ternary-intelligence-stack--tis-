@@ -1,0 +1,40 @@
+// Ternlang Tutorial 06: Scientific Modeling
+// Modeling physical stability and biological regulation.
+
+import scientific.physics.stability;
+import bio.gene_regulation;
+
+pub fn main() {
+    // ── 1. Physics: Stability Analysis ─────────────────────────────────────
+    // Analyze a potential well with a given second derivative
+    let curvature: float = 12.5; // Steep positive curvature
+    let stability_status: trit = stability.analyze_stability(curvature, 0.1);
+    
+    println!("Physical Stability Status: {}", stability_status);
+    
+    match stability_status {
+        affirm => { println!("System is in a stable local minimum."); }
+        tend   => { println!("System is in a metastable or flat region."); }
+        reject => { println!("System is UNSTABLE. Dynamic collapse possible."); }
+    }
+
+    // ── 2. Biology: Gene Regulation ────────────────────────────────────────
+    // Model a transcription factor influencing a target gene
+    let tf_signal: trit = affirm; // TF is active
+    let log2_fc: float = 2.4;     // Target gene shows high fold-change
+    
+    let target_status: trit = gene_regulation.classify_expression(log2_fc, 1.0);
+    println!("Target Gene Expression: {}", target_status);
+    
+    // Check if the influence is consistent with TF state
+    let regulation_consistency: trit = gene_regulation.transcription_influence(tf_signal, 0.85, target_status);
+    println!("Regulatory Consistency: {}", regulation_consistency);
+
+    // ── 3. Combined Logic ──────────────────────────────────────────────────
+    // A synthetic bio-circuit that only activates if physical conditions are stable
+    if stability_status == affirm && regulation_consistency == affirm {
+        println!("Synthetic Circuit: GO. All conditions met.");
+    } else {
+        println!("Synthetic Circuit: HOLD/ABORT. Check physical/bio constraints.");
+    }
+}

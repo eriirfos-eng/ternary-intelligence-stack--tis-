@@ -1,0 +1,131 @@
+// Ternlang Systems Security Zero Trust Module
+// Domain: systems.security.zero_trust
+// Version: 1.0.0
+// Description: Triadic access control and zero-trust policy enforcement.
+
+/**
+ * @fn session_trust_assessment
+ * Maps authentication confidence and device health to a session trit.
+ * returns: affirm (Trusted), tend (Elevated Risk/MFA needed), reject (Compromised/VETO)
+ */
+pub fn session_trust_assessment(auth_score: float, device_healthy: trit) -> trit {
+    // If device is rejected (-1) -> Session is rejected
+    if device_healthy == reject { return reject; }
+    
+    // Low auth score (< 0.5) -> Session is rejected
+    if auth_score < 0.5 { return reject; }
+    
+    // Moderate auth score (< 0.8) or marginal device health -> Need more evidence (0)
+    if auth_score < 0.8 || device_healthy == tend { return tend; }
+    
+    return affirm; // Trusted
+}
+
+/**
+ * @fn access_policy_gate
+ * Evaluates a triadic access policy based on user, resource, and context.
+ */
+pub fn access_policy_gate(user_authorized: trit, resource_sensitive: trit, context_safe: trit) -> trit {
+    // Context unsafe is a hard veto
+    if context_safe == reject { return reject; }
+    
+    // Unauthorized user is a hard veto
+    if user_authorized == reject { return reject; }
+    
+    match resource_sensitive {
+        affirm => {
+            // Highly sensitive resource: require full trust
+            if user_authorized == affirm && context_safe == affirm { return affirm; }
+            return tend; // Need manual review or MFA
+        }
+        tend => {
+            // Normal resource: follow standard consensus
+            return consensus(user_authorized, context_safe);
+        }
+        reject => {
+            // Public resource: permissive
+            return affirm;
+        }
+    }
+}
+
+/**
+ * @fn detect_intrusion_signal
+ * Analyzes behavioral anomalies to produce a security signal.
+ */
+pub fn detect_intrusion_signal(failed_attempts: int, unusual_location: trit, velocity_violation: bool) -> trit {
+    // Brute force or velocity violation (impossible travel) -> Hard veto
+    if failed_attempts > 10 || velocity_violation { return reject; }
+    
+    // Unusual location is a cautionary signal (0)
+    if unusual_location == reject { return tend; }
+    
+    if failed_attempts > 3 { return tend; }
+    
+    return affirm; // Normal behavior
+}
+
+/**
+ * @fn enforce_mfa_deliberation
+ * Determines if MFA is strictly required based on trust state.
+ * returns: affirm (Allow), tend (Request MFA), reject (Deny)
+ */
+pub fn enforce_mfa_deliberation(trust_state: trit, mfa_verified: bool) -> trit {
+    match trust_state {
+        affirm => { return affirm; } // Already trusted
+        tend   => { 
+            if mfa_verified { return affirm; }
+            return tend; // Wait for MFA
+        }
+        reject => { return reject; } // Denied regardless of MFA
+    }
+}
+
+/**
+ * @fn aggregate_security_posture
+ * Combines network, endpoint, and identity signals into a global posture trit.
+ */
+pub fn aggregate_security_posture(network: trit, endpoint: trit, identity: trit) -> trit {
+    // Endpoint compromise is a hard gate
+    if endpoint == reject { return reject; }
+    
+    let combined: trit = consensus(network, identity);
+    return consensus(combined, endpoint);
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Dynamic API access gate
+let trust = session_trust_assessment(token_entropy, laptop_encryption_state);
+let decision = access_policy_gate(trust, db_confidentiality, network_location);
+
+Example 2: Behavioral intrusion detection
+let signal = detect_intrusion_signal(fails, geofence_signal, impossible_travel);
+if signal == reject { lockout_account(); }
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "security_trust_assessment" {
+    assert_eq!(session_trust_assessment(0.95, affirm), affirm);
+    assert_eq!(session_trust_assessment(0.20, affirm), reject);
+    assert_eq!(session_trust_assessment(0.70, affirm), tend);
+}
+
+test "security_policy_gate" {
+    // High sensitivity resource requires full trust
+    assert_eq!(access_policy_gate(affirm, affirm, tend), tend);
+    // Public resource allows access even if user status is marginal
+    assert_eq!(access_policy_gate(tend, reject, affirm), affirm);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "posture_aggregation_latency" {
+    let mut i = 0;
+    while i < 5000 {
+        aggregate_security_posture(affirm, tend, affirm);
+        i = i + 1;
+    }
+}

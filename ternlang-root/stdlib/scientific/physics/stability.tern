@@ -1,0 +1,103 @@
+// Ternlang Physics Stability Module
+// Domain: scientific.physics.stability
+// Version: 1.0.0
+// Description: Physical system analysis and equilibrium modeling in trit-space.
+
+/**
+ * @fn classify_charge
+ * Maps electrostatic or generic charge to a trit.
+ * returns: affirm (positive), tend (neutral), reject (negative)
+ */
+pub fn classify_charge(q: float, epsilon: float) -> trit {
+    if q > epsilon { return affirm; }
+    if q < -epsilon { return reject; }
+    return tend;
+}
+
+/**
+ * @fn potential_gradient
+ * Maps the derivative of a potential field U'(x) to a trit.
+ * In physics, -U'(x) is force.
+ * returns: affirm (pull positive), tend (equilibrium), reject (pull negative)
+ */
+pub fn potential_gradient(dU: float, threshold: float) -> trit {
+    if dU > threshold { return reject; } // Force is negative (restoring)
+    if dU < -threshold { return affirm; } // Force is positive (restoring)
+    return tend; // Point of equilibrium
+}
+
+/**
+ * @fn analyze_stability
+ * Determines stability of an equilibrium point using the second derivative U''(x).
+ * returns: affirm (Stable / Local Min), tend (Metastable / Flat), reject (Unstable / Local Max)
+ */
+pub fn analyze_stability(d2U: float, epsilon: float) -> trit {
+    if d2U > epsilon { return affirm; } // Concave up -> Stable
+    if d2U < -epsilon { return reject; } // Concave down -> Unstable
+    return tend; // Saddle point or flat
+}
+
+/**
+ * @fn damped_oscillator_state
+ * Classifies the state of a damped harmonic oscillator.
+ * returns: affirm (Overdamped), tend (Critically damped), reject (Underdamped)
+ */
+pub fn damped_oscillator_state(gamma: float, omega0: float) -> trit {
+    let diff: float = gamma * gamma - 4.0 * omega0 * omega0;
+    if diff > 0.01 { return affirm; }
+    if diff < -0.01 { return reject; }
+    return tend;
+}
+
+/**
+ * @fn particle_in_well
+ * High-level simulation of a particle's movement preference in a potential well.
+ */
+pub fn particle_in_well(x: float, well_center: float) -> trit {
+    let dist: float = x - well_center;
+    if dist > 0.1 { return reject; } // Move left (-1)
+    if dist < -0.1 { return affirm; } // Move right (+1)
+    return tend; // Stay (0)
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Analyzing a circuit node
+let voltage_diff = v_node - v_target;
+let correction = classify_charge(voltage_diff, 0.001);
+apply_feedback(correction);
+
+Example 2: Stability of a robotic joint in potential space
+let stability = analyze_stability(second_derivative, 0.01);
+match stability {
+    affirm => { println!("Safe: System will return to equilibrium."); }
+    tend   => { println!("Caution: Neutral stability detected."); }
+    reject => { println!("VETO: Unstable state! Engaging brakes."); }
+}
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "physics_charge_mapping" {
+    assert_eq!(classify_charge(1.5, 0.1), affirm);
+    assert_eq!(classify_charge(-1.5, 0.1), reject);
+    assert_eq!(classify_charge(0.05, 0.1), tend);
+}
+
+test "potential_stability" {
+    // Stable equilibrium (Local Min)
+    assert_eq!(analyze_stability(10.0, 0.1), affirm);
+    // Unstable equilibrium (Local Max)
+    assert_eq!(analyze_stability(-10.0, 0.1), reject);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "stability_analysis_latency" {
+    let mut i = 0;
+    while i < 5000 {
+        analyze_stability(0.5, 0.01);
+        i = i + 1;
+    }
+}

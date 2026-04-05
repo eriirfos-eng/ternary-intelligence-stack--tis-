@@ -1,0 +1,106 @@
+// Ternlang Societal Ethics & Deliberation Module
+// Domain: societal.ethics.deliberation
+// Version: 1.0.0
+// Description: Triadic moral reasoning and ethical gatekeeping.
+
+/**
+ * @fn moral_assessment
+ * Evaluates an action based on core ethical axioms.
+ * returns: affirm (Permitted), tend (Ethically Unresolved), reject (Blocked/VETO)
+ */
+pub fn moral_assessment(utility: float, risk: float, is_prohibited: bool) -> trit {
+    // Prohibited actions (hard-coded core violations) are immediate vetos
+    if is_prohibited { return reject; }
+    
+    // High risk with low utility
+    if risk > 0.8 && utility < 0.3 { return reject; }
+    
+    // Low risk with high utility
+    if risk < 0.2 && utility > 0.7 { return affirm; }
+    
+    // Ambiguous middle-ground (e.g. high-risk high-reward)
+    return tend;
+}
+
+/**
+ * @fn resolve_moral_conflict
+ * Arbitrates between two opposing moral signals (e.g. Utility vs Duty).
+ */
+pub fn resolve_moral_conflict(s1: trit, s2: trit) -> trit {
+    // If either signal is a hard reject (-1), the action is blocked
+    if s1 == reject || s2 == reject { return reject; }
+    
+    // Otherwise, follow consensus
+    return consensus(s1, s2);
+}
+
+/**
+ * @fn ethical_hold_resolution
+ * Determines if an unresolved (0) ethical state requires human intervention.
+ */
+pub fn ethical_hold_resolution(tension: float, time_elapsed: int) -> trit {
+    // If tension (conflict) is high and we've waited too long, defer to human
+    if tension > 0.8 && time_elapsed > 3600 { return tend; }
+    
+    // If tension is low, we might be able to resolve automatically later
+    return affirm;
+}
+
+/**
+ * @fn compliance_consensus
+ * Aggregates multiple compliance checks (Legal, Ethical, Safety).
+ */
+pub fn compliance_consensus(legal: trit, ethical: trit, safety: trit) -> trit {
+    // Legal or safety violations are hard blocks
+    if legal == reject || safety == reject { return reject; }
+    
+    let moral_posture: trit = consensus(legal, ethical);
+    return consensus(moral_posture, safety);
+}
+
+/**
+ * @fn evaluate_intent
+ * Analyzes the "intent" signal of an agent.
+ */
+pub fn evaluate_intent(beneficial: float, harmful: float) -> trit {
+    if harmful > 0.5 { return reject; }
+    if beneficial > 0.8 { return affirm; }
+    return tend;
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: AI Agent action gate
+let perm = moral_assessment(proj_benefit, risk_profile, is_blacklisted);
+match perm {
+    affirm => { execute_action(); }
+    tend   => { request_ethical_review(); }
+    reject => { log_violation(); abort(); }
+}
+
+Example 2: Multi-signal compliance
+let status = compliance_consensus(gdpr_ok, ethical_fairness, data_safety);
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "ethics_moral_assessment" {
+    assert_eq!(moral_assessment(0.9, 0.1, false), affirm);
+    assert_eq!(moral_assessment(0.1, 0.9, false), reject);
+    assert_eq!(moral_assessment(0.5, 0.5, false), tend);
+}
+
+test "ethics_conflict_veto" {
+    assert_eq!(resolve_moral_conflict(affirm, reject), reject);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "compliance_consensus_perf" {
+    let mut i = 0;
+    while i < 5000 {
+        compliance_consensus(affirm, tend, affirm);
+        i = i + 1;
+    }
+}

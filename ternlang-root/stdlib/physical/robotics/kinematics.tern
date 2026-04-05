@@ -1,0 +1,126 @@
+// Ternlang Robotics Kinematics Module
+// Domain: physical.robotics.kinematics
+// Version: 1.0.0
+// Description: Core primitives for robotic motion and balance in balanced ternary.
+
+/**
+ * @struct JointState
+ * Represents the state of a robotic joint.
+ */
+struct JointState {
+    position: float,
+    velocity: float,
+    torque: float,
+    status: trit // affirm: active, tend: holding, reject: error/veto
+}
+
+/**
+ * @fn classify_motion
+ * Classifies motion based on velocity thresholds using triadic logic.
+ */
+pub fn classify_motion(velocity: float, threshold: float) -> trit {
+    if velocity > threshold { return affirm; }
+    if velocity < -threshold { return reject; }
+    return tend;
+}
+
+/**
+ * @fn compute_pd_control
+ * A Proportional-Derivative controller that returns a control trit.
+ */
+pub fn compute_pd_control(current: float, target: float, kp: float, kd: float, prev_error: float) -> trit {
+    let error: float = target - current;
+    let derivative: float = error - prev_error;
+    let output: float = kp * error + kd * derivative;
+    
+    // Ternary mapping: push positive, push negative, or hold stasis.
+    if output > 0.1 { return affirm; }
+    if output < -0.1 { return reject; }
+    return tend;
+}
+
+/**
+ * @fn balance_assessment
+ * Evaluates the stability of a robotic system.
+ * returns: affirm (stable), tend (marginal), reject (unstable - VETO)
+ */
+pub fn balance_assessment(tilt_angle: float, angular_vel: float) -> trit {
+    // Hard gate: extreme tilt triggers immediate veto
+    if tilt_angle > 45.0 || tilt_angle < -45.0 { return reject; }
+    
+    // Convergence logic: if tilt is high but moving back to center
+    if tilt_angle > 10.0 && angular_vel < -0.5 { return tend; }
+    if tilt_angle < -10.0 && angular_vel > 0.5 { return tend; }
+    
+    if tilt_angle < 5.0 && tilt_angle > -5.0 { return affirm; }
+    
+    return tend;
+}
+
+/**
+ * @fn obstacle_avoidance
+ * High-level routing based on multi-sensor obstacle signals.
+ */
+pub fn obstacle_avoidance(left_clear: trit, right_clear: trit, front_clear: trit) -> trit {
+    // Front blocked is a hard gate for forward motion
+    match front_clear {
+        reject => { return reject; } // Stop immediately
+        tend   => { 
+            // Cautionary slow
+            return consensus(left_clear, right_clear);
+        }
+        affirm => {
+            // Forward is clear, check paths
+            return consensus(left_clear, right_clear);
+        }
+    }
+}
+
+/**
+ * @fn forward_kinematics_sim
+ * Simplified forward kinematics simulation for a 2-DOF planar arm.
+ */
+pub fn forward_kinematics_sim(theta1: float, theta2: float, l1: float, l2: float) -> (float, float) {
+    let x: float = l1 * cos(theta1) + l2 * cos(theta1 + theta2);
+    let y: float = l1 * sin(theta1) + l2 * sin(theta1 + theta2);
+    return (x, y);
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Balancing a humanoid robot
+let stability = balance_assessment(current_tilt, current_gyro);
+match stability {
+    affirm => { proceed_with_task(); }
+    tend   => { activate_stabilizers(); }
+    reject => { trigger_scram(); }
+}
+
+Example 2: Sensor-driven obstacle avoidance
+let route = obstacle_avoidance(lidar_left, lidar_right, ultrasonic_front);
+move_robot(route);
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "kinematics_classification" {
+    assert_eq!(classify_motion(10.5, 5.0), affirm);
+    assert_eq!(classify_motion(-10.5, 5.0), reject);
+    assert_eq!(classify_motion(2.0, 5.0), tend);
+}
+
+test "kinematics_balance" {
+    assert_eq!(balance_assessment(0.0, 0.0), affirm);
+    assert_eq!(balance_assessment(50.0, 0.0), reject);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "pd_control_latency" {
+    let mut i = 0;
+    while i < 1000 {
+        compute_pd_control(0.5, 1.0, 0.1, 0.01, 0.0);
+        i = i + 1;
+    }
+}

@@ -1,0 +1,44 @@
+// Ternlang Tutorial 05: Physical Reasoning & Sensor Fusion
+// Demonstrating the use of physical.robotics and physical.sensors modules.
+
+import physical.robotics.kinematics;
+import physical.sensors.fusion;
+import reasoning.uncertainty_ext;
+
+pub fn main() {
+    // 1. Simulate sensor inputs
+    let lidar_dist: float = 0.5; // Obstacle detected
+    let gyro_tilt: float = 12.0; // Moderate tilt
+    let gyro_vel: float = -0.8;  // Counter-rotating
+    
+    // 2. Sensor Normalization
+    let obstacle_signal: trit = fusion.normalize_sensor_trit(lidar_dist, 0.2, 2.0);
+    println!("Obstacle Signal: {}", obstacle_signal);
+    
+    // 3. Balance Assessment
+    let stability: trit = kinematics.balance_assessment(gyro_tilt, gyro_vel);
+    println!("Stability Assessment: {}", stability);
+    
+    // 4. Decision under Uncertainty
+    // We create a deliberation vector from our sensors
+    let mut verdicts: trittensor<13> = trittensor<13>::zero();
+    verdicts[0] = obstacle_signal;
+    verdicts[1] = stability;
+    
+    // Measure logical tension
+    let tension: float = uncertainty_ext.compute_mass(verdicts);
+    println!("System Engagement Mass: {}", tension);
+    
+    // Final routing logic
+    match stability {
+        affirm => {
+            println!("Status: STABLE. Proceeding with motion.");
+        }
+        tend => {
+            println!("Status: MARGINAL. Activating micro-adjustments.");
+        }
+        reject => {
+            println!("Status: CRITICAL. Vetoing all motion commands.");
+        }
+    }
+}

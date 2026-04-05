@@ -1,0 +1,115 @@
+// Ternlang Systems Network Routing Module
+// Domain: systems.network.routing
+// Version: 1.0.0
+// Description: Congestion-aware routing and triadic traffic management.
+
+/**
+ * @fn assess_path_latency
+ * Maps RTT latency to a trit based on an SLA threshold.
+ * returns: affirm (Low Latency), tend (Acceptable/Marginal), reject (High Latency/Violation)
+ */
+pub fn assess_path_latency(rtt_ms: float, sla_ms: float) -> trit {
+    if rtt_ms < sla_ms * 0.5 { return affirm; }
+    if rtt_ms > sla_ms { return reject; }
+    return tend;
+}
+
+/**
+ * @fn congestion_trit
+ * Maps packet loss and queue depth to a triadic congestion signal.
+ */
+pub fn congestion_trit(packet_loss: float, queue_depth: float, max_queue: float) -> trit {
+    let loss_signal: bool = packet_loss > 0.01;
+    let queue_signal: float = queue_depth / max_queue;
+    
+    // Hard VETO: packet loss detected
+    if loss_signal { return reject; }
+    
+    // Marginal state: queue is filling up (> 70%)
+    if queue_signal > 0.7 { return tend; }
+    
+    return affirm; // Path is clear
+}
+
+/**
+ * @fn route_selection
+ * Implements triadic load balancing across three paths.
+ */
+pub fn route_selection(p1: trit, p2: trit, p3: trit) -> int {
+    // If path 1 is affirm, prefer it (0)
+    if p1 == affirm { return 0; }
+    // If path 2 is affirm, use it (1)
+    if p2 == affirm { return 1; }
+    // If path 3 is affirm, use it (2)
+    if p3 == affirm { return 2; }
+    
+    // Fallback to tend paths
+    if p1 == tend { return 0; }
+    if p2 == tend { return 1; }
+    
+    return -1; // All paths rejected (VETO)
+}
+
+/**
+ * @fn health_check_consensus
+ * Aggregates multiple network health signals (Latency, Jitter, Loss).
+ */
+pub fn health_check_consensus(latency: trit, jitter: trit, loss: trit) -> trit {
+    // Packet loss is a hard gate for path health
+    if loss == reject { return reject; }
+    
+    let signal_quality: trit = consensus(latency, jitter);
+    return consensus(signal_quality, loss);
+}
+
+/**
+ * @fn retry_backoff_deliberation
+ * Determines if a retry should be attempted based on current error state.
+ * returns: affirm (Retry now), tend (Delay/Backoff), reject (Abort)
+ */
+pub fn retry_backoff_deliberation(retry_count: int, max_retries: int, error_severity: trit) -> trit {
+    if retry_count >= max_retries { return reject; }
+    if error_severity == reject { return reject; } // Critical error, don't retry
+    
+    if retry_count < 2 { return affirm; }
+    return tend; // Wait/Backoff
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Selecting a route based on triadic health
+let h1 = health_check_consensus(l1, j1, loss1);
+let h2 = health_check_consensus(l2, j2, loss2);
+let selected_idx = route_selection(h1, h2, reject);
+
+Example 2: Adaptive retry logic
+let decision = retry_backoff_deliberation(attempts, 5, connection_status);
+match decision {
+    affirm => { send_packet(); }
+    tend   => { wait_ms(500); send_packet(); }
+    reject => { log_failure(); }
+}
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "routing_latency_assessment" {
+    assert_eq!(assess_path_latency(10.0, 50.0), affirm);
+    assert_eq!(assess_path_latency(100.0, 50.0), reject);
+}
+
+test "routing_congestion" {
+    assert_eq!(congestion_trit(0.0, 80.0, 100.0), tend);
+    assert_eq!(congestion_trit(0.05, 10.0, 100.0), reject);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "route_selection_latency" {
+    let mut i = 0;
+    while i < 5000 {
+        route_selection(affirm, tend, reject);
+        i = i + 1;
+    }
+}

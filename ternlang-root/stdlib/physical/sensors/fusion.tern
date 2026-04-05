@@ -1,0 +1,105 @@
+// Ternlang Sensor Fusion Module
+// Domain: physical.sensors.fusion
+// Version: 1.0.0
+// Description: Multi-modal sensor aggregation and anomaly detection using triadic state logic.
+
+/**
+ * @fn normalize_sensor_trit
+ * Converts a raw float reading into a trit based on a normal range [min, max].
+ */
+pub fn normalize_sensor_trit(value: float, min: float, max: float) -> trit {
+    if value > max { return affirm; } // High/Over
+    if value < min { return reject; } // Low/Under
+    return tend; // Normal/Balanced
+}
+
+/**
+ * @fn weighted_fusion
+ * Combines three triadic signals with associated weights.
+ * returns the consensus weighted signal.
+ */
+pub fn weighted_fusion(s1: trit, w1: float, s2: trit, w2: float, s3: trit, w3: float) -> trit {
+    let score: float = float(s1) * w1 + float(s2) * w2 + float(s3) * w3;
+    let threshold: float = (w1 + w2 + w3) * 0.33;
+    
+    if score > threshold { return affirm; }
+    if score < -threshold { return reject; }
+    return tend;
+}
+
+/**
+ * @fn detect_anomaly
+ * Detects if a sensor reading is drifting or jumping based on historical trend.
+ */
+pub fn detect_anomaly(current: float, history_avg: float, std_dev: float) -> trit {
+    let diff: float = abs(current - history_avg);
+    
+    // VETO: reading is > 3 sigma away
+    if diff > 3.0 * std_dev { return reject; }
+    
+    // WARN: reading is > 2 sigma away
+    if diff > 2.0 * std_dev { return tend; }
+    
+    return affirm; // Normal
+}
+
+/**
+ * @fn fault_tolerant_consensus
+ * Implements a 2-out-of-3 logic gate where any reject acts as a safety veto.
+ */
+pub fn fault_tolerant_consensus(s1: trit, s2: trit, s3: trit) -> trit {
+    // If any sensor reports a hard failure (-1), veto the whole block
+    if s1 == reject || s2 == reject || s3 == reject {
+        return reject;
+    }
+    
+    // Standard consensus for positive/neutral signals
+    return consensus(consensus(s1, s2), s3);
+}
+
+/**
+ * @fn compute_sensor_confidence
+ * returns a confidence trit based on sensor age and variance.
+ */
+pub fn compute_sensor_confidence(uptime_sec: int, noise_level: float) -> trit {
+    if uptime_sec < 5 { return tend; } // Warming up
+    if noise_level > 0.5 { return tend; } // High variance
+    if noise_level > 0.8 { return reject; } // Unreliable
+    return affirm; // Trusted
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Redundant temperature sensor check
+let t1 = normalize_sensor_trit(temp1, 20.0, 30.0);
+let t2 = normalize_sensor_trit(temp2, 20.0, 30.0);
+let t3 = normalize_sensor_trit(temp3, 20.0, 30.0);
+let safety_status = fault_tolerant_consensus(t1, t2, t3);
+
+Example 2: AI Agent environment trust
+let signal = weighted_fusion(camera_signal, 0.8, lidar_signal, 0.9, audio_signal, 0.3);
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "sensor_normalization" {
+    assert_eq!(normalize_sensor_trit(50.0, 10.0, 40.0), affirm);
+    assert_eq!(normalize_sensor_trit(5.0, 10.0, 40.0), reject);
+    assert_eq!(normalize_sensor_trit(25.0, 10.0, 40.0), tend);
+}
+
+test "sensor_fault_tolerance" {
+    assert_eq!(fault_tolerant_consensus(affirm, affirm, reject), reject);
+    assert_eq!(fault_tolerant_consensus(affirm, tend, affirm), tend);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "weighted_fusion_perf" {
+    let mut i = 0;
+    while i < 5000 {
+        weighted_fusion(affirm, 0.5, tend, 0.2, reject, 0.1);
+        i = i + 1;
+    }
+}

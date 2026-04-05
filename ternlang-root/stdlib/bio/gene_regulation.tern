@@ -1,0 +1,113 @@
+// Ternlang Gene Regulation Module
+// Domain: bio.gene_regulation
+// Version: 1.0.0
+// Description: Modeling gene expression and regulatory networks using triadic states.
+
+/**
+ * @fn classify_expression
+ * Maps a gene expression level (fold-change) to a trit.
+ * returns: affirm (Up-regulated), tend (Basal/Neutral), reject (Down-regulated)
+ */
+pub fn classify_expression(log2_fc: float, threshold: float) -> trit {
+    if log2_fc > threshold { return affirm; }
+    if log2_fc < -threshold { return reject; }
+    return tend;
+}
+
+/**
+ * @fn transcription_influence
+ * Models the influence of a transcription factor on a target gene.
+ * returns the net influence trit.
+ */
+pub fn transcription_influence(tf_state: trit, binding_affinity: float, cofactor_presence: trit) -> trit {
+    // Basic logic: TF must be active (+1) and cofactor should not be inhibitory (-1)
+    match tf_state {
+        affirm => {
+            // TF is present, check cofactor
+            return consensus(affirm, cofactor_presence);
+        }
+        reject => {
+            // TF is an active repressor
+            return reject;
+        }
+        tend => {
+            // TF is at basal levels
+            return tend;
+        }
+    }
+}
+
+/**
+ * @fn pathway_bottleneck
+ * Detects bottlenecks in a metabolic pathway based on flux signals.
+ */
+pub fn pathway_bottleneck(upstream_flux: trit, enzyme_capacity: trit, downstream_demand: trit) -> trit {
+    // If capacity is rejected (-1) -> Hard Bottleneck
+    if enzyme_capacity == reject { return reject; }
+    
+    // If demand is high (+1) but flux is basal (0) -> Potential Bottleneck
+    if downstream_demand == affirm && upstream_flux == tend { return tend; }
+    
+    return consensus(upstream_flux, downstream_demand);
+}
+
+/**
+ * @fn metabolic_state_consensus
+ * Aggregates multiple metabolic signals into a global cellular health trit.
+ */
+pub fn metabolic_state_consensus(atp_level: trit, redox_potential: trit, nutrient_availability: trit) -> trit {
+    // Nutrient exhaustion is a hard gate for growth
+    if nutrient_availability == reject { return reject; }
+    
+    let energetic_health: trit = consensus(atp_level, redox_potential);
+    return consensus(energetic_health, nutrient_availability);
+}
+
+/**
+ * @fn mutate_regulation
+ * Simulates a mutation's effect on a regulatory link.
+ */
+pub fn mutate_regulation(original_influence: trit, mutation_type: int) -> trit {
+    // mutation_type: 0 (Loss of function), 1 (Gain of function), 2 (Constitutive)
+    match mutation_type {
+        0 => { return tend; } // Becomes basal/null
+        1 => { return affirm; } // Over-active
+        2 => { return original_influence; } // No change
+        _ => { return reject; } // Deleterious/Inhibitory
+    }
+}
+
+// ── Usage Examples ─────────────────────────────────────────────────────────
+
+/*
+Example 1: Modeling a toggle switch
+let gene_a = classify_expression(fc_a, 1.0);
+let gene_b = classify_expression(fc_b, 1.0);
+let system_state = transcription_influence(gene_a, 0.9, trit_not(gene_b));
+
+Example 2: Cellular stress response
+let stress_signal = metabolic_state_consensus(atp_low, redox_imbalance, glucose_depleted);
+if stress_signal == reject { activate_autophagy(); }
+*/
+
+// ── Tests ──────────────────────────────────────────────────────────────────
+
+test "expression_classification" {
+    assert_eq!(classify_expression(2.5, 1.0), affirm);
+    assert_eq!(classify_expression(-2.5, 1.0), reject);
+    assert_eq!(classify_expression(0.2, 1.0), tend);
+}
+
+test "pathway_logic" {
+    assert_eq!(pathway_bottleneck(affirm, reject, affirm), reject);
+}
+
+// ── Benchmarks ─────────────────────────────────────────────────────────────
+
+bench "metabolic_consensus_latency" {
+    let mut i = 0;
+    while i < 5000 {
+        metabolic_state_consensus(affirm, tend, affirm);
+        i = i + 1;
+    }
+}
