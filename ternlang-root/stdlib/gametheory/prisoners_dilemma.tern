@@ -1,0 +1,27 @@
+// Module:  stdlib/gametheory/prisoners_dilemma.tern
+// Purpose: Iterated Prisoner's Dilemma
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Cooperate (affirm), Defect (reject), or Withhold/Skip (tend).
+
+fn calculate_payoff_trit(p1_action: trit, p2_action: trit) -> int {
+    if p1_action == tend { return 0; } // Didn't play
+    if p2_action == tend { return 0; }
+
+    if p1_action == affirm {
+        if p2_action == affirm { return 3; } // Both cooperate (Reward)
+        if p2_action == reject { return 0; } // Sucker's payoff
+    }
+    if p1_action == reject {
+        if p2_action == affirm { return 5; } // Temptation
+        if p2_action == reject { return 1; } // Both defect (Punishment)
+    }
+    return 0;
+}
+
+fn tit_for_tat_trit(last_opponent_action: trit) -> trit {
+    // Start with cooperate, then mirror opponent.
+    if last_opponent_action == tend { return affirm; } // First move
+    return last_opponent_action;
+}

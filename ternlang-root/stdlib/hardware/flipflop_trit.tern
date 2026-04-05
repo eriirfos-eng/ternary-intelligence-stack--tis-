@@ -1,0 +1,23 @@
+// Module:  stdlib/hardware/flipflop_trit.tern
+// Purpose: Ternary Flip-Flop (Memory Cell)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Clocked memory element storing a trit.
+
+struct TFlipFlop {
+    q: trit
+}
+
+fn tff_clock_edge(ff: &mut TFlipFlop, d: trit, enable: trit) {
+    // If enable is affirm, write. If reject, clear. If tend, hold.
+    match enable {
+        affirm => { ff.q = d; }
+        tend   => { /* Hold state, no operation */ }
+        reject => { ff.q = tend; /* Reset to zero/tend */ }
+    }
+}
+
+fn tff_read(ff: TFlipFlop) -> trit {
+    return ff.q;
+}

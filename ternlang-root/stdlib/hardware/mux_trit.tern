@@ -1,0 +1,26 @@
+// Module:  stdlib/hardware/mux_trit.tern
+// Purpose: Ternary Multiplexer
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// 3-to-1 multiplexer driven by a single select trit.
+
+fn mux_3_to_1(sel: trit, in_neg: trit, in_zero: trit, in_pos: trit) -> trit {
+    // In hardware, this routes one of three physical lines based on voltage
+    match sel {
+        affirm => { return in_pos; }
+        tend   => { return in_zero; }
+        reject => { return in_neg; }
+    }
+}
+
+fn demux_1_to_3(sel: trit, input: trit) -> trit[] {
+    // Routes one input to three outputs
+    let mut out: trit[] = [tend, tend, tend];
+    match sel {
+        affirm => { out[2] = input; }
+        tend   => { out[1] = input; }
+        reject => { out[0] = input; }
+    }
+    return out;
+}

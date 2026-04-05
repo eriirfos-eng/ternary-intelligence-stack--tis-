@@ -1,0 +1,25 @@
+// Module:  stdlib/finance/arbitrage.tern
+// Purpose: Statistical Arbitrage Signal Generator
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Identifies price discrepancies across two assets.
+
+fn stat_arb_trit(spread: float, mean_spread: float, std_dev: float) -> trit {
+    // Mean reversion strategy
+    let z_score: float = (spread - mean_spread) / std_dev;
+    
+    // Z-Score boundaries trigger the ternary states
+    if z_score > 2.0 { return reject; } // Spread too wide, short the spread
+    if z_score < -2.0 { return affirm; } // Spread too narrow, long the spread
+    return tend; // Spread is within normal bounds
+}
+
+fn triangular_arb_trit(rate_ab: float, rate_bc: float, rate_ca: float) -> trit {
+    let cross_rate: float = rate_ab * rate_bc * rate_ca;
+    
+    // Ideal is 1.0. Is the deviation enough to cover fees?
+    if cross_rate > 1.005 { return affirm; } // Arbitrage opportunity exists
+    if cross_rate < 0.995 { return reject; } // Reverse arbitrage
+    return tend; // No profitable opportunity
+}

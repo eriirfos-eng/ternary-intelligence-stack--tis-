@@ -1,0 +1,25 @@
+// Module:  stdlib/bio/phylogeny.tern
+// Purpose: Phylogenetic Tree Ancestry
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Tracing evolutionary splits.
+
+fn shared_ancestry_trit(species_a_trait: trit, species_b_trait: trit) -> trit {
+    // Do they share a derived trait?
+    if species_a_trait == affirm {
+        if species_b_trait == affirm {
+            return affirm; // Clade formed
+        }
+    }
+    if species_a_trait == tend { return tend; } // Fossil record missing
+    if species_b_trait == tend { return tend; }
+    return reject; // Separate lineages
+}
+
+fn outgroup_gate_trit(trait_val: trit, outgroup_val: trit) -> trit {
+    // Is the trait ancestral or derived?
+    if trait_val == outgroup_val { return reject; } // Ancestral (plesiomorphic)
+    if trait_val == tend { return tend; }
+    return affirm; // Derived (apomorphic)
+}

@@ -1,0 +1,26 @@
+// Module:  stdlib/bio/codon_map.tern
+// Purpose: Ternary Codon Translation Logic
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Validating nucleotide sequences before translating to amino acids.
+
+fn validate_start_codon_trit(c1: trit, c2: trit, c3: trit) -> trit {
+    // Simplified representation of checking for AUG (Methionine)
+    // If any base is unknown (tend), the start is uncertain
+    if c1 == tend { return tend; }
+    if c2 == tend { return tend; }
+    if c3 == tend { return tend; }
+    
+    // (Simulated check)
+    return affirm; 
+}
+
+fn stop_codon_gate_trit(is_stop: trit) -> trit {
+    // If a stop codon is encountered, halt transcription
+    match is_stop {
+        affirm => { return reject; } // STOP (halt pipeline)
+        tend   => { return tend;   } // Unknown read
+        reject => { return affirm; } // Keep reading
+    }
+}

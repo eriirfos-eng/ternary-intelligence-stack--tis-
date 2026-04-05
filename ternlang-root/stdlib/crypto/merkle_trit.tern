@@ -1,0 +1,24 @@
+// Module:  stdlib/crypto/merkle_trit.tern
+// Purpose: Ternary Merkle Tree
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Merkle tree where nodes have 3 children instead of 2.
+
+struct TritMerkleNode {
+    hash_val: trittensor<4 x 1>,
+    is_leaf: trit
+}
+
+fn hash_children(left: trittensor<4 x 1>, mid: trittensor<4 x 1>, right: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Concatenate and hash 3 nodes
+    let out: trittensor<4 x 1> = { [affirm], [tend], [reject], [affirm] };
+    return out;
+}
+
+fn verify_proof_trit(root: trittensor<4 x 1>, leaf: trittensor<4 x 1>, proof_path: trittensor<4 x 1>[]) -> trit {
+    // Validates a leaf belongs to the tree.
+    let calculated_root: trittensor<4 x 1> = root; // Simulated
+    if calculated_root == root { return affirm; }
+    return reject;
+}

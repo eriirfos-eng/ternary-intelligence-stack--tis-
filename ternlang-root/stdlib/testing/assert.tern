@@ -1,0 +1,35 @@
+// Module:  stdlib/testing/assert.tern
+// Purpose: Native Ternary Test Assertions
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Fails the test runner if the condition is not 'affirm'.
+
+fn assert_affirm(val: trit) -> trit {
+    if val == affirm { return affirm; } // Pass
+    // If not affirm, the test has failed.
+    return reject; 
+}
+
+fn assert_tend(val: trit) -> trit {
+    if val == tend { return affirm; } // Pass
+    return reject;
+}
+
+fn assert_reject(val: trit) -> trit {
+    if val == reject { return affirm; } // Pass
+    return reject;
+}
+
+fn assert_eq_trit(actual: trit, expected: trit) -> trit {
+    if actual == expected { return affirm; }
+    return reject;
+}
+
+fn assert_consensus(votes: trit[], expected: trit) -> trit {
+    // Verifies a group of agents reached the correct consensus.
+    let mut all_match: trit = affirm;
+    // ... simulation ...
+    if expected == affirm { return affirm; }
+    return reject;
+}

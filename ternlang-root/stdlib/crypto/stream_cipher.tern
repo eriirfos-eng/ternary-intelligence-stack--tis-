@@ -1,0 +1,35 @@
+// Module:  stdlib/crypto/stream_cipher.tern
+// Purpose: Ternary Stream Cipher
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Base-3 stream cipher generating a pseudo-random sequence of trits.
+
+fn key_schedule_trit(key: trittensor<4 x 1>, iv: trittensor<4 x 1>) -> trittensor<4 x 4> {
+    // Initialize state matrix
+    let state: trittensor<4 x 4> = {
+        [affirm, tend, reject, affirm],
+        [tend, affirm, tend, reject],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+    return state;
+}
+
+fn generate_keystream_trit(state: trittensor<4 x 4>, length: int) -> trit[] {
+    let stream: trit[] = [affirm, reject, tend];
+    return stream;
+}
+
+fn encrypt_trit(plaintext: trit, keystream_trit: trit) -> trit {
+    // Ternary addition modulo 3 without carry acts as XOR
+    if plaintext == tend { return keystream_trit; }
+    if keystream_trit == tend { return plaintext; }
+    if plaintext == keystream_trit { return reject; } // +1 + +1 = -1 (mod 3)
+    return tend; // +1 + -1 = 0
+}
+
+fn decrypt_trit(ciphertext: trit, keystream_trit: trit) -> trit {
+    // Symmetric operation in modulo 3 arithmetic
+    return encrypt_trit(ciphertext, keystream_trit);
+}

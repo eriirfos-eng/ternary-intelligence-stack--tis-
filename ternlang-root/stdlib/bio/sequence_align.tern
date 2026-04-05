@@ -1,0 +1,25 @@
+// Module:  stdlib/bio/sequence_align.tern
+// Purpose: DNA/RNA Sequence Alignment
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Sequence alignment is inherently ternary: 
+// Match (affirm), Gap/Indel (tend), Mismatch (reject).
+
+fn compare_nucleotide_trit(base_a: trit, base_b: trit) -> trit {
+    // If one is missing (tend), it's a gap
+    if base_a == tend { return tend; }
+    if base_b == tend { return tend; }
+    
+    if base_a == base_b { return affirm; } // Match
+    return reject; // Mismatch
+}
+
+fn needleman_wunsch_score_trit(align_state: trit) -> float {
+    // Converts alignment state to scoring matrix
+    match align_state {
+        affirm => { return 1.0; }  // Match bonus
+        tend   => { return -0.5; } // Gap penalty
+        reject => { return -1.0; } // Mismatch penalty
+    }
+}

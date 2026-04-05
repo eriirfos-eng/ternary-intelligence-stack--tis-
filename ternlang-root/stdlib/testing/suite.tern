@@ -1,0 +1,27 @@
+// Module:  stdlib/testing/suite.tern
+// Purpose: Test Suite Runner
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Collects assertions and outputs a ternary test summary.
+
+struct TestSuite {
+    passed: int,
+    failed: int,
+    skipped: int // Maps to 'tend' tests
+}
+
+fn run_test_trit(test_fn_result: trit) -> trit {
+    // Evaluates a test. If a test returns 'tend', it is marked as skipped.
+    match test_fn_result {
+        affirm => { return affirm; } // Pass
+        tend   => { return tend;   } // Skip
+        reject => { return reject; } // Fail
+    }
+}
+
+fn summarize_suite(suite: TestSuite) -> trit {
+    if suite.failed > 0 { return reject; } // Red build
+    if suite.passed == 0 && suite.skipped > 0 { return tend; } // Yellow build
+    return affirm; // Green build
+}

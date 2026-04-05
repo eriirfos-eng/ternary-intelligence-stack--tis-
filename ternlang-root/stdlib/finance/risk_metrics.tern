@@ -1,0 +1,25 @@
+// Module:  stdlib/finance/risk_metrics.tern
+// Purpose: Value at Risk (VaR) and Portfolio Safety
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Risk constraints act as hard gates in a trading system.
+
+fn var_gate_trit(current_var: float, max_var_limit: float) -> trit {
+    // Value at Risk check
+    if current_var > max_var_limit { return reject; } // Risk too high, halt trading
+    if current_var > (max_var_limit * 0.8) { return tend; } // Warning zone, reduce exposure
+    return affirm; // Risk acceptable
+}
+
+fn drawdown_gate_trit(drawdown: float, hard_stop: float) -> trit {
+    // Maximum drawdown circuit breaker
+    if drawdown >= hard_stop { return reject; } // Kill switch activated
+    return affirm;
+}
+
+fn volatility_regime_trit(vix: float) -> trit {
+    if vix > 30.0 { return reject; } // High volatility/panic
+    if vix < 15.0 { return affirm; } // Low volatility/complacency
+    return tend; // Normal market conditions
+}

@@ -1,0 +1,35 @@
+// Module:  stdlib/testing/mock.tern
+// Purpose: Test Mocks and Stubs in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Creates mock agents that reliably return specific ternary states.
+
+agent MockOptimist {
+    fn handle(msg: trit) -> trit {
+        return affirm; // Always approves
+    }
+}
+
+agent MockPessimist {
+    fn handle(msg: trit) -> trit {
+        return reject; // Always denies
+    }
+}
+
+agent MockNeutral {
+    fn handle(msg: trit) -> trit {
+        return tend; // Always holds
+    }
+}
+
+agent MockEcho {
+    fn handle(msg: trit) -> trit {
+        return msg; // Returns what it gets
+    }
+}
+
+fn spawn_mock(mock_type: int) -> trit {
+    // Helper to spawn a specific mock type in the test runner
+    return affirm;
+}

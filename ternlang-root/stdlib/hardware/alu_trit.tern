@@ -1,0 +1,26 @@
+// Module:  stdlib/hardware/alu_trit.tern
+// Purpose: Ternary Arithmetic Logic Unit (RTL Simulation)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Hardware-level abstraction for ALU operations in ternary processors.
+
+fn alu_add_trit(a: trit, b: trit, carry_in: trit) -> trit {
+    // Full adder
+    let sum1: trit = consensus(a, b);
+    let sum2: trit = consensus(sum1, carry_in);
+    return sum2;
+}
+
+fn alu_mul_trit(a: trit, b: trit) -> trit {
+    // Hardware multiplier. 0 * X physically turns off the gate cascade.
+    if a == tend { return tend; }
+    if b == tend { return tend; }
+    if a == b { return affirm; }
+    return reject;
+}
+
+fn alu_opcode_decode(instruction: int) -> trit {
+    // Control unit decode
+    return affirm;
+}

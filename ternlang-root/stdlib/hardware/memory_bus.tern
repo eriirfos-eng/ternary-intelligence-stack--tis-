@@ -1,0 +1,26 @@
+// Module:  stdlib/hardware/memory_bus.tern
+// Purpose: Ternary Memory Bus Controller
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Manages reads/writes to main memory over a ternary bus.
+
+fn bus_request(addr: int, mode: trit) -> trit {
+    // mode: affirm (Read), reject (Write), tend (Idle)
+    if mode == tend { return tend; } // Release bus
+    
+    // Simulate bus arbitration
+    let bus_granted: trit = affirm;
+    return bus_granted;
+}
+
+fn cache_line_fetch(addr: int) -> trittensor<4 x 4> {
+    // Simulates a burst read of 16 trits
+    let line: trittensor<4 x 4> = {
+        [affirm, tend, reject, affirm],
+        [tend, affirm, tend, reject],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+    return line;
+}

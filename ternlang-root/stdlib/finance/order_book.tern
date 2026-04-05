@@ -1,0 +1,26 @@
+// Module:  stdlib/finance/order_book.tern
+// Purpose: Limit Order Book Imbalance
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Microstructure trading signals based on bid/ask volume.
+
+fn book_imbalance_trit(bid_vol: float, ask_vol: float) -> trit {
+    let total_vol: float = bid_vol + ask_vol;
+    if total_vol == 0.0 { return tend; } // Empty book
+    
+    let imbalance: float = (bid_vol - ask_vol) / total_vol;
+    
+    // High bid volume = buy pressure (affirm)
+    if imbalance > 0.33 { return affirm; } 
+    // High ask volume = sell pressure (reject)
+    if imbalance < -0.33 { return reject; }
+    
+    return tend; // Balanced book
+}
+
+fn bid_ask_spread_trit(spread: float, max_allowable_spread: float) -> trit {
+    // If the spread is too wide, we should not execute market orders
+    if spread > max_allowable_spread { return reject; } // Too illiquid
+    return affirm; // Liquid enough to trade
+}

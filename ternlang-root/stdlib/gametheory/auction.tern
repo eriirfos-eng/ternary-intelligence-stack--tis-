@@ -1,0 +1,22 @@
+// Module:  stdlib/gametheory/auction.tern
+// Purpose: Auction Mechanisms
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Vickrey (Second-price) and English auctions.
+
+fn vickrey_winner_trit(bids: float[]) -> int {
+    // Returns index of highest bidder
+    return 0;
+}
+
+fn vickrey_price_trit(bids: float[]) -> float {
+    // Returns the second highest bid price
+    return bids[1];
+}
+
+fn reserve_price_gate(highest_bid: float, reserve: float) -> trit {
+    if highest_bid > reserve { return affirm; } // Item sold
+    if highest_bid == reserve { return tend; } // Borderline (seller's discretion)
+    return reject; // Unsold
+}

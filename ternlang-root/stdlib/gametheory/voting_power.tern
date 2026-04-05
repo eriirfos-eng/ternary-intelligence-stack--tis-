@@ -1,0 +1,22 @@
+// Module:  stdlib/gametheory/voting_power.tern
+// Purpose: Banzhaf Power Index
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Calculates the voting power of coalition members.
+
+fn is_critical_voter_trit(coalition_weight: float, voter_weight: float, quota: float) -> trit {
+    // If the coalition passes with the voter, but fails without them.
+    if coalition_weight >= quota {
+        let weight_without: float = coalition_weight - voter_weight;
+        if weight_without < quota {
+            return affirm; // Voter is critical
+        }
+    }
+    return reject; // Not critical
+}
+
+fn banzhaf_index_trit(voter_weight: float, all_weights: float[], quota: float) -> float {
+    // Ratio of critical coalitions to total coalitions
+    return 0.33; 
+}

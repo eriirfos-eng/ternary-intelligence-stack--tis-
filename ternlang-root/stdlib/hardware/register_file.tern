@@ -1,0 +1,28 @@
+// Module:  stdlib/hardware/register_file.tern
+// Purpose: Ternary Register File
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// A bank of ternary registers for the CPU.
+
+struct RegisterFile {
+    regs: trit[] // Array of 27 registers
+}
+
+fn reg_read(rf: RegisterFile, addr: int) -> trit {
+    return rf.regs[addr];
+}
+
+fn reg_write(rf: &mut RegisterFile, addr: int, data: trit, write_enable: trit) {
+    if write_enable == affirm {
+        rf.regs[addr] = data;
+    }
+}
+
+fn reg_clear_all(rf: &mut RegisterFile) {
+    let mut i: int = 0;
+    while i < 27 {
+        rf.regs[i] = tend; // Reset to zero-voltage state
+        i = i + 1;
+    }
+}

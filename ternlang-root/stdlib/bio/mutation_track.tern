@@ -1,0 +1,24 @@
+// Module:  stdlib/bio/mutation_track.tern
+// Purpose: Genomic Mutation Classification
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Classifies mutations as beneficial, neutral, or deleterious.
+
+fn mutation_impact_trit(synonymous: trit, protein_change: float) -> trit {
+    // Synonymous mutations (no amino acid change) are neutral
+    if synonymous == affirm { return tend; }
+    
+    // Non-synonymous changes
+    if protein_change > 0.0 { return affirm; } // Adaptive
+    if protein_change < 0.0 { return reject; } // Deleterious
+    
+    return tend; // Neutral drift
+}
+
+fn snp_detect_trit(reference_base: trit, sample_base: trit) -> trit {
+    // Single Nucleotide Polymorphism
+    if reference_base == sample_base { return reject; } // No mutation
+    if sample_base == tend { return tend; } // Low read quality
+    return affirm; // SNP Detected
+}

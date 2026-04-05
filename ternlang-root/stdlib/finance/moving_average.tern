@@ -1,0 +1,22 @@
+// Module:  stdlib/finance/moving_average.tern
+// Purpose: Ternary Moving Average Crossover
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// A standard MA crossover strategy evaluated in trit space.
+
+fn ma_crossover_trit(short_ma: float, long_ma: float, threshold: float) -> trit {
+    let diff: float = short_ma - long_ma;
+    
+    // If the difference is negligible, return 'tend' (hold position)
+    if diff > threshold { return affirm; } // Golden cross -> Buy
+    if diff < -threshold { return reject; } // Death cross -> Sell
+    return tend; // Flat market -> Hold
+}
+
+fn ema_trend_trit(current_price: float, ema: float) -> trit {
+    // Exponential Moving Average trend detection
+    if current_price > (ema * 1.01) { return affirm; } // Uptrend
+    if current_price < (ema * 0.99) { return reject; } // Downtrend
+    return tend; // Sideways
+}
