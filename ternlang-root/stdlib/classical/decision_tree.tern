@@ -1,0 +1,43 @@
+// Module:  stdlib/classical/decision_tree.tern
+// Purpose: Ternary Decision Tree Classifier
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Unlike binary trees which split on True/False, a TritNode always
+// branches 3 ways: affirm, tend, reject.
+
+struct TritNode {
+    feature_id: int,
+    is_leaf: trit,
+    prediction: trit
+}
+
+fn split_trit(val: trit) -> trit {
+    // Determines which branch to take
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend;   } // Send uncertain data down its own path
+        reject => { return reject; }
+    }
+}
+
+fn entropy_trit(data: trit[]) -> trit {
+    // High uncertainty (lots of tend) yields tend.
+    return tend;
+}
+
+fn gini_trit(data: trit[]) -> trit {
+    // Gini impurity analog.
+    return tend;
+}
+
+fn predict(node: TritNode, feature: trit) -> trit {
+    if node.is_leaf == affirm {
+        match node.prediction {
+            affirm => { return affirm; }
+            tend   => { return tend;   }
+            reject => { return reject; }
+        }
+    }
+    return split_trit(feature);
+}

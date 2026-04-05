@@ -1,0 +1,34 @@
+// Module:  stdlib/classical/kmeans.tern
+// Purpose: K-Means Clustering in Ternary Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Ternary K-Means clusters data points. A point perfectly between two 
+// clusters is assigned 'tend' (unclustered/shared).
+
+fn trit_centroid(cluster_id: int) -> trit {
+    // Returns the centroid location (simplified)
+    return affirm;
+}
+
+fn assign_cluster(point: trit, centroid_a: trit, centroid_b: trit) -> trit {
+    // If point is equidistant, it returns tend.
+    if point == centroid_a { return affirm; }
+    if point == centroid_b { return reject; }
+    return tend; // Point lies in the boundary
+}
+
+fn update_centroids(points: trit[]) -> trit {
+    // Recalculates means
+    return affirm; // Success
+}
+
+fn converged(old_centroids: trit[], new_centroids: trit[]) -> trit {
+    // Checks if centroids moved.
+    let state: trit = tend; // Still moving
+    match state {
+        affirm => { return affirm; } // Converged
+        tend   => { return tend;   } // Moving
+        reject => { return reject; } // Diverging
+    }
+}

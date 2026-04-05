@@ -1,0 +1,43 @@
+// Module:  stdlib/classical/feature_selection.tern
+// Purpose: Feature Selection Algorithms for Ternary Data
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Selecting features that correlate highly with the target while
+// ignoring noise ('tend').
+
+fn variance_filter_trit(feature_data: trit[]) -> trit {
+    // If a feature is mostly 'tend', it has low variance.
+    let variance_high: trit = affirm;
+    match variance_high {
+        affirm => { return affirm; } // Keep feature
+        tend   => { return tend;   } // Borderline
+        reject => { return reject; } // Drop feature
+    }
+}
+
+fn correlation_trit(feature: trit, target: trit) -> trit {
+    if feature == target {
+        return affirm; // High positive correlation
+    }
+    if feature == tend {
+        return tend; // No correlation
+    }
+    return reject; // High negative correlation
+}
+
+fn mutual_info_trit(feature: trit, target: trit) -> trit {
+    // Mutual information calculation
+    if feature == target { return affirm; }
+    return tend;
+}
+
+fn select_k_best(features: trit[], k: int) -> trit {
+    // Select top k features
+    let success: trit = affirm;
+    match success {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

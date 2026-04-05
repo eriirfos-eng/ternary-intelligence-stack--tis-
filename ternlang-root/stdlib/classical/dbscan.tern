@@ -1,0 +1,38 @@
+// Module:  stdlib/classical/dbscan.tern
+// Purpose: DBSCAN Density-Based Clustering
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// DBSCAN naturally fits ternary logic:
+// affirm = core point, reject = noise, tend = border point.
+
+fn trit_neighborhood(point: trit, epsilon: float) -> trit {
+    // Finds neighbors within epsilon
+    return affirm;
+}
+
+fn core_point(neighbors_count: int, min_samples: int) -> trit {
+    if neighbors_count >= min_samples {
+        return affirm; // Core
+    }
+    if neighbors_count > 0 {
+        return tend; // Border point
+    }
+    return reject; // Noise
+}
+
+fn expand_cluster(point: trit) -> trit {
+    match point {
+        affirm => { return affirm; } // Expand
+        tend   => { return tend;   } // Do not expand, but include in cluster
+        reject => { return reject; } // Ignore
+    }
+}
+
+fn classify_noise(point_status: trit) -> trit {
+    match point_status {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

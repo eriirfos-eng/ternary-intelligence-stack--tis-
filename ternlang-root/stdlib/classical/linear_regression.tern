@@ -1,0 +1,48 @@
+// Module:  stdlib/classical/linear_regression.tern
+// Purpose: Ternary Linear Model implementation (sklearn.linear_model.LinearRegression equivalent)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Linear regression in trit space maps inputs to a prediction trit. 
+// A 'tend' state means the confidence is too low to affirm or reject.
+
+struct TritLinearRegression {
+    weights: trittensor<4 x 4>,
+    bias: trit
+}
+
+fn predict(model: TritLinearRegression, input: trittensor<4 x 1>) -> trit {
+    // @sparseskip ensures we skip any neutral (tend) weights or inputs
+    @sparseskip
+    let out: trittensor<4 x 1> = model.weights * input;
+    
+    let result: trit = out[0, 0];
+    // If our prediction is ambiguous, we return tend
+    match result {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn fit_step(model: TritLinearRegression, x: trittensor<4 x 1>, y: trit) -> trit {
+    let pred: trit = predict(model, x);
+    if pred == y {
+        return affirm; // Step successful, no major update
+    } else {
+        if pred == tend {
+            return tend; // Step ambiguous, holding
+        }
+        return reject; // Error requires correction
+    }
+}
+
+fn residual(y_true: trit, y_pred: trit) -> trit {
+    if y_true == y_pred {
+        return affirm; // No residual error
+    }
+    if y_true == tend {
+        return tend; // True value unknown, residual unknown
+    }
+    return reject; // Error
+}

@@ -1,0 +1,50 @@
+// Module:  stdlib/classical/preprocessing.tern
+// Purpose: Data Preprocessing and Transformation Utilities
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Data normalization and encoding. Missing values are gracefully
+// handled by defaulting to 'tend'.
+
+fn normalize_trit(val: float) -> trit {
+    // Converts a float to a ternary value based on thresholds.
+    if val > 0.5 { return affirm; }
+    if val < -0.5 { return reject; }
+    return tend;
+}
+
+fn standardize_trit(val: trit) -> trit {
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn one_hot_trit(category: int, target: int) -> trit {
+    if category == target {
+        return affirm;
+    }
+    return reject;
+}
+
+fn label_encode(label: trit) -> trit {
+    match label {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn impute_tend(val: trit) -> trit {
+    // Missing values become tend (0) instead of being imputed with mean.
+    // This allows sparse skips to ignore them safely!
+    if val == tend {
+        return tend;
+    }
+    match val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

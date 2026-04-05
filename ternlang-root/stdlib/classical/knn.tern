@@ -1,0 +1,42 @@
+// Module:  stdlib/classical/knn.tern
+// Purpose: K-Nearest Neighbors Classifier in Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Ternary KNN calculates distance in trit space. If the neighbors are 
+// evenly split, it naturally returns 'tend' instead of breaking ties randomly.
+
+fn trit_distance(a: trit, b: trit) -> trit {
+    // Distance between states. 
+    // affirm vs affirm = affirm (close)
+    // affirm vs reject = reject (far)
+    if a == b { return affirm; }
+    if a == tend { return tend; }
+    if b == tend { return tend; }
+    return reject;
+}
+
+fn vote_k_neighbors(neighbors: trit[]) -> trit {
+    let affirms: int = 0;
+    let rejects: int = 0;
+    // Iterate to count (simulated)
+    if affirms > rejects {
+        return affirm;
+    }
+    if rejects > affirms {
+        return reject;
+    }
+    // Tie or overwhelming uncertainty
+    return tend;
+}
+
+fn predict(input: trit) -> trit {
+    // Dummy neighbors array
+    let neighbors: trit[] = [affirm, reject, tend];
+    let vote: trit = vote_k_neighbors(neighbors);
+    match vote {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

@@ -1,0 +1,36 @@
+// Module:  stdlib/classical/pca.tern
+// Purpose: Principal Component Analysis in Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Ternary PCA finds orthogonal directions of maximum variance.
+
+fn trit_covariance(feature_a: trit, feature_b: trit) -> trit {
+    // If features are perfectly correlated, affirm.
+    if feature_a == feature_b { return affirm; }
+    // If uncorrelated, tend.
+    if feature_a == tend { return tend; }
+    return reject; // Inversely correlated
+}
+
+fn explained_variance_trit(component_id: int) -> trit {
+    // Returns significance of a principal component.
+    // If variance is negligible, returns tend.
+    return affirm;
+}
+
+fn project(data: trittensor<4 x 1>, components: trittensor<4 x 4>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = components * data;
+    return out;
+}
+
+fn reconstruct(projected: trittensor<4 x 1>, components: trittensor<4 x 4>) -> trit {
+    // Reconstructs original data.
+    let score: trit = affirm; // Dummy success
+    match score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

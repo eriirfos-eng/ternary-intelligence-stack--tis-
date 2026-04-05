@@ -1,0 +1,40 @@
+// Module:  stdlib/classical/logistic_regression.tern
+// Purpose: Ternary Logistic Regression (sklearn.linear_model.LogisticRegression equivalent)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Instead of mapping to probabilities in [0, 1], ternary logistic regression
+// maps inputs directly to affirm (+1), tend (0), or reject (-1).
+
+fn sigmoid_trit(x: trit) -> trit {
+    // In ternary, the activation preserves the active center state (tend).
+    match x {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn decision_boundary(score: trit, margin: trit) -> trit {
+    // If the margin is tend, we lack the confidence to split the space.
+    if margin == tend {
+        return tend;
+    }
+    match score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn binary_to_trit_label(label: int) -> trit {
+    // Legacy datasets often use 0 for false and 1 for true.
+    // We convert them to proper ternary semantics.
+    if label > 0 {
+        return affirm;
+    }
+    if label < 0 {
+        return reject;
+    }
+    return tend; // 0 maps to tend (uncertain), NOT reject!
+}

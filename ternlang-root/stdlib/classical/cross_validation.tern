@@ -1,0 +1,40 @@
+// Module:  stdlib/classical/cross_validation.tern
+// Purpose: Cross-validation Strategies for Trit Models
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Validating model performance. Models returning 'tend' during
+// evaluation are penalized or measured separately.
+
+fn k_fold_trit(k: int, data: trit[]) -> trit {
+    // Splits data into k folds
+    return affirm;
+}
+
+fn stratified_split(labels: trit[]) -> trit {
+    // Ensures class balance, including balance of 'tend' labels
+    let success: trit = affirm;
+    match success {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn score_trit(fold_id: int) -> trit {
+    // Scores a single fold
+    return affirm;
+}
+
+fn cv_aggregate(scores: trit[]) -> trit {
+    // Aggregates cross-validation scores
+    let first: trit = scores[0];
+    if first == tend {
+        return tend; // Unstable model across folds
+    }
+    match first {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

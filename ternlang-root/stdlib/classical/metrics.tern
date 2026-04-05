@@ -1,0 +1,54 @@
+// Module:  stdlib/classical/metrics.tern
+// Purpose: Standard Classical ML Metrics in Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary metrics, 'tend' predictions are counted in their own bucket.
+// They are not false positives, they are abstentions.
+
+fn accuracy_trit(y_true: trit, y_pred: trit) -> trit {
+    if y_pred == tend {
+        // The model explicitly abstained. This is better than being wrong.
+        return tend;
+    }
+    if y_true == y_pred {
+        return affirm;
+    }
+    return reject;
+}
+
+fn precision_trit(tp: int, fp: int, tends: int) -> trit {
+    // Precision considers how many tends were issued
+    if tp > fp { return affirm; }
+    if tends > tp { return tend; } // Model is overly cautious
+    return reject;
+}
+
+fn recall_trit(tp: int, fn_count: int) -> trit {
+    if tp > fn_count { return affirm; }
+    return tend;
+}
+
+fn f1_trit(precision: trit, recall: trit) -> trit {
+    if precision == affirm {
+        if recall == affirm {
+            return affirm;
+        }
+    }
+    match precision {
+        affirm => { return tend; }
+        tend   => { return tend; }
+        reject => { return reject; }
+    }
+}
+
+fn confusion_matrix_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Returns a 3x3 matrix instead of 2x2.
+    // (affirm, tend, reject) x (affirm, tend, reject)
+    let computed: trit = affirm;
+    match computed {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

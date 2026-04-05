@@ -1,0 +1,51 @@
+// Module:  stdlib/classical/svm.tern
+// Purpose: Ternary Support Vector Machine (sklearn.svm.SVC equivalent)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// In ternary SVM, the margin explicitly incorporates the 'tend' state.
+// Points falling inside the margin are classified as 'tend' (uncertain) 
+// instead of forcing a binary classification.
+
+struct TritSVM {
+    support_vectors: trittensor<10 x 4>,
+    weights: trittensor<4 x 1>
+}
+
+fn support_vector(index: int) -> trit {
+    // Dummy check for support vector membership
+    return affirm;
+}
+
+fn hinge_trit(y_true: trit, y_pred: trit) -> trit {
+    // Hinge loss analog. If predictions match, no loss (affirm).
+    if y_true == y_pred {
+        return affirm;
+    }
+    if y_pred == tend {
+        // Point is inside the margin
+        return tend;
+    }
+    return reject; // Misclassified
+}
+
+fn margin(width: trit) -> trit {
+    // A 'tend' width indicates the margin hasn't converged.
+    match width {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
+
+fn classify(model: TritSVM, input: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let score: trittensor<1 x 1> = model.weights * input;
+    
+    // If the score is zero, it lies exactly in the margin
+    match score[0, 0] {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

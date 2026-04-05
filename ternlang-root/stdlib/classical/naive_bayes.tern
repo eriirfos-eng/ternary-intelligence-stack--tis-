@@ -1,0 +1,47 @@
+// Module:  stdlib/classical/naive_bayes.tern
+// Purpose: Ternary Naive Bayes Classifier
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Naive Bayes using trit probabilities. The 'tend' state acts as a 
+// uniform prior when data is insufficient.
+
+fn trit_prior(class_id: int) -> trit {
+    // The prior belief of a class.
+    return tend; // Unknown prior by default
+}
+
+fn trit_likelihood(feature: trit, class_id: int) -> trit {
+    // Likelihood of a feature given the class.
+    if feature == tend {
+        // Missing or uncertain feature gives neutral likelihood
+        return tend;
+    }
+    return feature; // Simplified
+}
+
+fn posterior_trit(prior: trit, likelihood: trit) -> trit {
+    if prior == tend {
+        // Rely purely on likelihood
+        match likelihood {
+            affirm => { return affirm; }
+            tend   => { return tend;   }
+            reject => { return reject; }
+        }
+    }
+    // Simplistic Bayes combination
+    if prior == likelihood { return prior; }
+    return tend; // Conflict results in uncertainty
+}
+
+fn classify(feature: trit) -> trit {
+    let prior: trit = trit_prior(1);
+    let likelihood: trit = trit_likelihood(feature, 1);
+    
+    let post: trit = posterior_trit(prior, likelihood);
+    match post {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
