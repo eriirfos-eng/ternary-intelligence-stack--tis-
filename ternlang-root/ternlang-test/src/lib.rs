@@ -10,13 +10,14 @@
 //!
 //! # Quick start
 //! ```rust,no_run
-//! use ternlang_test::{TernTestCase, TernExpected, assert_tern};
-//!
+//! # use ternlang_test::{TernTestCase, TernExpected, assert_tern};
+//! # fn main() {
 //! assert_tern!(TernTestCase {
 //!     name: "hold is the zero state",
 //!     source: "fn main() -> trit { return 0; }",
 //!     expected: TernExpected::Trit(0),
 //! });
+//! # }
 //! ```
 
 use ternlang_core::{
@@ -165,12 +166,14 @@ pub fn run_tern_test(case: &TernTestCase) -> TernTestResult {
 /// Run a `TernTestCase` and panic with a readable message if it fails.
 ///
 /// ```rust,no_run
-/// use ternlang_test::{TernTestCase, TernExpected, assert_tern};
+/// # use ternlang_test::{TernTestCase, TernExpected, assert_tern};
+/// # fn main() {
 /// assert_tern!(TernTestCase {
 ///     name: "hold is zero",
 ///     source: "fn main() -> trit { return 0; }",
 ///     expected: TernExpected::Trit(0),
 /// });
+/// # }
 /// ```
 #[macro_export]
 macro_rules! assert_tern {
