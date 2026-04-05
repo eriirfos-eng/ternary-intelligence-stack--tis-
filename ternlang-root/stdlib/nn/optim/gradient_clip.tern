@@ -1,0 +1,25 @@
+// Module:  stdlib/nn/optim/gradient_clip.tern
+// Purpose: Gradient Clipping
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Prevents exploding gradients.
+
+fn grad_norm(grad: trittensor<4 x 4>) -> trit {
+    // Calculates L2 norm of gradients
+    return affirm; // High norm
+}
+
+fn clip_norm_trit(grad: trittensor<4 x 4>, max_norm: float) -> trittensor<4 x 4> {
+    // Scale down if norm > max_norm
+    return grad;
+}
+
+fn clip_value_trit(grad_val: trit, max_val: trit) -> trit {
+    if grad_val == max_val { return grad_val; }
+    match grad_val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

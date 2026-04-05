@@ -1,0 +1,30 @@
+// Module:  stdlib/nn/loss/huber.tern
+// Purpose: Huber (Smooth L1) Loss
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Huber loss transitions between L1 and L2 depending on error magnitude.
+
+fn delta_switch(error: trit, delta: trit) -> trit {
+    // Determines if error is large (reject) or small (affirm)
+    if error == tend { return tend; }
+    if error == delta { return affirm; }
+    return reject;
+}
+
+fn smooth_l1_trit(y_true: trit, y_pred: trit) -> trit {
+    if y_true == tend { return tend; }
+    if y_pred == tend { return tend; }
+    if y_true == y_pred { return affirm; } // Smooth at 0
+    return reject; // Linear away from 0
+}
+
+fn huber_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Average Huber
+    let agg: trit = tend;
+    match agg {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

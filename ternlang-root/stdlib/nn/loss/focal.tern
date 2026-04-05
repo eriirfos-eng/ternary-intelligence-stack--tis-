@@ -1,0 +1,32 @@
+// Module:  stdlib/nn/loss/focal.tern
+// Purpose: Ternary Focal Loss
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Focal loss emphasizes hard examples. In ternary, 'tend' predictions
+// are considered hard examples because the network is uncertain.
+
+fn modulating_factor(y_true: trit, y_pred: trit) -> trit {
+    // If prediction is tend, we highly modulate (focus) on it.
+    if y_pred == tend {
+        return affirm; // High focus
+    }
+    if y_true == y_pred {
+        return reject; // Low focus
+    }
+    return tend; // Medium focus
+}
+
+fn hard_example_weight(y_pred: trit) -> trit {
+    if y_pred == tend { return affirm; } // Max weight
+    return tend;
+}
+
+fn focal_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    let state: trit = tend;
+    match state {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

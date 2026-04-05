@@ -1,0 +1,30 @@
+// Module:  stdlib/nn/optim/lr_scheduler.tern
+// Purpose: Learning Rate Schedulers
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Adjusts learning rate over time.
+
+struct StepDecay {
+    step_size: int,
+    gamma: float
+}
+
+fn warmup_trit(current_step: int, warmup_steps: int) -> trit {
+    if current_step < warmup_steps { return affirm; } // Still warming up
+    return tend; // Warmup complete
+}
+
+fn cosine_anneal_trit(current_step: int, max_steps: int) -> trit {
+    // Smoothly decays
+    return affirm; // simulated curve multiplier
+}
+
+fn plateau_detect(metric: trit) -> trit {
+    // If metric stagnates (tend), reduce LR.
+    match metric {
+        affirm => { return affirm; } // Improving
+        tend   => { return tend;   } // Plateaued
+        reject => { return reject; } // Worsening
+    }
+}

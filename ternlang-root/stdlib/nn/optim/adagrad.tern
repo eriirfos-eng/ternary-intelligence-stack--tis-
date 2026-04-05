@@ -1,0 +1,25 @@
+// Module:  stdlib/nn/optim/adagrad.tern
+// Purpose: AdaGrad Optimizer for Trit Gradients
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Accumulates squared gradients. In ternary, frequently neutral ('tend') 
+// parameters maintain high learning rates.
+
+struct AdaGrad {
+    lr: float,
+    eps: float
+}
+
+fn accumulated_sq(grad: trittensor<4 x 4>, acc: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Add square of grad to acc
+    @sparseskip
+    let next_acc: trittensor<4 x 4> = acc;
+    return next_acc;
+}
+
+fn adapt_lr_trit(base_lr: float, acc_val: trit) -> trit {
+    // If historically low activity (tend), keep LR high (affirm).
+    if acc_val == tend { return affirm; }
+    return tend; // Decrease LR
+}

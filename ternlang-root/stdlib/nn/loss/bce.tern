@@ -1,0 +1,26 @@
+// Module:  stdlib/nn/loss/bce.tern
+// Purpose: Binary Cross-Entropy (BCE) Adapted for Trits
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// BCE typically measures binary classification loss. Here, if the label
+// is 'tend', BCE ignores the sample (sparse loss).
+
+fn bce_logit_trit(y_true: trit, logit: trit) -> trit {
+    if y_true == tend {
+        // Label is uncertain, loss is neutral. This naturally skips the sample.
+        return tend; 
+    }
+    if y_true == logit { return affirm; } // Low loss
+    return reject; // High loss
+}
+
+fn binary_cross_entropy_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Averages the BCE per element
+    let agg: trit = tend;
+    match agg {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

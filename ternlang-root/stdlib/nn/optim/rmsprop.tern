@@ -1,0 +1,26 @@
+// Module:  stdlib/nn/optim/rmsprop.tern
+// Purpose: RMSProp Optimizer for Trit Gradients
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Adapts learning rates based on moving average of squared gradients.
+// When gradient is 'tend', cache doesn't update (sparse update).
+
+struct RMSProp {
+    lr: float,
+    alpha: float,
+    eps: float
+}
+
+fn cache_update(grad: trittensor<4 x 4>, cache: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    // Only update cache where grad is not 'tend'
+    @sparseskip
+    let new_cache: trittensor<4 x 4> = cache; // simulated update
+    return new_cache;
+}
+
+fn param_step_rms(param: trittensor<4 x 4>, grad: trittensor<4 x 4>, cache: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    @sparseskip
+    let next_param: trittensor<4 x 4> = param; // Simulated param -= lr * grad / sqrt(cache)
+    return next_param;
+}

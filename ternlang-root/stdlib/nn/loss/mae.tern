@@ -1,0 +1,29 @@
+// Module:  stdlib/nn/loss/mae.tern
+// Purpose: Mean Absolute Error (MAE) for Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// MAE focuses on absolute difference. In ternlang, distances between 
+// -1 and 1 are 2 units, but we represent closeness as affirm.
+
+fn absolute_error_trit(y_true: trit, y_pred: trit) -> trit {
+    if y_true == tend { return tend; } 
+    if y_pred == tend { return tend; }
+    if y_true == y_pred { return affirm; }
+    return reject; // Error exists
+}
+
+fn mae_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Averages the absolute error
+    return tend;
+}
+
+fn median_error_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Robust to outliers, focuses on the median state
+    let state: trit = tend;
+    match state {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

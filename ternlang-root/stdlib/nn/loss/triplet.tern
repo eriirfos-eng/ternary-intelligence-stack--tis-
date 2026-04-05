@@ -1,0 +1,37 @@
+// Module:  stdlib/nn/loss/triplet.tern
+// Purpose: Triplet Margin Loss
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Uses Anchor, Positive, Negative. If any is 'tend', the whole triplet
+// is discarded via returning 'tend'.
+
+fn anchor_positive_trit(anchor: trittensor<4 x 1>, positive: trittensor<4 x 1>) -> trit {
+    return affirm; // High similarity
+}
+
+fn anchor_negative_trit(anchor: trittensor<4 x 1>, negative: trittensor<4 x 1>) -> trit {
+    return reject; // Low similarity
+}
+
+fn margin_enforce(pos_sim: trit, neg_sim: trit) -> trit {
+    if pos_sim == tend { return tend; }
+    if neg_sim == tend { return tend; }
+    if pos_sim == affirm {
+        if neg_sim == reject {
+            return affirm; // Margin maintained
+        }
+    }
+    return reject; // Violation
+}
+
+fn triplet_trit(a: trittensor<4 x 1>, p: trittensor<4 x 1>, n: trittensor<4 x 1>) -> trit {
+    let ps: trit = anchor_positive_trit(a, p);
+    let ns: trit = anchor_negative_trit(a, n);
+    let enforce: trit = margin_enforce(ps, ns);
+    match enforce {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

@@ -1,0 +1,36 @@
+// Module:  stdlib/nn/loss/mse.tern
+// Purpose: Mean Squared Error (MSE) for Trit Space
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// MSE in ternary measures how far off the states are. 
+// A 'tend' target or prediction makes the error explicitly 'tend'.
+
+fn squared_residual(y_true: trit, y_pred: trit) -> trit {
+    if y_true == tend { return tend; } // Missing target
+    if y_pred == tend { return tend; } // Missing prediction
+    if y_true == y_pred { return affirm; } // 0 error mapped to affirm (good)
+    return reject; // Max error
+}
+
+fn mse_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Average squared residuals.
+    let total_error: int = 0;
+    let has_tend: int = 0;
+    
+    // (Simulation of loop)
+    if has_tend > 0 {
+        return tend; // Error is incalculable precisely
+    }
+    return reject; // Mock high error
+}
+
+fn rmse_trit(y_true: trit[], y_pred: trit[]) -> trit {
+    // Root MSE. 
+    let mse: trit = mse_trit(y_true, y_pred);
+    match mse {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

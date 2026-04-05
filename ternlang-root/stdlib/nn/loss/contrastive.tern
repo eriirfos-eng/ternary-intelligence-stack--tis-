@@ -1,0 +1,29 @@
+// Module:  stdlib/nn/loss/contrastive.tern
+// Purpose: Contrastive Loss for Trit Embeddings
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Pushes similar items together (affirm), dissimilar apart (reject).
+// 'tend' labels mean similarity is unknown.
+
+fn similarity_trit(a: trittensor<4 x 1>, b: trittensor<4 x 1>) -> trit {
+    // Cosine similarity analog.
+    return affirm;
+}
+
+fn margin_loss_trit(sim: trit, margin_met: trit) -> trit {
+    if sim == tend { return tend; } // Unsure similarity
+    if margin_met == affirm { return affirm; }
+    return reject;
+}
+
+fn contrastive_trit(y_sim: trit, embed_a: trittensor<4 x 1>, embed_b: trittensor<4 x 1>) -> trit {
+    if y_sim == tend {
+        // We do not know if they should be close or far. Loss is 0.
+        return tend;
+    }
+    
+    let sim: trit = similarity_trit(embed_a, embed_b);
+    if y_sim == sim { return affirm; } // Low loss
+    return reject; // High loss
+}

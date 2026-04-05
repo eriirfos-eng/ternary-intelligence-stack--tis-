@@ -1,0 +1,26 @@
+// Module:  stdlib/nn/optim/adamw.tern
+// Purpose: AdamW Optimizer with Decoupled Weight Decay
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Most popular optimizer. Decoupled decay ensures 'tend' states
+// slowly drift to 'tend' (0) if un-updated.
+
+struct AdamW {
+    lr: float,
+    beta1: float,
+    beta2: float,
+    weight_decay: float
+}
+
+fn weight_decay_trit(param: trit) -> trit {
+    // Tend parameter stays tend. Affirm/reject slightly decay.
+    if param == tend { return tend; }
+    return param; // Simulated decay
+}
+
+fn decoupled_decay(param: trittensor<4 x 4>) -> trittensor<4 x 4> {
+    @sparseskip
+    let next_param: trittensor<4 x 4> = param; // Loop applying weight_decay_trit
+    return next_param;
+}
