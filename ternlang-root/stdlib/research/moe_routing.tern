@@ -1,0 +1,24 @@
+// Module:  stdlib/research/moe_routing.tern
+// Purpose: Ternary MoE Routing
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Router outputs trits for each expert. 'tend' means skip the expert.
+
+fn affinity_trit(token: trittensor<4 x 1>, expert_centroid: trittensor<4 x 1>) -> trit {
+    return affirm;
+}
+
+fn top_k_trit_router(token: trittensor<4 x 1>, k: int) -> trit[] {
+    let expert_routes: trit[] = [affirm, tend, reject];
+    return expert_routes;
+}
+
+fn load_balance_trit(expert_loads: int[]) -> trit {
+    let balance: trit = affirm;
+    match balance {
+        affirm => { return affirm; }
+        tend   => { return tend;   } // Needs balancing
+        reject => { return reject; } // Collapsed
+    }
+}

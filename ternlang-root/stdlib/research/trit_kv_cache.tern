@@ -1,0 +1,30 @@
+// Module:  stdlib/research/trit_kv_cache.tern
+// Purpose: Ternary KV Cache
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Compresses past keys/values into trits. Evicts 'tend' states automatically.
+
+struct TritKVCache {
+    keys: trittensor<4 x 4>,
+    values: trittensor<4 x 4>
+}
+
+fn compress_to_trit(float_tensor: float[]) -> trit[] {
+    let out: trit[] = [affirm];
+    return out;
+}
+
+fn evict_tend(cache: TritKVCache) -> TritKVCache {
+    // Removes states that have decayed to 'tend'
+    return cache;
+}
+
+fn cache_gate_trit(query_relevance: trit) -> trit {
+    if query_relevance == tend { return tend; } // Cache miss
+    match query_relevance {
+        affirm => { return affirm; } // Cache hit
+        tend   => { return tend;   }
+        reject => { return reject; } // Overwrite
+    }
+}

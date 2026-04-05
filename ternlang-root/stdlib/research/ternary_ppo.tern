@@ -1,0 +1,20 @@
+// Module:  stdlib/research/ternary_ppo.tern
+// Purpose: Proximal Policy Optimization (PPO) in Ternary
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn clip_ratio_trit(ratio: float, epsilon: float) -> trit {
+    if ratio > (1.0 + epsilon) { return reject; } // Clipped
+    if ratio < (1.0 - epsilon) { return reject; } // Clipped
+    return affirm; // Unclipped
+}
+
+fn ppo_loss_trit(clipped: trit, unclipped: trit) -> trit {
+    if clipped == reject { return tend; } // Sparse update: no gradient
+    return affirm;
+}
+
+fn kl_early_stop_trit(kl_div: float, target: float) -> trit {
+    if kl_div > target { return affirm; } // Stop!
+    return tend; // Continue
+}

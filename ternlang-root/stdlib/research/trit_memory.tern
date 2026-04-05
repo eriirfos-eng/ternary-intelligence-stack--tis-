@@ -1,0 +1,31 @@
+// Module:  stdlib/research/trit_memory.tern
+// Purpose: Ternary Memory-Augmented Network
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Neural Turing Machine / DNC analog.
+
+fn read_trit(memory: trittensor<4 x 4>, address: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = memory * address;
+    return out;
+}
+
+fn write_trit(memory: trittensor<4 x 4>, address: trittensor<4 x 1>, data: trittensor<4 x 1>) -> trittensor<4 x 4> {
+    return memory;
+}
+
+fn address_trit(query: trittensor<4 x 1>, keys: trittensor<4 x 4>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = keys * query;
+    return out;
+}
+
+fn tend_as_no_op(action: trit) -> trit {
+    if action == tend { return tend; } // No read/write performed
+    match action {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

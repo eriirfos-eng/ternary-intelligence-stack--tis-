@@ -1,0 +1,27 @@
+// Module:  stdlib/research/tritformer.tern
+// Purpose: Full Ternary Transformer Block (Tritformer)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Combines trit attention, trit FFN, and trit layer norm. No float anywhere.
+
+struct TritformerBlock {
+    qkv_weights: trittensor<4 x 4>,
+    ffn_expand: trittensor<8 x 4>,
+    ffn_contract: trittensor<4 x 8>
+}
+
+fn tritformer_forward(block: TritformerBlock, x: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Simplified: QKV projection
+    @sparseskip
+    let qkv: trittensor<4 x 1> = block.qkv_weights * x;
+    
+    // FFN
+    @sparseskip
+    let expanded: trittensor<8 x 1> = block.ffn_expand * qkv;
+    
+    @sparseskip
+    let out: trittensor<4 x 1> = block.ffn_contract * expanded;
+    
+    return out;
+}

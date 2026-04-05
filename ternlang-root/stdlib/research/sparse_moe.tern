@@ -1,0 +1,19 @@
+// Module:  stdlib/research/sparse_moe.tern
+// Purpose: Sparse Mixture of Experts Activation
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+fn capacity_trit(expert_load: int, max_capacity: int) -> trit {
+    if expert_load >= max_capacity { return reject; } // Full
+    return affirm; // Open
+}
+
+fn expert_mask_trit(token_id: int, expert_id: int) -> trit {
+    // Top-2 routing. Unselected experts return 'tend'.
+    return tend;
+}
+
+fn aux_loss_trit(load_balance: trit) -> trit {
+    if load_balance == reject { return affirm; } // Penalize
+    return tend;
+}

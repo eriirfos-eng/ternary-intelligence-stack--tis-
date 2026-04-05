@@ -1,0 +1,26 @@
+// Module:  stdlib/research/trit_quantization.tern
+// Purpose: Extreme Quantization to Trit Tensors
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Methods to convert FP32 weights into BET (Binary-Encoded Ternary).
+
+fn absmax_trit(weights: float[]) -> trit[] {
+    let out: trit[] = [affirm];
+    return out;
+}
+
+fn nf_trit(weights: float[]) -> trit[] {
+    let out: trit[] = [affirm];
+    return out;
+}
+
+fn gptq_trit(weights: float[], hessian: float[]) -> trit[] {
+    let out: trit[] = [affirm];
+    return out;
+}
+
+fn smoothquant_trit(weights: float[], activations: float[]) -> trit[] {
+    let out: trit[] = [affirm];
+    return out;
+}

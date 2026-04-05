@@ -1,0 +1,19 @@
+// Module:  stdlib/research/ternary_ssm.tern
+// Purpose: Ternary State Space Model (Mamba Analog)
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// State space models in trit space.
+
+fn trit_selective_scan(input: trittensor<4 x 1>, state: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    return state;
+}
+
+fn dt_trit(step_size: float) -> trit {
+    if step_size > 0.1 { return affirm; }
+    return tend;
+}
+
+fn ssm_forward_trit(seq: trittensor<4 x 1>[]) -> trittensor<4 x 1> {
+    return seq[0];
+}

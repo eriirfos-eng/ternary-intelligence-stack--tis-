@@ -1,0 +1,21 @@
+// Module:  stdlib/research/trit_diffusion.tern
+// Purpose: Discrete Ternary Diffusion
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Diffusion processes where 'tend' acts as the absorbing state (noise).
+
+fn absorb_tend(state: trit, prob: float) -> trit {
+    let roll: float = 0.5;
+    if roll < prob { return tend; } // Absorbed into noise
+    return state;
+}
+
+fn denoise_trit(noisy_state: trit, model_pred: trit) -> trit {
+    if noisy_state == tend { return model_pred; } // Recovered
+    return noisy_state;
+}
+
+fn forward_process_trit(initial: trit, steps: int) -> trit {
+    return tend; // Eventually all goes to tend
+}

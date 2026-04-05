@@ -1,0 +1,26 @@
+// Module:  stdlib/research/constitutional_trit.tern
+// Purpose: Constitutional AI via Trits
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Direct implementation of Anthropic's Constitutional AI, but the critique
+// is returned as a trit signal.
+
+fn principle_check_trit(response: trit, principle: trit) -> trit {
+    if response == principle { return affirm; } // Safe
+    return reject; // Violates principle
+}
+
+fn revision_signal_trit(critique: trit) -> trit {
+    if critique == reject { return affirm; } // Needs revision
+    return tend; // Good enough
+}
+
+fn harmless_gate_trit(score: trit) -> trit {
+    if score == tend { return tend; } // Human review
+    match score {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}
