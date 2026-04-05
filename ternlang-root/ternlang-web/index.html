@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,7 +56,142 @@
   </script>
 
   <style>
-    body { background-color: #05050A; color: #dde0f0; overflow-x: hidden; }
+    /* ── Theme variables ─────────────────────────────── */
+    :root {
+      --theme-bg:      #05050A;
+      --theme-bg2:     #0D0D16;
+      --theme-bg3:     #151522;
+      --theme-text:    #dde0f0;
+      --theme-muted:   #7a7d99;
+      --theme-border:  #232336;
+      --theme-card:    rgba(21,21,34,0.8);
+      --theme-glass:   rgba(13,13,22,0.6);
+      --theme-grid:    rgba(255,255,255,0.02);
+    }
+    [data-theme="light"] {
+      --theme-bg:      #f4f5fb;
+      --theme-bg2:     #eaecf7;
+      --theme-bg3:     #dde0f0;
+      --theme-text:    #14142a;
+      --theme-muted:   #5a5d82;
+      --theme-border:  #c8cce8;
+      --theme-card:    rgba(255,255,255,0.9);
+      --theme-glass:   rgba(240,242,255,0.85);
+      --theme-grid:    rgba(0,0,0,0.03);
+    }
+    body {
+      background-color: var(--theme-bg);
+      color: var(--theme-text);
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    [data-theme="light"] .glass {
+      background: var(--theme-glass);
+      border-color: var(--theme-border);
+    }
+    [data-theme="light"] .glass-card {
+      background: var(--theme-card);
+      border-color: var(--theme-border);
+    }
+    [data-theme="light"] nav { border-color: var(--theme-border); }
+    [data-theme="light"] .bg-t_bg  { background-color: var(--theme-bg)  !important; }
+    [data-theme="light"] .bg-t_bg2 { background-color: var(--theme-bg2) !important; }
+    [data-theme="light"] .bg-t_bg3 { background-color: var(--theme-bg3) !important; }
+    [data-theme="light"] .border-t_border { border-color: var(--theme-border) !important; }
+    [data-theme="light"] .text-t_muted    { color: var(--theme-muted) !important; }
+    [data-theme="light"] .text-white      { color: var(--theme-text)  !important; }
+    [data-theme="light"] #ternary-canvas  { opacity: 0.15; }
+    [data-theme="light"] .bg-grid {
+      background-image: linear-gradient(to right, var(--theme-grid) 1px, transparent 1px),
+                        linear-gradient(to bottom, var(--theme-grid) 1px, transparent 1px);
+    }
+
+    /* ── Theme toggle button ─────────────────────────── */
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--theme-border);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .theme-toggle:hover { background: rgba(0,212,170,0.1); border-color: #00d4aa; }
+    .theme-toggle .icon-moon { display: inline; }
+    .theme-toggle .icon-sun  { display: none; }
+    [data-theme="light"] .theme-toggle .icon-moon { display: none; }
+    [data-theme="light"] .theme-toggle .icon-sun  { display: inline; }
+
+    /* ── Terminal section ────────────────────────────── */
+    .term-window {
+      background: #0a0a12;
+      border: 1px solid #1e2035;
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    [data-theme="light"] .term-window { background: #1a1a2e; border-color: #2a2a45; }
+    .term-titlebar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      background: #12121e;
+      border-bottom: 1px solid #1e2035;
+    }
+    .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .term-body { display: flex; min-height: 380px; }
+    .term-sidebar {
+      width: 160px; flex-shrink: 0;
+      border-right: 1px solid #1e2035;
+      padding: 8px 0;
+    }
+    .term-file {
+      padding: 7px 14px;
+      color: #5a5d82;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 12px;
+    }
+    .term-file:hover { color: #a0a3c8; background: rgba(255,255,255,0.03); }
+    .term-file.active { color: #00d4aa; background: rgba(0,212,170,0.07); border-left: 2px solid #00d4aa; }
+    .term-editor { flex: 1; padding: 16px; overflow: auto; color: #cdd6f4; line-height: 1.8; }
+    .term-output {
+      border-top: 1px solid #1e2035;
+      padding: 12px 16px;
+      min-height: 90px;
+      background: #070710;
+    }
+    .term-line { line-height: 1.7; white-space: pre; }
+    .tc-kw  { color: #89b4fa; font-weight: 600; }
+    .tc-val { color: #00f5c4; font-weight: 600; }
+    .tc-fn  { color: #cba6f7; }
+    .tc-cm  { color: #45475a; font-style: italic; }
+    .tc-ty  { color: #f9e2af; }
+    .tc-op  { color: #89dceb; }
+    .tc-str { color: #a6e3a1; }
+    .tc-out-ok   { color: #00f5c4; font-weight: 600; }
+    .tc-out-info { color: #6c7086; }
+    .tc-out-warn { color: #f9e2af; }
+    .tc-out-num  { color: #f38ba8; }
+    .term-cursor { display: inline-block; width: 8px; height: 14px; background: #00d4aa; vertical-align: middle; animation: blink 1s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .term-run-btn {
+      margin-left: auto;
+      padding: 4px 14px;
+      background: rgba(0,212,170,0.12);
+      border: 1px solid rgba(0,212,170,0.3);
+      border-radius: 5px;
+      color: #00d4aa;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+    }
+    .term-run-btn:hover { background: #00d4aa; color: #000; }
+    .term-run-btn:disabled { opacity: 0.4; cursor: default; }
     
     .bg-grid {
       background-size: 40px 40px;
@@ -153,13 +288,20 @@
         <a href="#api" class="text-t_muted hover:text-t_teal transition-colors">API</a>
         <a href="#examples" class="text-t_muted hover:text-t_teal transition-colors">Examples</a>
         <a href="#benchmark" class="text-t_muted hover:text-t_teal transition-colors">Benchmarks</a>
+        <a href="#terminal"  class="text-t_muted hover:text-t_teal transition-colors">Terminal</a>
         <a href="#licensing" class="text-t_muted hover:text-t_teal transition-colors">Licensing</a>
         <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/albert-agent" target="_blank" rel="noopener noreferrer" class="text-t_blue font-bold hover:text-white transition-colors">Project Albert</a>
       </div>
 
-      <a href="#licensing" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-t_teal/10 text-t_teal border border-t_teal/30 rounded font-mono text-sm hover:bg-t_teal hover:text-black transition-all">
-        Get API Key
-      </a>
+      <div class="flex items-center gap-3">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+          <span class="icon-moon">🌙</span>
+          <span class="icon-sun">☀️</span>
+        </button>
+        <a href="#licensing" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-t_teal/10 text-t_teal border border-t_teal/30 rounded font-mono text-sm hover:bg-t_teal hover:text-black transition-all">
+          Get API Key
+        </a>
+      </div>
     </div>
   </nav>
 
@@ -173,8 +315,11 @@
       <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">
         Good night, <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-t_teal to-t_blue">binary.</span>
       </h1>
-      <p class="text-xl md:text-2xl text-t_muted font-light mb-12 max-w-2xl mx-auto">
-        The world operates in three states. Your AI agents should too. Engineered for the 1 out of 10 uncertainty metric inherent in all dynamic causal systems.
+      <p class="text-2xl md:text-3xl text-t_muted font-light mb-6 max-w-2xl mx-auto leading-relaxed">
+        The world isn't yes or no.<br class="hidden md:block"/> It's yes, no, and <em class="text-white not-italic font-semibold">not yet</em>.
+      </p>
+      <p class="text-base md:text-lg text-t_muted/70 font-light mb-12 max-w-xl mx-auto">
+        Ternlang gives AI agents a third state — <span class="text-t_teal font-mono">tend</span> — a formal right to hold, deliberate, and request more evidence before committing to a decision.
       </p>
 
       <!-- Advanced Zone Diagram — hidden on mobile -->
@@ -221,7 +366,7 @@
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">122x</span><span class="text-xs text-t_muted uppercase tracking-widest">Sparse speedup</span></div>
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">177+</span><span class="text-xs text-t_muted uppercase tracking-widest">Tests passing</span></div>
       <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">10</span><span class="text-xs text-t_muted uppercase tracking-widest">MCP tools</span></div>
-      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">250+</span><span class="text-xs text-t_muted uppercase tracking-widest">.tern programs</span></div>
+      <div class="text-center reveal"><span class="block font-mono text-3xl font-bold text-t_teal mb-1">300+</span><span class="text-xs text-t_muted uppercase tracking-widest">.tern programs</span></div>
     </div>
   </div>
 
@@ -715,6 +860,51 @@ event: done</pre>
     </div>
   </section>
 
+  <!-- Interactive Terminal -->
+  <section id="terminal" class="relative z-10 py-24 px-6 bg-t_bg border-t border-t_border">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12 reveal">
+        <p class="font-mono text-t_teal text-xs tracking-widest uppercase mb-4">Try it live</p>
+        <h2 class="text-3xl md:text-5xl font-light text-white mb-4">
+          See ternlang <strong class="font-bold text-t_teal">think.</strong>
+        </h2>
+        <p class="text-t_muted text-lg max-w-xl mx-auto">Select a program, press Run, and watch the BET VM deliberate in real time.</p>
+      </div>
+
+      <div class="term-window reveal">
+        <!-- Title bar -->
+        <div class="term-titlebar">
+          <span class="term-dot" style="background:#ff5f6d"></span>
+          <span class="term-dot" style="background:#f59e0b"></span>
+          <span class="term-dot" style="background:#22c55e"></span>
+          <span style="color:#3a3d5c;margin-left:8px;font-size:12px;">ternlang terminal</span>
+          <button class="term-run-btn" id="term-run-btn">▶ Run</button>
+        </div>
+
+        <!-- Body: sidebar + editor -->
+        <div class="term-body">
+          <!-- File list -->
+          <div class="term-sidebar">
+            <div style="color:#2a2d4a;font-size:10px;padding:6px 14px 4px;text-transform:uppercase;letter-spacing:.1em;">programs</div>
+            <div class="term-file active" data-prog="0">classify.tern</div>
+            <div class="term-file" data-prog="1">pipeline.tern</div>
+            <div class="term-file" data-prog="2">sparse_nn.tern</div>
+            <div class="term-file" data-prog="3">moe_vote.tern</div>
+            <div class="term-file" data-prog="4">uncertainty.tern</div>
+          </div>
+
+          <!-- Code editor (read-only display) -->
+          <div class="term-editor" id="term-editor"></div>
+        </div>
+
+        <!-- Output -->
+        <div class="term-output" id="term-output">
+          <div class="term-line tc-out-info">// Select a program and press ▶ Run</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA -->
   <section class="relative z-10 py-24 px-6 bg-gradient-to-b from-t_bg2 to-black border-t border-t_border text-center">
     <div class="max-w-3xl mx-auto reveal">
@@ -1011,6 +1201,262 @@ event: done</pre>
       requestAnimationFrame(animate);
     }
     animate();
+
+    // ── Theme Toggle ─────────────────────────────────────────────────────────
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('ternlang-theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('ternlang-theme', next);
+    });
+
+    // ── Interactive Terminal ──────────────────────────────────────────────────
+    const PROGRAMS = [
+      {
+        name: 'classify.tern',
+        code: [
+          ['cm', '// hello.tern — your first ternlang program'],
+          ['', ''],
+          ['kw', 'fn '] + '',
+          ['', ''],
+        ],
+        tokens: [
+          {t:'cm', v:'// classify.tern — 3-class AI classifier\n'},
+          {t:'cm', v:'// affirm = high confidence  tend = uncertain  reject = negative\n\n'},
+          {t:'kw', v:'struct '},{t:'ty', v:'Signal'},{t:'', v:' {\n'},
+          {t:'', v:'  strength:  '},{t:'ty', v:'trit'},{t:'', v:',\n  context:   '},{t:'ty', v:'trit'},{t:'', v:',\n  history:   '},{t:'ty', v:'trit'},{t:'', v:',\n}\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'classify'},{t:'', v:'(s: '},{t:'ty', v:'Signal'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'match '},{t:'', v:'s.strength {\n'},
+          {t:'', v:'    '},{t:'val', v:'affirm'},{t:'', v:' => {\n'},
+          {t:'', v:'      '},{t:'kw', v:'match '},{t:'', v:'s.context {\n'},
+          {t:'', v:'        '},{t:'val', v:'affirm'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:'; }\n'},
+          {t:'', v:'        '},{t:'val', v:'tend  '},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   }\n'},
+          {t:'', v:'        '},{t:'val', v:'reject'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   }\n'},
+          {t:'', v:'      }\n    }\n'},
+          {t:'', v:'    '},{t:'val', v:'tend  '},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   }\n'},
+          {t:'', v:'    '},{t:'val', v:'reject'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'reject'},{t:'', v:'; }\n'},
+          {t:'', v:'  }\n}\n'},
+        ],
+        output: [
+          {t:'info', v:'[BET VM]   loaded classify.tern'},
+          {t:'info', v:'[compile]  struct Signal → 3 trit registers'},
+          {t:'info', v:'[compile]  18 tokens → 26 opcodes'},
+          {t:'info', v:'[run]  classify({ strength: affirm, context: affirm, history: affirm })'},
+          {t:'ok',   v:'→  affirm   (high confidence — all signals aligned)'},
+          {t:'info', v:'[run]  classify({ strength: affirm, context: reject, history: tend })'},
+          {t:'warn', v:'→  tend     (conflicting signals — holding for more data)'},
+          {t:'info', v:'[run]  classify({ strength: reject, context: tend, history: reject })'},
+          {t:'num',  v:'→  reject   (negative — do not proceed)'},
+        ],
+      },
+      {
+        name: 'pipeline.tern',
+        tokens: [
+          {t:'cm', v:'// pipeline.tern — gated execution pipeline\n'},
+          {t:'cm', v:'// tend propagates: one uncertain stage = whole pipeline holds\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'validate'},{t:'', v:'(input: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:';\n}\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'enrich'},{t:'', v:'(data: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';\n'},{t:'cm', v:'  // waiting for external data source\n'},{t:'', v:'}\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'decide'},{t:'', v:'(signal: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'v: '},{t:'ty', v:'trit'},{t:'', v:' = '},{t:'fn', v:'validate'},{t:'', v:'(signal);\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'e: '},{t:'ty', v:'trit'},{t:'', v:' = '},{t:'fn', v:'enrich'},{t:'', v:'(v);\n'},
+          {t:'', v:'  '},{t:'kw', v:'match '},{t:'', v:'e {\n'},
+          {t:'', v:'    '},{t:'val', v:'affirm'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:'; }\n'},
+          {t:'', v:'    '},{t:'val', v:'tend  '},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   }\n'},
+          {t:'', v:'    '},{t:'val', v:'reject'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'reject'},{t:'', v:'; }\n'},
+          {t:'', v:'  }\n}\n'},
+        ],
+        output: [
+          {t:'info', v:'[BET VM]   loaded pipeline.tern'},
+          {t:'info', v:'[compile]  3 functions → 41 opcodes'},
+          {t:'info', v:'[run]      decide(affirm)'},
+          {t:'info', v:'[stage 1]  validate(affirm)    → affirm ✓'},
+          {t:'warn', v:'[stage 2]  enrich(affirm)      → tend   ⏸'},
+          {t:'warn', v:'[gate]     pipeline halted at stage 2 — waiting for data'},
+          {t:'warn', v:'→  tend    (not a failure — formal hold state)'},
+        ],
+      },
+      {
+        name: 'sparse_nn.tern',
+        tokens: [
+          {t:'cm', v:'// sparse_nn.tern — neural inference with @sparseskip\n'},
+          {t:'cm', v:'// balanced ternary weights are ~58% zero — skip them\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'layer'},{t:'', v:'(\n'},
+          {t:'', v:'  w: '},{t:'ty', v:'trittensor<8 x 8>'},{t:'', v:',\n'},
+          {t:'', v:'  x: '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:'\n) -> '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:' {\n'},
+          {t:'kw', v:'  @sparseskip\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'y: '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:' = '},{t:'fn', v:'matmul'},{t:'', v:'(w, x);\n'},
+          {t:'', v:'  '},{t:'kw', v:'return '},{t:'', v:'y;\n}\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'forward'},{t:'', v:'(input: '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'h: '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:' = '},{t:'fn', v:'layer'},{t:'', v:'(w1, input);\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'out: '},{t:'ty', v:'trittensor<8 x 1>'},{t:'', v:' = '},{t:'fn', v:'layer'},{t:'', v:'(w2, h);\n'},
+          {t:'', v:'  '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:';\n}\n'},
+        ],
+        output: [
+          {t:'info', v:'[BET VM]    loaded sparse_nn.tern'},
+          {t:'info', v:'[compile]   16 tokens → 28 opcodes'},
+          {t:'info', v:'[@sparseskip] layer 1: scanning 8×8 weight tensor...'},
+          {t:'warn', v:'[sparsity]  layer 1: 61.0% sparse — 39 of 64 ops skipped'},
+          {t:'info', v:'[@sparseskip] layer 2: scanning 8×8 weight tensor...'},
+          {t:'warn', v:'[sparsity]  layer 2: 54.7% sparse — 35 of 64 ops skipped'},
+          {t:'ok',   v:'[benchmark] dense:  128 multiply ops'},
+          {t:'ok',   v:'[benchmark] sparse:  54 multiply ops  →  2.37x speedup'},
+          {t:'ok',   v:'→  affirm'},
+        ],
+      },
+      {
+        name: 'moe_vote.tern',
+        tokens: [
+          {t:'cm', v:'// moe_vote.tern — Mixture of Experts consensus\n'},
+          {t:'cm', v:'// MoE-13 architecture: specialists vote, majority rules\n\n'},
+          {t:'kw', v:'agent '},{t:'ty', v:'SyntaxExpert'},{t:'', v:'  { '},{t:'kw', v:'fn '},{t:'fn', v:'handle'},{t:'', v:'(p: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' { '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:'; } }\n'},
+          {t:'kw', v:'agent '},{t:'ty', v:'ReasonExpert'},{t:'', v:' { '},{t:'kw', v:'fn '},{t:'fn', v:'handle'},{t:'', v:'(p: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' { '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:'; } }\n'},
+          {t:'kw', v:'agent '},{t:'ty', v:'SafetyExpert'},{t:'', v:' { '},{t:'kw', v:'fn '},{t:'fn', v:'handle'},{t:'', v:'(p: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   } }\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'orchestrate'},{t:'', v:'(query: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'s: '},{t:'ty', v:'AgentRef'},{t:'', v:' = '},{t:'kw', v:'spawn '},{t:'ty', v:'SyntaxExpert'},{t:'', v:';\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'r: '},{t:'ty', v:'AgentRef'},{t:'', v:' = '},{t:'kw', v:'spawn '},{t:'ty', v:'ReasonExpert'},{t:'', v:';\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'f: '},{t:'ty', v:'AgentRef'},{t:'', v:' = '},{t:'kw', v:'spawn '},{t:'ty', v:'SafetyExpert'},{t:'', v:';\n'},
+          {t:'', v:'  '},{t:'kw', v:'send '},{t:'', v:'s query; '},{t:'kw', v:'send '},{t:'', v:'r query; '},{t:'kw', v:'send '},{t:'', v:'f query;\n'},
+          {t:'', v:'  '},{t:'cm', v:'// collect votes\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'v1: '},{t:'ty', v:'trit'},{t:'', v:' = '},{t:'kw', v:'await '},{t:'', v:'s;\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'v2: '},{t:'ty', v:'trit'},{t:'', v:' = '},{t:'kw', v:'await '},{t:'', v:'r;\n'},
+          {t:'', v:'  '},{t:'kw', v:'let '},{t:'', v:'v3: '},{t:'ty', v:'trit'},{t:'', v:' = '},{t:'kw', v:'await '},{t:'', v:'f;\n'},
+          {t:'', v:'  '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:';\n}\n'},
+        ],
+        output: [
+          {t:'info', v:'[BET VM]    loaded moe_vote.tern'},
+          {t:'info', v:'[compile]   3 agents, 44 tokens → 67 opcodes'},
+          {t:'info', v:'[spawn]     SyntaxExpert  → agent@0x01'},
+          {t:'info', v:'[spawn]     ReasonExpert  → agent@0x02'},
+          {t:'info', v:'[spawn]     SafetyExpert  → agent@0x03'},
+          {t:'info', v:'[votes]     SyntaxExpert  → affirm'},
+          {t:'info', v:'[votes]     ReasonExpert  → affirm'},
+          {t:'warn', v:'[votes]     SafetyExpert  → tend  (requesting review)'},
+          {t:'info', v:'[tally]     affirm=2  tend=1  reject=0'},
+          {t:'ok',   v:'[MoE]       majority threshold met → affirm'},
+          {t:'ok',   v:'→  affirm'},
+        ],
+      },
+      {
+        name: 'uncertainty.tern',
+        tokens: [
+          {t:'cm', v:'// uncertainty.tern — tend is not null. it is a state.\n'},
+          {t:'cm', v:'// binary systems crash on unknown. ternlang routes it.\n\n'},
+          {t:'kw', v:'fn '},{t:'fn', v:'diagnose'},{t:'', v:'(symptom: '},{t:'ty', v:'trit'},{t:'', v:', test: '},{t:'ty', v:'trit'},{t:'', v:') -> '},{t:'ty', v:'trit'},{t:'', v:' {\n'},
+          {t:'', v:'  '},{t:'kw', v:'match '},{t:'', v:'symptom {\n'},
+          {t:'', v:'    '},{t:'val', v:'affirm'},{t:'', v:' => {\n'},
+          {t:'', v:'      '},{t:'kw', v:'match '},{t:'', v:'test {\n'},
+          {t:'', v:'        '},{t:'val', v:'affirm'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'affirm'},{t:'', v:'; }\n'},
+          {t:'', v:'        '},{t:'val', v:'tend  '},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   '},{t:'cm', v:'// order more tests'},{t:'', v:' }\n'},
+          {t:'', v:'        '},{t:'val', v:'reject'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   '},{t:'cm', v:'// conflicting — hold'},{t:'', v:' }\n'},
+          {t:'', v:'      }\n    }\n'},
+          {t:'', v:'    '},{t:'val', v:'tend  '},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'tend'},{t:'', v:';   '},{t:'cm', v:'// patient stable'},{t:'', v:' }\n'},
+          {t:'', v:'    '},{t:'val', v:'reject'},{t:'', v:' => { '},{t:'kw', v:'return '},{t:'val', v:'reject'},{t:'', v:'; '},{t:'cm', v:'// clear negative'},{t:'', v:' }\n'},
+          {t:'', v:'  }\n}\n'},
+        ],
+        output: [
+          {t:'info', v:'[BET VM]   loaded uncertainty.tern'},
+          {t:'info', v:'[compile]  17 tokens → 24 opcodes'},
+          {t:'info', v:'[run]  diagnose(affirm, affirm)   — clear positive signal'},
+          {t:'ok',   v:'→  affirm   (proceed with treatment)'},
+          {t:'info', v:'[run]  diagnose(affirm, tend)     — symptom present, test inconclusive'},
+          {t:'warn', v:'→  tend     (order secondary tests — not a failure, a protocol)'},
+          {t:'info', v:'[run]  diagnose(affirm, reject)   — contradictory evidence'},
+          {t:'warn', v:'→  tend     (hold decision — contradiction detected, escalate)'},
+          {t:'info', v:'[run]  diagnose(reject, reject)   — no indicators'},
+          {t:'num',  v:'→  reject   (negative — discharge)'},
+        ],
+      },
+    ];
+
+    let activeProg = 0;
+    let termRunning = false;
+
+    function colorClass(t) {
+      if (t === 'kw')  return 'tc-kw';
+      if (t === 'val') return 'tc-val';
+      if (t === 'fn')  return 'tc-fn';
+      if (t === 'cm')  return 'tc-cm';
+      if (t === 'ty')  return 'tc-ty';
+      return '';
+    }
+
+    function renderProgram(idx) {
+      const prog = PROGRAMS[idx];
+      const editor = document.getElementById('term-editor');
+      editor.innerHTML = prog.tokens.map(tok => {
+        const cls = colorClass(tok.t);
+        const escaped = tok.v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const html = escaped.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;');
+        return cls ? `<span class="${cls}">${html}</span>` : html;
+      }).join('') + '<span class="term-cursor"></span>';
+
+      document.getElementById('term-output').innerHTML =
+        '<div class="term-line tc-out-info">// Press ▶ Run to execute ' + prog.name + '</div>';
+    }
+
+    function runProgram() {
+      if (termRunning) return;
+      termRunning = true;
+      const btn = document.getElementById('term-run-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Running...';
+
+      const output = document.getElementById('term-output');
+      output.innerHTML = '';
+
+      const prog = PROGRAMS[activeProg];
+      const prompt = document.createElement('div');
+      prompt.className = 'term-line';
+      prompt.style.color = '#5a5d82';
+      prompt.innerHTML = '$ ternlang run ' + prog.name;
+      output.appendChild(prompt);
+
+      let i = 0;
+      function nextLine() {
+        if (i >= prog.output.length) {
+          btn.disabled = false;
+          btn.textContent = '▶ Run';
+          termRunning = false;
+          return;
+        }
+        const line = prog.output[i++];
+        const el = document.createElement('div');
+        el.className = 'term-line';
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.15s';
+        if (line.t === 'ok')   el.classList.add('tc-out-ok');
+        if (line.t === 'info') el.classList.add('tc-out-info');
+        if (line.t === 'num')  el.classList.add('tc-out-num');
+        if (line.t === 'warn') el.classList.add('tc-out-warn');
+        el.textContent = line.v;
+        output.appendChild(el);
+        output.scrollTop = output.scrollHeight;
+        requestAnimationFrame(() => { el.style.opacity = '1'; });
+        setTimeout(nextLine, 160 + Math.random() * 120);
+      }
+      setTimeout(nextLine, 200);
+    }
+
+    // File selector
+    document.querySelectorAll('.term-file').forEach(el => {
+      el.addEventListener('click', () => {
+        if (termRunning) return;
+        document.querySelectorAll('.term-file').forEach(f => f.classList.remove('active'));
+        el.classList.add('active');
+        activeProg = parseInt(el.dataset.prog);
+        renderProgram(activeProg);
+      });
+    });
+
+    document.getElementById('term-run-btn').addEventListener('click', runProgram);
+
+    // Init
+    renderProgram(0);
   </script>
 </body>
 </html>
