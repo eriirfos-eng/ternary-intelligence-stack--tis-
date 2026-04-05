@@ -1,0 +1,34 @@
+// Module: 04_sparse_ops.tern
+// Purpose: Leveraging '@sparseskip' for efficient ternary operations
+// Author: RFI-IRFOS
+
+// Ternary logic is naturally sparse. 'tend' (0) represents neutrality.
+// Any multiplication by 'tend' results in 'tend'. 
+// The '@sparseskip' directive tells the compiler to skip these calculations at the hardware level.
+
+fn main() {
+    // 1. Create a sparse tensor (mostly 'tend' values)
+    let sparse_tensor: trittensor<4 x 4> = {
+        [tend, affirm, tend, tend],
+        [tend, tend, reject, tend],
+        [affirm, tend, tend, tend],
+        [tend, tend, tend, reject]
+    };
+
+    let weight_tensor: trittensor<4 x 4> = {
+        [affirm, reject, affirm, reject],
+        [reject, affirm, reject, affirm],
+        [affirm, reject, affirm, reject],
+        [reject, affirm, reject, affirm]
+    };
+
+    // 2. Perform matrix multiplication with '@sparseskip'
+    // This dramatically reduces the number of operations in neural networks.
+    @sparseskip
+    let result: trittensor<4 x 4> = sparse_tensor * weight_tensor;
+
+    // 3. Why it matters
+    // In large AI models, most weights or activations might be 'tend' (neutral).
+    // Skipping '0 * X' operations allows for massive power savings and speed.
+    print("Sparse matrix multiplication complete using @sparseskip.");
+}

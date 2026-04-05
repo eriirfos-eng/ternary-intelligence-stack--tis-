@@ -1,0 +1,37 @@
+// Module: 02_match_exhaustive.tern
+// Purpose: Understanding why 3-way matches are mandatory.
+// Author: RFI-IRFOS
+
+// In ternary logic, a binary if/else is considered unsafe.
+// This tutorial shows why exhaustive matches are mandatory.
+
+fn main() {
+    // 1. Example 1: Traffic Light
+    let traffic_light: trit = tend; // Let's say it's yellow/caution
+
+    match traffic_light {
+        affirm => { print("State: Green - Go."); }
+        tend   => { print("State: Yellow - Slow down/Prepare to stop."); }
+        reject => { print("State: Red - Stop."); }
+    }
+
+    // 2. Example 2: Medical Test Result
+    let test_result: trit = tend; // Inconclusive result
+
+    match test_result {
+        affirm => { print("Result: Positive - Treatment needed."); }
+        tend   => { print("Result: Inconclusive - Retest required."); }
+        reject => { print("Result: Negative - No treatment needed."); }
+    }
+    // Notice: Binary tests (True/False) might force 'Inconclusive' to be 'False', 
+    // which could lead to missed cases. Ternary 'tend' prevents this error.
+
+    // 3. Example 3: Loan Approval
+    let loan_status: trit = tend; // Needs more documentation
+
+    match loan_status {
+        affirm => { print("Status: Approved - Funds released."); }
+        tend   => { print("Status: Pending - More documentation requested."); }
+        reject => { print("Status: Denied - Funds withheld."); }
+    }
+}

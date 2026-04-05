@@ -1,0 +1,40 @@
+// Module: 01_hello_ternary.tern
+// Purpose: Introduction to Ternary Logic and the Three States
+// Author: RFI-IRFOS
+
+// In ternlang, every 'trit' (ternary bit) can have one of three values:
+// 1. affirm (+1) - Represents True, Yes, Positive, Positive Charge, Up.
+// 2. tend (0)    - Represents Maybe, Neutral, Unknown, Zero, Mid.
+// 3. reject (-1) - Represents False, No, Negative, Negative Charge, Down.
+
+fn main() {
+    // 1. Declare trits using the core constants
+    let state_positive: trit = affirm;
+    let state_neutral: trit = tend;
+    let state_negative: trit = reject;
+
+    // 2. Output and matching
+    // Every match MUST handle all three states. This prevents binary-thinking errors.
+    match state_positive {
+        affirm => {
+            print("State is affirm (+1): The result is positive.");
+        }
+        tend => {
+            print("State is tend (0): The result is neutral or uncertain.");
+        }
+        reject => {
+            print("State is reject (-1): The result is negative.");
+        }
+    }
+
+    // 3. Why 'tend' matters?
+    // In binary (True/False), 'False' often conflates 'No' and 'Unknown'.
+    // In ternary, 'tend' captures the 'Unknown' or 'Neutral' state explicitly.
+    let decision: trit = tend;
+    
+    match decision {
+        affirm => { print("Action: Proceed."); }
+        tend   => { print("Action: Hold for more data (The power of 'tend')."); }
+        reject => { print("Action: Stop."); }
+    }
+}

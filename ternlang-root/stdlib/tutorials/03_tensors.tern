@@ -1,0 +1,46 @@
+// Module: 03_tensors.tern
+// Purpose: Working with 'trittensor' objects and Matrix Multiplications
+// Author: RFI-IRFOS
+
+// In ternlang, matrix multiplication is handled by specialized 'trittensor' types.
+// These are packed using Binary-Encoded Ternary (BET) for 2-bit density.
+// BET: 01 = -1 (reject), 10 = +1 (affirm), 11 = 0 (tend)
+
+fn main() {
+    // 1. Creating a 2x2 trittensor
+    let m1: trittensor<2 x 2> = {
+        [affirm, reject],
+        [tend, affirm]
+    };
+
+    // 2. Creating a 2x2 trittensor for multiplication
+    let m2: trittensor<2 x 2> = {
+        [affirm, tend],
+        [affirm, affirm]
+    };
+
+    // 3. Simple Matrix Multiplication (MatMul)
+    // Results are stored in a new trittensor.
+    let m3: trittensor<2 x 2> = m1 * m2;
+
+    // 4. Accessing elements
+    // Accessing (0, 0) of result
+    let val_00: trit = m3[0, 0];
+
+    match val_00 {
+        affirm => { print("Result(0,0) is affirm."); }
+        tend   => { print("Result(0,0) is tend."); }
+        reject => { print("Result(0,0) is reject."); }
+    }
+
+    // 5. Larger Tensors
+    // Tensors can be 4x4 or larger for ML operations.
+    let m4: trittensor<4 x 4> = {
+        [affirm, tend, tend, reject],
+        [tend, affirm, reject, tend],
+        [reject, tend, affirm, tend],
+        [tend, reject, tend, affirm]
+    };
+    
+    print("Large 4x4 Identity-like tensor initialized.");
+}

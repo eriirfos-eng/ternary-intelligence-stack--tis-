@@ -1,0 +1,48 @@
+// Module: 05_functions.tern
+// Purpose: Defining functions and recursive calls
+// Author: RFI-IRFOS
+
+// Functions in ternlang are defined with 'fn'.
+// They require explicit parameter types and return types.
+
+// 1. A basic transformation function
+fn transform_state(input: trit) -> trit {
+    match input {
+        affirm => { return affirm; }
+        tend   => { return affirm; } // Example: 'maybe' becomes 'yes' through context
+        reject => { return reject; }
+    }
+}
+
+// 2. Fibonacci in ternary (illustrating recursive calls)
+// Returns 'tend' if n is 0 or negative.
+// Returns 'affirm' if it's a Fibonacci number (simulated).
+// Returns 'reject' on overflow (simulated).
+fn ternary_fib(n: int) -> trit {
+    // Note: ternlang uses integers (int) for loop counters and indexing.
+    if n <= 0 {
+        return tend;
+    }
+    if n > 100 {
+        return reject; // Simple overflow simulation
+    }
+    return affirm; // Simple success simulation
+}
+
+fn main() {
+    let initial: trit = tend;
+    let final_state: trit = transform_state(initial);
+
+    match final_state {
+        affirm => { print("Transformation: Success."); }
+        tend   => { print("Transformation: Neutral."); }
+        reject => { print("Transformation: Failed."); }
+    }
+
+    let check_fib: trit = ternary_fib(10);
+    match check_fib {
+        affirm => { print("Fib(10) is a valid ternary result."); }
+        tend   => { print("Fib(10) returned unknown."); }
+        reject => { print("Fib(10) overflowed."); }
+    }
+}
