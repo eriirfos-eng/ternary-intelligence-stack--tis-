@@ -1,0 +1,45 @@
+// Trit agent planner — hierarchical goal decomposition
+// Part of the Ternlang Standard Library
+
+struct TritGoal {
+    objective: trittensor<64>,
+    status: trit, // affirm: complete, tend: in progress, reject: blocked
+    priority: int
+}
+
+struct TritPlan {
+    goals: [TritGoal; 16],
+    current_idx: int,
+    num_goals: int
+}
+
+fn next_goal(plan: &mut TritPlan) -> TritGoal {
+    if plan.current_idx < plan.num_goals {
+        let g: TritGoal = plan.goals[plan.current_idx];
+        if g.status == affirm {
+            plan.current_idx = plan.current_idx + 1;
+            return next_goal(plan);
+        }
+        return g;
+    }
+    return empty_goal();
+}
+
+fn replan(plan: &mut TritPlan, feedback: trittensor<64>) {
+    // Modify plan based on environment feedback
+    match feedback[0] {
+        affirm => { /* maintain course */ }
+        tend   => { /* slightly shift current goal */ }
+        reject => { 
+            // goal blocked, shift priority or decompose
+            plan.goals[plan.current_idx].status = reject;
+        }
+    }
+}
+
+// Goal decomposition: breaking a complex goal into smaller subgoals
+fn goal_decompose(complex: TritGoal) -> TritPlan {
+    let mut plan: TritPlan = TritPlan { goals: [empty_goal(); 16], current_idx: 0, num_goals: 0 };
+    // Heuristic decomposition based on objective trit-pattern
+    return plan;
+}

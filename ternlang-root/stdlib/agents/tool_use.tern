@@ -1,0 +1,61 @@
+// Trit tool use — gated interfaces for agent capabilities
+// Part of the Ternlang Standard Library
+
+struct TritTool {
+    id: int,
+    description: trittensor<64>,
+    cost: float,
+    active: bool
+}
+
+struct TritToolkit {
+    tools: [TritTool; 32],
+    num_tools: int
+}
+
+// Gate tool: Only allows access to tool if signal is affirm
+fn gate_tool(tool: &mut TritTool, signal: trit) {
+    match signal {
+        affirm => { tool.active = true; }
+        tend   => { /* no change */ }
+        reject => { tool.active = false; }
+    }
+}
+
+// Select tool: Find most relevant tool for a goal
+fn select_tool(tk: TritToolkit, goal: trittensor<64>) -> int {
+    let mut best_idx: int = -1;
+    let mut best_score: float = -1.0;
+    
+    let mut i: int = 0;
+    while i < tk.num_tools {
+        let score: float = match_score(tk.tools[i].description, goal);
+        if score > best_score && tk.tools[i].active {
+            best_score = score;
+            best_idx = i;
+        }
+        i = i + 1;
+    }
+    return best_idx;
+}
+
+// Tool chain: Sequence of tools to solve a problem
+fn tool_chain(tk: TritToolkit, tools: [int; 5], input: trittensor<64>) -> trittensor<64> {
+    let mut state: trittensor<64> = input;
+    let mut i: int = 0;
+    while i < 5 {
+        let tool_id: int = tools[i];
+        if tool_id >= 0 && tk.tools[tool_id].active {
+            // Apply tool (simulated transformation)
+            state = tool_apply(tool_id, state);
+        }
+        i = i + 1;
+    }
+    return state;
+}
+
+// Helper: Simulated tool application
+fn tool_apply(id: int, input: trittensor<64>) -> trittensor<64> {
+    // Placeholder for actual tool implementation (shell, web, math, etc.)
+    return input;
+}

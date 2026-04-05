@@ -1,0 +1,41 @@
+// Trit agent reflection — introspection and consistency logs
+// Part of the Ternlang Standard Library
+
+struct TritReflectionLog {
+    history: trittensor<1024 x 64>, // Past actions/thoughts
+    confidence: float,
+    last_reflection: int
+}
+
+fn reflect(log: &mut TritReflectionLog, current_thought: trittensor<64>) -> trit {
+    // Introspect: compare current thought against historical consistency
+    let mut score: float = 0.0;
+    let mut i: int = 0;
+    while i < 100 && (log.last_reflection - i) >= 0 {
+        score = score + match_score(log.history[log.last_reflection - i], current_thought);
+        i = i + 1;
+    }
+    score = score / float(i);
+    
+    // Output reflection signal:
+    // affirm: consistent/certain
+    // tend: neutral/ambiguous
+    // reject: inconsistent/error
+    if score > 0.8 { return affirm; }
+    else if score < 0.3 { return reject; }
+    return tend;
+}
+
+fn assess_consistency(log: TritReflectionLog) -> float {
+    // Global consistency metric over the entire history
+    return log.confidence;
+}
+
+// Introspect: Adjust confidence based on reflection results
+fn introspect(log: &mut TritReflectionLog, signal: trit) {
+    match signal {
+        affirm => { log.confidence = log.confidence + 0.05 * (1.0 - log.confidence); }
+        tend   => { /* hold constant */ }
+        reject => { log.confidence = log.confidence - 0.1; }
+    }
+}

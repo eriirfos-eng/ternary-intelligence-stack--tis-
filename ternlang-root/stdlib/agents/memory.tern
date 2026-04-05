@@ -1,0 +1,63 @@
+// Trit agent memory — hierarchical storage for AI agents
+// Part of the Ternlang Standard Library
+
+struct TritMemory {
+    short_term: trittensor<256 x 64>,
+    long_term: AssociativeMemory,
+    st_occupancy: int
+}
+
+fn remember(mem: &mut TritMemory, info: trittensor<64>) {
+    if mem.st_occupancy < 256 {
+        mem.short_term[mem.st_occupancy] = info;
+        mem.st_occupancy = mem.st_occupancy + 1;
+    } else {
+        consolidate(mem);
+    }
+}
+
+fn recall(mem: TritMemory, key: trittensor<64>) -> trittensor<64> {
+    // 1. Search short term
+    let mut i: int = 0;
+    while i < mem.st_occupancy {
+        if match_score(mem.short_term[i], key) > 0.9 {
+            return mem.short_term[i];
+        }
+        i = i + 1;
+    }
+    
+    // 2. Fallback to associative long term memory
+    return associative_recall(mem.long_term, key);
+}
+
+fn consolidate(mem: &mut TritMemory) {
+    // Important info moves to long-term memory
+    let mut i: int = 0;
+    while i < mem.st_occupancy {
+        let key: trittensor<64> = extract_key(mem.short_term[i]);
+        associate(&mut mem.long_term, key, mem.short_term[i]);
+        i = i + 1;
+    }
+    mem.st_occupancy = 0;
+}
+
+// Replay: simulated dreams/training on past memory cells
+fn replay(mem: &mut TritMemory, n_samples: int) {
+    let mut s: int = 0;
+    while s < n_samples {
+        let idx: int = random_int(0, mem.st_occupancy);
+        // Process memory sample to reinforce weights
+        s = s + 1;
+    }
+}
+
+// Helper: Similarity score between two trit tensors
+fn match_score(a: trittensor<64>, b: trittensor<64>) -> float {
+    let mut match_count: int = 0;
+    let mut i: int = 0;
+    while i < 64 {
+        if a[i] == b[i] { match_count = match_count + 1; }
+        i = i + 1;
+    }
+    return float(match_count) / 64.0;
+}

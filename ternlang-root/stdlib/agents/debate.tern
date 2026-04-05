@@ -1,0 +1,48 @@
+// Trit agent debate — adversarial deliberation framework
+// Part of the Ternlang Standard Library
+
+struct TritDebater {
+    id: int,
+    belief: trittensor<64>,
+    confidence: float
+}
+
+fn propose(debater: TritDebater) -> trittensor<64> {
+    // Current stance on the topic
+    return debater.belief;
+}
+
+fn challenge(debater: &mut TritDebater, opponent_proposal: trittensor<64>) -> trit {
+    // Return affirm if agree, reject if disagree, tend if uncertain
+    let score: float = match_score(debater.belief, opponent_proposal);
+    if score > 0.7 { return affirm; }
+    else if score < 0.4 { return reject; }
+    return tend;
+}
+
+// Arbitrate: Judge between two competing proposals
+fn arbitrate(judge: TritDebater, p1: trittensor<64>, p2: trittensor<64>) -> int {
+    let s1: float = match_score(judge.belief, p1);
+    let s2: float = match_score(judge.belief, p2);
+    
+    if s1 > s2 { return 1; }
+    if s2 > s1 { return 2; }
+    return 0; // split decision
+}
+
+fn debate(d1: &mut TritDebater, d2: &mut TritDebater, judge: &mut TritDebater, rounds: int) -> int {
+    let mut winner: int = 0;
+    let mut r: int = 0;
+    while r < rounds {
+        let p1: trittensor<64> = propose(*d1);
+        let p2: trittensor<64> = propose(*d2);
+        
+        let c1: trit = challenge(d1, p2);
+        let c2: trit = challenge(d2, p1);
+        
+        // Final judge decision
+        winner = arbitrate(*judge, p1, p2);
+        r = r + 1;
+    }
+    return winner;
+}
