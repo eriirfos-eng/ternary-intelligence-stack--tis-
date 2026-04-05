@@ -21,10 +21,10 @@ Ternlang adds the third state.
 | Trit | Name | What it means |
 |------|------|---------------|
 | `−1` | **reject** | Clear negative signal. Do not proceed. |
-| ` 0` | **hold** | Insufficient data. Gather more before acting. |
+| ` 0` | **tend** | Insufficient data. Gather more before acting. |
 | `+1` | **affirm** | Clear positive signal. Proceed. |
 
-The `hold` state is not indecision. It is a **first-class routing instruction** — a computational directive to remain in deliberation until evidence crosses a threshold. This makes ternlang the natural foundation for AI agents that must reason honestly under uncertainty.
+The `tend` state is not indecision. It is a **first-class routing instruction** — a computational directive to remain in deliberation until evidence crosses a threshold. This makes ternlang the natural foundation for AI agents that must reason honestly under uncertainty.
 
 ---
 
@@ -36,7 +36,7 @@ The `hold` state is not indecision. It is a **first-class routing instruction** 
 | [Sparse Inference](#sparse-ternary-inference) | BitNet-style ternary weights with 86–122× speedup over dense float32 |
 | [MoE-13 Orchestrator](#moe-13-ternary-orchestrator) | Mixture-of-Experts reasoning engine with safety hard gate |
 | [Live API](#live-api) | REST + SSE + MCP endpoints at `https://ternlang.com` |
-| [Example Library](#example-library) | 250+ `.tern` programs across every domain |
+| [Example Library](#example-library) | 300+ `.tern` programs across every domain |
 | [Ecosystem Bridges](#ecosystem-position) | Interop with Brandon Smith 9-trit, Owlet, BitNet b1.58 |
 
 ---
@@ -49,9 +49,9 @@ Ternlang programs use `trit` as the only scalar type. Every `match` must cover a
 // A ternary medical triage gate
 fn patient_conscious(signal: trit) -> trit {
     match signal {
-        -1 => { return -1; }   // hard gate — unconscious patient blocks all other evaluation
-         0 => { return 0;  }
-         1 => { return 1;  }
+        reject => { return reject; }   // hard gate — unconscious patient blocks all other evaluation
+        tend   => { return tend;   }
+        affirm => { return affirm; }
     }
 }
 
@@ -59,19 +59,19 @@ fn vital_signs(heart: trit, pressure: trit) -> trit {
     return consensus(heart, pressure);
 }
 
-let conscious: trit = patient_conscious(1);
+let conscious: trit = patient_conscious(affirm);
 
 match conscious {
-    -1 => { return -1; }   // immediate escalation, no further checks
-     0 => { return 0;  }
-     1 => {
-         let vitals: trit = vital_signs(1, 0);
-         match vitals {
-             -1 => { return -1; }
-              0 => { return 0;  }
-              1 => { return 1;  }
-         }
-     }
+    reject => { return reject; }   // immediate escalation, no further checks
+    tend   => { return tend;   }
+    affirm => {
+        let vitals: trit = vital_signs(affirm, tend);
+        match vitals {
+            reject => { return reject; }
+            tend   => { return tend;   }
+            affirm => { return affirm; }
+        }
+    }
 }
 ```
 
@@ -189,7 +189,7 @@ curl -X POST https://ternlang.com/api/trit_decide \
 
 | Endpoint | Description |
 |----------|-------------|
-| `POST /api/trit_decide` | Float evidence array → reject / hold / affirm + confidence |
+| `POST /api/trit_decide` | Float evidence array → reject / tend / affirm + confidence |
 | `POST /api/trit_vector` | Named dimensions with weights → aggregate ternary decision |
 | `POST /api/trit_consensus` | `consensus(a, b)` → ternary result |
 | `POST /api/trit_deliberate` | EMA convergence loop — multi-round evidence → stable trit |
@@ -198,8 +198,9 @@ curl -X POST https://ternlang.com/api/trit_decide \
 | `POST /api/moe/orchestrate` | Full MoE-13 pass — synchronous JSON result |
 | `GET  /api/stream/moe_orchestrate` | MoE-13 pass streamed round-by-round via SSE |
 | `GET  /api/stream/deliberate` | EMA deliberation streamed per round via SSE |
+| `GET  /api/usage` | Monthly usage stats for the authenticated key |
 
-**API key:** [ternlang.com/#licensing](https://ternlang.com/#licensing)
+**API key:** [ternlang.com/pricing](https://ternlang.com/pricing) · Tier 2 (€24/month): 10,000 calls/month, calendar-month reset
 
 ### MCP Server
 
@@ -233,7 +234,7 @@ For local stdio transport (Claude Desktop, offline use):
 
 ## Example Library
 
-**250+ `.tern` programs** covering real-world decision logic across every domain — the largest collection of balanced ternary programs in existence.
+**300+ `.tern` programs** covering real-world decision logic across every domain — the largest collection of balanced ternary programs in existence.
 
 | Category | Examples |
 |----------|---------|
@@ -244,7 +245,9 @@ For local stdio transport (Claude Desktop, offline use):
 | [AI Agents](examples/08_evidence_collector.tern) | Evidence density, confidence escalation, MoE routing, deliberation |
 | [Civic Systems](examples/12_vote_aggregator.tern) | Vote aggregation, bail decision, treaty negotiation, refugee status |
 | [Computer Science](examples/09_risc_fetch_decode.tern) | CPU pipeline, cache invalidation, API rate limiting, deployment gate |
-| [Tutorials](examples/tutorials/) | 20 self-documenting files — one concept per file |
+| [Tutorials](stdlib/tutorials/) | 15 step-by-step tutorials — hello ternary → full ML pipeline |
+| [QNN / Qutrit](stdlib/qnn/) | Qutrit Neural Networks — Kepp 2026 reference implementations |
+| [Standard Library](stdlib/) | Agents, reasoning, ML layers, optimizers, std, benchmarks |
 
 → [**Browse all examples**](examples/INDEX.md)
 
