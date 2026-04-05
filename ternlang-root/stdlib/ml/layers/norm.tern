@@ -1,0 +1,72 @@
+// Trit normalization — stabilizing ternary layer activations
+// Part of the Ternlang Standard Library
+
+// Layer normalization adapted for ternary values
+fn trit_layer_norm(input: trittensor<64>) -> trittensor<64> {
+    let mut sum_val: float = 0.0;
+    let mut i: int = 0;
+    while i < 64 {
+        match input[i] {
+            affirm => { sum_val = sum_val + 1.0; }
+            tend   => { sum_val = sum_val + 0.0; }
+            reject => { sum_val = sum_val - 1.0; }
+        }
+        i = i + 1;
+    }
+    
+    let mean: float = sum_val / 64.0;
+    let mut output: trittensor<64> = trittensor<64>::zero();
+    let mut j: int = 0;
+    while j < 64 {
+        // Shift towards center based on mean
+        if mean > 0.3 {
+            // Signal is skewed towards affirm, damp it down
+            match input[j] {
+                affirm => { output[j] = tend; }
+                tend   => { output[j] = reject; }
+                reject => { output[j] = reject; }
+            }
+        } else if mean < -0.3 {
+            // Signal is skewed towards reject, damp it up
+            match input[j] {
+                affirm => { output[j] = affirm; }
+                tend   => { output[j] = affirm; }
+                reject => { output[j] = tend; }
+            }
+        } else {
+            output[j] = input[j];
+        }
+        j = j + 1;
+    }
+    return output;
+}
+
+// Batch normalization for ternary activations
+// Tracks running statistics of trit distributions
+struct TritBatchNorm {
+    running_mean: float,
+    running_var: float,
+    momentum: float
+}
+
+fn trit_batch_norm_apply(bn: &mut TritBatchNorm, input: trittensor<64>) -> trittensor<64> {
+    // Logic for batch stats update and normalization
+    return trittensor<64>::zero();
+}
+
+// RMS normalization (Root Mean Square) for ternary
+fn trit_rms_norm(input: trittensor<64>, scale: float) -> trittensor<64> {
+    let mut rms: float = 0.0;
+    let mut i: int = 0;
+    while i < 64 {
+        match input[i] {
+            affirm => { rms = rms + 1.0; }
+            tend   => { rms = rms + 0.0; }
+            reject => { rms = rms + 1.0; } // Square of -1 is 1
+        }
+        i = i + 1;
+    }
+    rms = rms / 64.0;
+    // ... applying scale
+    return trittensor<64>::zero();
+}

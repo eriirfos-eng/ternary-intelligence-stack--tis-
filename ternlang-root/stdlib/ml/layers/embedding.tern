@@ -1,0 +1,68 @@
+// Trit embedding — ternary representation of discrete tokens
+// Part of the Ternlang Standard Library
+
+struct TritEmbedding {
+    table: trittensor<1024 x 64>, // Vocabulary size 1024, embedding dimension 64
+    vocab_size: int
+}
+
+fn embed(emb: TritEmbedding, token_id: int) -> trittensor<64> {
+    if token_id < emb.vocab_size {
+        return emb.table[token_id];
+    }
+    return trittensor<64>::zero();
+}
+
+// Positional encoding in ternary format
+// Uses a fixed pattern of trits to represent sequence position
+fn positional_encode_trit(position: int, d_model: int) -> trittensor<64> {
+    let mut encoding: trittensor<64> = trittensor<64>::zero();
+    let mut i: int = 0;
+    while i < d_model {
+        // Simple modulo-based ternary positional pattern
+        let phase: int = (position / (i + 1)) % 3;
+        match phase {
+            0 => { encoding[i] = reject; }
+            1 => { encoding[i] = tend;   }
+            2 => { encoding[i] = affirm; }
+        }
+        i = i + 1;
+    }
+    return encoding;
+}
+
+fn add_positional_encoding(input: &mut trittensor<SEQ x 64>) {
+    let mut pos: int = 0;
+    while pos < SEQ {
+        let enc: trittensor<64> = positional_encode_trit(pos, 64);
+        let mut i: int = 0;
+        while i < 64 {
+            // Addition with ternary overflow logic (half-adder behavior)
+            // Simplified here: result remains in trit range
+            input[pos][i] = trit_add_wrapped(input[pos][i], enc[i]);
+            i = i + 1;
+        }
+        pos = pos + 1;
+    }
+}
+
+// Helper: Wrapped ternary addition to stay in range [-1, 0, 1]
+fn trit_add_wrapped(a: trit, b: trit) -> trit {
+    match a {
+        affirm => { 
+            match b {
+                affirm => { return reject; } // Wrap affirm + affirm = reject
+                tend   => { return affirm; }
+                reject => { return tend;   }
+            }
+        }
+        tend => { return b; }
+        reject => {
+            match b {
+                affirm => { return tend;   }
+                tend   => { return reject; }
+                reject => { return affirm; } // Wrap reject + reject = affirm
+            }
+        }
+    }
+}

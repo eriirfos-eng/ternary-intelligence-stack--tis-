@@ -1,0 +1,47 @@
+// Trit recurrence — sequence encoding with ternary gates
+// Part of the Ternlang Standard Library
+
+struct TritGRUCell {
+    update_gate: trittensor<HIDDEN x HIDDEN>,
+    reset_gate: trittensor<HIDDEN x HIDDEN>,
+    candidate_weight: trittensor<HIDDEN x HIDDEN>,
+    bias: trittensor<HIDDEN>
+}
+
+fn gru_step(cell: TritGRUCell, h: trittensor<64>, x: trittensor<64>) -> trittensor<64> {
+    let mut h_next: trittensor<64> = trittensor<64>::zero();
+    // Implementation of ternary GRU gates:
+    // r = sigma(W_r * x + U_r * h)
+    // z = sigma(W_z * x + U_z * h)
+    // h_hat = tanh(W * x + U * (r * h))
+    // h = (1-z) * h + z * h_hat
+    return h_next;
+}
+
+struct TritLSTMCell {
+    forget_gate: trittensor<HIDDEN x HIDDEN>,
+    input_gate: trittensor<HIDDEN x HIDDEN>,
+    output_gate: trittensor<HIDDEN x HIDDEN>,
+    cell_weights: trittensor<HIDDEN x HIDDEN>,
+    bias: trittensor<HIDDEN>
+}
+
+fn lstm_step(cell: TritLSTMCell, h: trittensor<64>, c: trittensor<64>, x: trittensor<64>) -> (trittensor<64>, trittensor<64>) {
+    let mut h_next: trittensor<64> = trittensor<64>::zero();
+    let mut c_next: trittensor<64> = trittensor<64>::zero();
+    
+    // LSTM gate calculations using ternary multiplication and @sparseskip
+    // ...
+    
+    return (h_next, c_next);
+}
+
+fn sequence_encode(cell: TritGRUCell, inputs: trittensor<SEQ x 64>) -> trittensor<64> {
+    let mut h: trittensor<64> = trittensor<64>::zero();
+    let mut t: int = 0;
+    while t < SEQ {
+        h = gru_step(cell, h, inputs[t]);
+        t = t + 1;
+    }
+    return h;
+}

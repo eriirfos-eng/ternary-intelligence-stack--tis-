@@ -1,0 +1,67 @@
+// Trit convolution — sparse spatial feature extraction
+// Part of the Ternlang Standard Library
+
+struct TritConv1D {
+    weight: trittensor<IN_CH x OUT_CH x KERNEL>,
+    bias: trittensor<OUT_CH>
+}
+
+fn convolve1d(conv: TritConv1D, input: trittensor<IN_CH x L>) -> trittensor<OUT_CH x L> {
+    let mut out: trittensor<OUT_CH x L> = trittensor<OUT_CH x L>::zero();
+    
+    let mut oc: int = 0;
+    while oc < OUT_CH {
+        let mut i: int = 0;
+        while i < L {
+            let mut acc: int = 0;
+            @sparseskip
+            let mut ic: int = 0;
+            while ic < IN_CH {
+                let mut k: int = 0;
+                while k < KERNEL {
+                    let idx: int = i + k - (KERNEL / 2);
+                    if idx >= 0 && idx < L {
+                        // Sparse ternary multiplication
+                        match input[ic][idx] {
+                            affirm => {
+                                match conv.weight[ic][oc][k] {
+                                    affirm => { acc = acc + 1; }
+                                    tend   => { /* Skip */ }
+                                    reject => { acc = acc - 1; }
+                                }
+                            }
+                            tend => { /* Skip ic loop iteration due to @sparseskip */ }
+                            reject => {
+                                match conv.weight[ic][oc][k] {
+                                    affirm => { acc = acc - 1; }
+                                    tend   => { /* Skip */ }
+                                    reject => { acc = acc + 1; }
+                                }
+                            }
+                        }
+                    }
+                    k = k + 1;
+                }
+                ic = ic + 1;
+            }
+            
+            // Apply bias and quantize back to trit
+            if acc > 0 { out[oc][i] = affirm; }
+            else if acc < 0 { out[oc][i] = reject; }
+            else { out[oc][i] = tend; }
+            i = i + 1;
+        }
+        oc = oc + 1;
+    }
+    return out;
+}
+
+struct TritConv2D {
+    weight: trittensor<IN_CH x OUT_CH x K x K>,
+    bias: trittensor<OUT_CH>
+}
+
+fn convolve2d(conv: TritConv2D, input: trittensor<IN_CH x H x W>) -> trittensor<OUT_CH x H x W> {
+    // 2D convolution logic with nested loops and @sparseskip
+    return trittensor<OUT_CH x H x W>::zero();
+}

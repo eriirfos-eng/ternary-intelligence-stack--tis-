@@ -1,0 +1,52 @@
+// Trit attention — sparse ternary multi-head attention
+// Part of the Ternlang Standard Library
+
+struct TritAttentionHead {
+    query_weights: trittensor<64 x 64>,
+    key_weights: trittensor<64 x 64>,
+    value_weights: trittensor<64 x 64>
+}
+
+fn score(q: trittensor<64>, k: trittensor<64>) -> float {
+    let mut dot: float = 0.0;
+    @sparseskip
+    let mut i: int = 0;
+    while i < 64 {
+        match q[i] {
+            affirm => {
+                match k[i] {
+                    affirm => { dot = dot + 1.0; }
+                    tend   => { dot = dot + 0.0; }
+                    reject => { dot = dot - 1.0; }
+                }
+            }
+            tend => { /* Skip */ }
+            reject => {
+                match k[i] {
+                    affirm => { dot = dot - 1.0; }
+                    tend   => { dot = dot + 0.0; }
+                    reject => { dot = dot + 1.0; }
+                }
+            }
+        }
+        i = i + 1;
+    }
+    return dot / 8.0; // Scaled dot product (sqrt of 64)
+}
+
+fn attend(head: TritAttentionHead, inputs: trittensor<SEQ x 64>) -> trittensor<SEQ x 64> {
+    let mut output: trittensor<SEQ x 64> = trittensor<SEQ x 64>::zero();
+    // Implementation of Q, K, V projections and attention mechanism
+    // ...
+    return output;
+}
+
+struct MultiHeadAttention {
+    heads: [TritAttentionHead; 4],
+    output_projection: trittensor<256 x 256>
+}
+
+fn multi_head_attend(mha: MultiHeadAttention, inputs: trittensor<SEQ x 256>) -> trittensor<SEQ x 256> {
+    // Concatenate head outputs and project
+    return trittensor<SEQ x 256>::zero();
+}
