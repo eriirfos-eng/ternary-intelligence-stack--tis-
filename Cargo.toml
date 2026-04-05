@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "ternlang-root/ternlang-core",
+    "ternlang-root/ternlang-codegen",
+    "ternlang-root/ternlang-ml",
+    "ternlang-root/ternlang-cli",
+    "ternlang-root/ternlang-api",
+    "ternlang-root/ternlang-test", "ternlang-root/ternlang-mcp", "ternlang-root/ternlang-runtime", "ternlang-root/ternlang-hdl", "ternlang-root/ternlang-lsp", "ternlang-root/ternpkg", "ternlang-root/ternlang-compat", "ternlang-root/ternlang-moe", "ternlang-translator",
+]
+resolver = "2"
+
+[workspace.package]
+version     = "0.1.0"
+edition     = "2024"
+license     = "LGPL-3.0-or-later"
+repository  = "https://github.com/eriirfos-eng/ternary-intelligence-stack"
+homepage    = "https://ternlang.com"
+authors     = ["RFI-IRFOS <licensing@ternlang.com>"]
+keywords    = ["ternary", "trit", "balanced-ternary", "vm", "compiler"]
+categories  = ["compilers", "science"]
