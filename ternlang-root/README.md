@@ -4,9 +4,10 @@
 
 [![crates.io](https://img.shields.io/crates/v/ternlang-core.svg)](https://crates.io/crates/ternlang-core)
 [![license](https://img.shields.io/badge/license-LGPL--3.0%20%2F%20BSL--1.1-blue)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-177%2B%20passing-brightgreen)](#architecture)
+[![tests](https://img.shields.io/badge/tests-212%2B%20passing-brightgreen)](#architecture)
 [![API](https://img.shields.io/badge/API-live-brightgreen)](https://ternlang-api.fly.dev/health)
-[![MCP](https://img.shields.io/badge/MCP-10%20tools-purple)](https://ternlang.com/mcp)
+[![MCP](https://img.shields.io/badge/MCP-20%20tools%20v0.3.0-purple)](https://ternlang.com/mcp)
+[![Linguist PR](https://img.shields.io/badge/GitHub%20Linguist-PR%20pending-yellow)](https://github.com/github/linguist/pulls)
 
 Built by [RFI-IRFOS](https://ternlang.com) · [ternlang.com](https://ternlang.com) · [Whitepaper (DOI)](https://doi.org/10.17605/OSF.IO/TZ7DC)
 
@@ -35,7 +36,7 @@ The `tend` state is not indecision. It is a **first-class routing instruction** 
 | [Language & VM](#language--vm) | Compile and run `.tern` programs on the Balanced Ternary Execution VM |
 | [Sparse Inference](#sparse-ternary-inference) | BitNet-style ternary weights with 86–122× speedup over dense float32 |
 | [MoE-13 Orchestrator](#moe-13-ternary-orchestrator) | Mixture-of-Experts reasoning engine with safety hard gate |
-| [Live API](#live-api) | REST + SSE + MCP endpoints at `https://ternlang.com` |
+| [Live API + MCP](#live-api) | REST + SSE + 20 MCP tools at `https://ternlang.com` · 3-layer AI memory |
 | [Example Library](#example-library) | 300+ `.tern` programs across every domain |
 | [Ecosystem Bridges](#ecosystem-position) | Interop with Brandon Smith 9-trit, Owlet, BitNet b1.58 |
 
@@ -75,7 +76,9 @@ match conscious {
 }
 ```
 
-**Built-in functions:** `consensus(a, b)` · `invert(x)` · `truth()` · `hold()` · `conflict()`
+**Built-in Standard Library:** 217+ modules including `std::*`, `classical::*`, `nn::*`, `nlp::*`, `vision::*`, `rl::*`, `stats::*`, and research-grade `qnn::*`.
+
+**Compiler Features:** First-class `affirm/tend/reject` keywords · Binary `if/while` fallbacks · Tensor indexing `obj[r,c]` · Built-in `use` resolver with zero runtime I/O.
 
 **Quick start — install the CLI:**
 
@@ -202,11 +205,27 @@ curl -X POST https://ternlang.com/api/trit_decide \
 
 **API key:** [ternlang.com/pricing](https://ternlang.com/pricing) · Tier 2 (€24/month): 10,000 calls/month, calendar-month reset
 
-### MCP Server
+### MCP Server — v0.3.0 (20 tools)
 
 The MCP server runs at `https://ternlang.com/mcp` — compatible with Claude Desktop, Smithery, and any HTTP MCP client.
 
-**10 tools:** `trit_decide` · `trit_consensus` · `trit_eval` · `ternlang_run` · `quantize_weights` · `sparse_benchmark` · `moe_orchestrate` · `moe_deliberate` · `trit_action_gate` · `trit_enlighten`
+**10 free tools (no key):** `trit_decide` · `trit_consensus` · `trit_eval` · `ternlang_run` · `quantize_weights` · `sparse_benchmark` · `moe_orchestrate` · `moe_deliberate` · `trit_action_gate` · `trit_upgrade`
+
+**10 premium tools (X-Ternlang-Key):** `trit_compress` · `trit_triage` · `trit_plan` · `trit_factcheck` · `moe_full` · `trit_mem_write` · `trit_mem_read` · `trit_mem_consolidate` · `trit_mem_stats` · `trit_mem_compress`
+
+#### Three-Layer AI Memory (v0.3.0 flagship)
+
+The `trit_mem_*` tools implement a server-side three-layer memory system modelled on human memory consolidation:
+
+| Layer | TTL | Capacity | Write behaviour | Consolidation |
+|-------|-----|----------|-----------------|---------------|
+| `working` | 1h | LRU-256 | Raw write | Affirm → session (compressed) |
+| `session` | 24h | LRU-128 | Ternary-compressed | Affirm at half-life → MoE-13 → core |
+| `core` | Never | Unlimited | Compressed + MoE-resolved | Identity anchors, vetoes |
+
+**Ternary attention on read:** `score = key_overlap×0.35 + value_overlap×0.55 + trit_bias×0.10`
+
+Memory is stored server-side keyed to your API key — no state blob to pass between calls.
 
 ```json
 {
@@ -265,11 +284,11 @@ For local stdio transport (Claude Desktop, offline use):
 | [`ternlang-ml`](ternlang-ml/) | BSL-1.1 | Sparse matmul, BitNet quantization, TernaryMLP, deliberation engine, coalition vote, action gate |
 | [`ternlang-moe`](ternlang-moe/) | BSL-1.1 | MoE-13 orchestrator — dual-key routing, triad synthesis, 3-tier memory, AgentHarness |
 | [`ternlang-api`](ternlang-api/) | BSL-1.1 | REST + SSE API, multi-tenant key management, all reasoning endpoints |
-| [`ternlang-mcp`](ternlang-mcp/) | BSL-1.1 | MCP server — 10 tools, stdio + HTTP transport |
+| [`ternlang-mcp`](ternlang-mcp/) | BSL-1.1 | MCP server — 20 tools (10 free + 10 premium), stdio + HTTP transport, server-side 3-layer memory |
 | [`ternlang-hdl`](ternlang-hdl/) | BSL-1.1 | Verilog-2001 codegen, BET processor, FPGA simulation |
 | [`ternlang-runtime`](ternlang-runtime/) | BSL-1.1 | Distributed TCP actor runtime |
 
-**146+ tests · All passing · v0.1.0**
+**212+ tests · All passing · v0.3.0**
 
 ---
 
