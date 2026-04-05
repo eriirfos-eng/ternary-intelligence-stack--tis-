@@ -73,6 +73,7 @@ pub enum Opcode {
     TpushStr = 0x13,     // Phase 5.1: Push string literal
     Tless    = 0x14,     // Integer less-than: pop b, pop a → push trit(a < b)
     Tgreater = 0x15,     // Integer greater-than: pop b, pop a → push trit(a > b)
+    Teq      = 0x16,     // Equality: pop b, pop a → push trit(a == b)
     Thalt = 0x00,
 }
 
@@ -548,6 +549,12 @@ impl BetVm {
                     };
                     self.stack.push(Value::Trit(result));
                 }
+                0x16 => { // TEQ — equality: pop b, pop a → push trit(a == b)
+                    let b = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    let a = self.stack.pop().ok_or(VmError::StackUnderflow)?;
+                    let result = if a == b { Trit::Affirm } else { Trit::Reject };
+                    self.stack.push(Value::Trit(result));
+                }
                 // ─────────────────────────────────────────────────────────────────
 
                 0x00 => return Ok(()), // Thalt
@@ -559,6 +566,10 @@ impl BetVm {
 
     pub fn get_register(&self, reg: usize) -> Value {
         self.registers[reg].clone()
+    }
+
+    pub fn get_stack_top(&self) -> Option<Value> {
+        self.stack.last().cloned()
     }
 
     pub fn get_tensor(&self, idx: usize) -> Option<&Vec<Trit>> {

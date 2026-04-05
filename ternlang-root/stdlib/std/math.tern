@@ -4,8 +4,7 @@
 
 // Balanced ternary addition of three trits with carry propagation
 fn ternadd3(a: trit, b: trit, c: trit) -> trit {
-    let ab: trit = consensus(a, b);
-    return consensus(ab, c);
+    return a + b + c;
 }
 
 // Negate: maps +1↔-1, 0→0

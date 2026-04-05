@@ -1,0 +1,17 @@
+// Module:  stdlib/testing/sanity_test.tern
+// Purpose: Basic sanity test for the ternary test runner
+// Author:  RFI-IRFOS
+
+use std::math;
+
+let x: trit = affirm;
+let y: trit = reject;
+
+// Test ternary addition: +1 + -1 = 0
+let sum: trit = consensus(x, y);
+
+if sum == tend {
+    return affirm; // PASS
+} else {
+    return reject; // FAIL
+}

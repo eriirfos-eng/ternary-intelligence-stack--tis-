@@ -1,0 +1,25 @@
+// Module:  stdlib/std/math_test.tern
+// Purpose: Tests for std::math
+// Author:  RFI-IRFOS
+
+use std::math;
+
+let a: trit = affirm;
+let b: trit = tend;
+let c: trit = reject;
+
+// Test neg (invert)
+if neg(a) != reject { return reject; }
+if neg(b) != tend   { return reject; }
+if neg(c) != affirm { return reject; }
+
+// Test rectify
+if rectify(a) != affirm { return reject; }
+if rectify(b) != tend   { return reject; }
+if rectify(c) != tend   { return reject; }
+
+// Test ternadd3
+if ternadd3(affirm, reject, tend) != tend { return reject; }
+if ternadd3(affirm, affirm, reject) != affirm { return reject; }
+
+return affirm;

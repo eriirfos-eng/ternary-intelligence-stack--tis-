@@ -449,8 +449,8 @@ impl BytecodeEmitter {
                     BinOp::Add      => self.code.push(0x02), // TADD
                     BinOp::Mul      => self.code.push(0x03), // TMUL
                     BinOp::Sub      => { self.code.push(0x04); self.code.push(0x02); } // TNEG rhs, TADD
-                    BinOp::Equal    => self.code.push(0x0e), // TCONS (equality via consensus)
-                    BinOp::NotEqual => { self.code.push(0x0e); self.code.push(0x04); } // TCONS then TNEG
+                    BinOp::Equal    => self.code.push(0x16), // TEQ
+                    BinOp::NotEqual => { self.code.push(0x16); self.code.push(0x04); } // TEQ then TNEG
                     BinOp::And      => self.code.push(0x03), // TMUL (ternary AND = multiply)
                     BinOp::Or       => self.code.push(0x0e), // TCONS (ternary OR = consensus)
                     BinOp::Less     => self.code.push(0x14), // TLESS  (a < b → affirm/tend/reject)

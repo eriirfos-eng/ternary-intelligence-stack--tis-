@@ -14,6 +14,8 @@ use ternlang_core::StdlibLoader;
 use ternlang_ml::{TritMatrix, bitnet_threshold, benchmark};
 use ternlang_hdl::{BetSimEmitter, BetRtlProcessor};
 use ternlang_runtime::TernNode;
+use walkdir::WalkDir;
+use colored::*;
 
 #[derive(ClapParser)]
 #[command(name = "ternlang")]
@@ -79,6 +81,12 @@ enum Commands {
         /// Run Yosys synthesis if yosys is on PATH
         #[arg(short, long)]
         synth: bool,
+    },
+    /// Run native ternary tests (*_test.tern)
+    Test {
+        /// Path to a file or directory to search for tests
+        #[arg(default_value = ".")]
+        path: PathBuf,
     },
     /// [hidden] You already know what this does
     #[command(hide = true)]
@@ -172,6 +180,9 @@ fn main() {
         }
         Commands::HdlSynth { output, synth } => {
             run_hdl_synth(output.as_deref(), *synth);
+        }
+        Commands::Test { path } => {
+            run_tests(path);
         }
         Commands::Enlighten => {
             enlighten();
@@ -564,4 +575,97 @@ fn enlighten() {
     println!("  ║                                                      ║");
     println!("  ╚══════════════════════════════════════════════════════╝");
     println!();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test Runner — Phase IV: Native Ternary Tests
+// ─────────────────────────────────────────────────────────────────────────────
+fn run_tests(path: &std::path::PathBuf) {
+    println!("{}", "Ternary Test Runner".bold().bright_blue());
+    println!("Searching for *_test.tern in {:?}", path);
+    println!("{}", "─".repeat(52));
+
+    let mut passed = 0;
+    let mut failed = 0;
+    let mut skipped = 0;
+
+    for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
+        let fpath = entry.path();
+        if fpath.is_file() && fpath.extension().map_or(false, |ext| ext == "tern") {
+            let fname = fpath.file_name().unwrap().to_str().unwrap();
+            if fname.ends_with("_test.tern") {
+                print!("test {} ... ", fname);
+                use std::io::Write;
+                std::io::stdout().flush().unwrap();
+
+                let input = match fs::read_to_string(fpath) {
+                    Ok(s) => s,
+                    Err(_) => {
+                        println!("{}", "ERROR (read)".red());
+                        failed += 1;
+                        continue;
+                    }
+                };
+
+                let mut parser = Parser::new(&input);
+                let mut emitter = BytecodeEmitter::new();
+
+                match parser.parse_program() {
+                    Ok(mut prog) => {
+                        ternlang_core::StdlibLoader::resolve(&mut prog);
+                        emitter.emit_program(&prog);
+                    }
+                    Err(_) => {
+                        // Fallback to statement-by-statement for simple scripts
+                        let mut parser = Parser::new(&input);
+                        while let Ok(stmt) = parser.parse_stmt() {
+                            emitter.emit_stmt(&stmt);
+                        }
+                    }
+                }
+
+                let code = emitter.finalize();
+                let mut vm = BetVm::new(code);
+                match vm.run() {
+                    Ok(_) => {
+                        let result = vm.peek_stack(); // tests should leave result on stack top
+                        match result {
+                            Some(Value::Trit(t)) => {
+                                match t {
+                                    ternlang_core::trit::Trit::Affirm => {
+                                        println!("{}", "ok".green());
+                                        passed += 1;
+                                    }
+                                    ternlang_core::trit::Trit::Tend => {
+                                        println!("{}", "skipped".yellow());
+                                        skipped += 1;
+                                    }
+                                    ternlang_core::trit::Trit::Reject => {
+                                        println!("{}", "FAILED".red());
+                                        failed += 1;
+                                    }
+                                }
+                            }
+                            _ => {
+                                println!("{}", "FAILED (no trit return)".red());
+                                failed += 1;
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        println!("{} ({})", "FAILED (vm)".red(), e);
+                        failed += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    println!("{}", "─".repeat(52));
+    let status_str = if failed == 0 { "ok".green() } else { "FAILED".red() };
+    println!("test result: {}. {} passed; {} failed; {} skipped", status_str, passed, failed, skipped);
+
+    if failed > 0 {
+        std::process::exit(1);
+    }
 }

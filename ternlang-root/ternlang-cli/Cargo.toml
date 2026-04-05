@@ -16,3 +16,5 @@ ternlang-ml      = { path = "../ternlang-ml",      version = "0.1.0" }
 ternlang-hdl     = { path = "../ternlang-hdl",     version = "0.1.0" }
 ternlang-runtime = { path = "../ternlang-runtime", version = "0.1.0" }
 clap = { version = "4.4", features = ["derive"] }
+walkdir = "2.4"
+colored = "2.0"
