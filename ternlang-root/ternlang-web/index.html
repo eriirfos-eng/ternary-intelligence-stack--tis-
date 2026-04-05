@@ -455,6 +455,39 @@
     </div>
   </div>
 
+  <!-- Quickstart Section -->
+  <section id="quickstart" class="relative z-10 py-20 bg-t_bg2 border-b border-t_border">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl font-bold mb-6 text-white">⚡ Deploy Stack in 60s</h2>
+        <p class="text-t_muted text-lg mb-8">Install the complete triadic ecosystem (Compiler, VM, Translator, Auditor) with a single command.</p>
+        
+        <div class="bg-t_bg p-6 rounded-xl border border-t_blue/30 relative group overflow-hidden mb-10">
+          <div class="absolute inset-0 bg-t_blue/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <code class="text-t_blue font-mono text-lg break-all">curl -fsSL https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/scripts/install.sh | bash</code>
+          <button onclick="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/scripts/install.sh | bash')" class="mt-4 block mx-auto px-4 py-2 bg-t_bg3 hover:bg-t_blue/20 text-t_blue border border-t_blue/30 rounded text-sm transition-colors">
+            Copy Command
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/blob/main/QUICKSTART.md" target="_blank" class="p-4 bg-t_bg3 border border-t_border rounded-lg hover:border-t_teal/50 transition-all text-center">
+            <h3 class="text-t_teal font-bold mb-1">Quickstart Manual</h3>
+            <p class="text-xs text-t_muted">Step-by-step guide from zero to trit.</p>
+          </a>
+          <a href="https://github.com/eriirfos-eng/ternary-intelligence-stack/tree/main/examples" target="_blank" class="p-4 bg-t_bg3 border border-t_border rounded-lg hover:border-t_blue/50 transition-all text-center">
+            <h3 class="text-t_blue font-bold mb-1">Browse Examples</h3>
+            <p class="text-xs text-t_muted">260+ triadic program patterns.</p>
+          </a>
+          <a href="/pricing.html" class="p-4 bg-t_bg3 border border-t_border rounded-lg hover:border-t_red/50 transition-all text-center">
+            <h3 class="text-t_red font-bold mb-1">Scale Node</h3>
+            <p class="text-xs text-t_muted">Deploy high-mass sovereign AI.</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Mobile Section Nav -->
   <div class="md:hidden relative z-10 px-4 py-6 bg-t_bg2 border-b border-t_border">
     <p class="font-mono text-t_muted text-[10px] uppercase tracking-widest text-center mb-4">Jump to</p>
