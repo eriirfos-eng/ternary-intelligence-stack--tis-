@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "RFI-IRFOS"
+    given-names: "Research Focus Institute – Interdisciplinary Research Facility for Open Sciences"
+    address: "Elisabethinergasse 25"
+    city: "Graz"
+    post-code: "8020"
+    country: "AT"
+title: "Ternary Intelligence Stack (TIS) & Ternlang Programming Language"
+version: 0.1.0
+date-released: 2026-04-05
+url: "https://github.com/eriirfos-eng/ternary-intelligence-stack"
+repository-code: "https://github.com/eriirfos-eng/ternary-intelligence-stack"
+keywords:
+  - "balanced ternary"
+  - "ternary computing"
+  - "AI safety"
+  - "mixture of experts"
+  - "sovereign AI"
+  - "BET VM"
+  - "ternary intelligence stack"
+  - "ternlang"
+license: "LGPL-3.0-or-later"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "RFI-IRFOS"
+  title: "A Triadic Paradigm for Autonomous Intelligence: The Ternary Intelligence Stack"
+  year: 2026
+  journal: "Open Science Framework"
