@@ -1265,8 +1265,8 @@ async fn mcp_server_card() -> Json<Value> {
     Json(json!({
         "name":        "ternlang",
         "displayName": "Ternlang — Ternary Intelligence Stack",
-        "version":     "0.1.1",
-        "description": "Turns any binary AI agent into a ternary decision engine. Adds the third state: hold (trit=0) — not indecision, a first-class routing instruction that tells the agent to gather more data before committing.",
+        "version":     "0.2.0",
+        "description": "The only MCP server built on balanced ternary logic. Adds a third decision state — hold (trit=0) — that binary AI agents cannot express natively. Includes a live BET VM compiler, 13-expert MoE deliberation engine, BitNet-style weight quantizer, and multi-dimensional safety gate. Used by AI agents that need to route 'I need more data' as a first-class outcome rather than forcing a premature yes/no.",
         "homepage":    "https://ternlang.com",
         "icon":        "https://raw.githubusercontent.com/eriirfos-eng/ternary-intelligence-stack/main/ternlang-root/ternlang-web/favicon.svg",
         "repository":  "https://github.com/eriirfos-eng/ternary-intelligence-stack",
@@ -1274,13 +1274,14 @@ async fn mcp_server_card() -> Json<Value> {
         "transport":   "http",
         "endpoint":    "https://ternlang.com/mcp",
         "auth":        { "type": "none" },
+        "tags":        ["ai", "reasoning", "decision", "ternary", "safety", "ml", "deliberation"],
         "configSchema": {
             "type": "object",
             "properties": {
                 "apiKey": {
                     "type": "string",
-                    "title": "Ternlang API Key",
-                    "description": "Required for moe_orchestrate and premium REST endpoints. Pass as X-Ternlang-Key header. The 10 MCP tools work without a key. Get a key at https://ternlang.com/#licensing"
+                    "title": "Ternlang API Key (optional)",
+                    "description": "All 10 MCP tools are free with no key. An API key unlocks the full REST API: all 13 MoE experts, SSE streaming, 10k calls/month, production SLA. Get a key at https://ternlang.com/pricing"
                 }
             },
             "required": []
@@ -1288,8 +1289,9 @@ async fn mcp_server_card() -> Json<Value> {
         "tools": [
             "trit_decide", "trit_consensus", "trit_eval", "ternlang_run",
             "quantize_weights", "sparse_benchmark", "moe_orchestrate",
-            "moe_deliberate", "trit_action_gate", "trit_enlighten"
-        ]
+            "moe_deliberate", "trit_action_gate", "trit_upgrade"
+        ],
+        "highlight": "moe_orchestrate — 13-expert Mixture-of-Experts deliberation (3-expert preview free; full 13 via REST API key)"
     }))
 }
 
@@ -1297,14 +1299,16 @@ async fn mcp_server_card() -> Json<Value> {
 
 async fn mcp_info() -> Json<Value> {
     Json(json!({
-        "name":      "ternlang-mcp",
-        "version":   "0.1.0",
-        "protocol":  "2024-11-05",
-        "transport": "http",
-        "endpoint":  "https://ternlang.com/mcp",
-        "usage":     "POST JSON-RPC 2.0 — methods: initialize, tools/list, tools/call",
-        "tools":     10,
-        "auth":      "none",
+        "name":        "ternlang-mcp",
+        "version":     "0.2.0",
+        "protocol":    "2024-11-05",
+        "transport":   "http",
+        "endpoint":    "https://ternlang.com/mcp",
+        "usage":       "POST JSON-RPC 2.0 — methods: initialize, tools/list, tools/call",
+        "tools":       10,
+        "auth":        "none — all 10 MCP tools are free",
+        "highlight":   "moe_orchestrate: 13-expert MoE deliberation (3-expert preview free)",
+        "upgrade":     "https://ternlang.com/pricing",
     }))
 }
 
@@ -1342,9 +1346,10 @@ async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
                 "capabilities": { "tools": {} },
                 "serverInfo": {
                     "name":        "ternlang-mcp",
-                    "version":     "0.1.0",
-                    "description": "Ternary Intelligence Stack — turns binary AI agents into ternary decision engines.",
+                    "version":     "0.2.0",
+                    "description": "The only MCP server built on balanced ternary logic. Adds hold (trit=0) as a first-class decision outcome. Includes live BET VM, 13-expert MoE deliberation, BitNet quantization, and multi-dimensional safety gate.",
                     "homepage":    "https://ternlang.com",
+                    "pricing":     "https://ternlang.com/pricing",
                 }
             }
         }),
@@ -1391,7 +1396,7 @@ async fn mcp_handler(Json(req): Json<McpRpcRequest>) -> Json<Value> {
 // ─── MCP tool dispatch ────────────────────────────────────────────────────────
 
 fn mcp_dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
-    match name {
+    let mut result = match name {
         "trit_decide"      => mcp_trit_decide(params),
         "trit_consensus"   => mcp_trit_consensus(params),
         "trit_eval"        => mcp_trit_eval(params),
@@ -1401,9 +1406,24 @@ fn mcp_dispatch_tool(name: &str, params: &Value) -> Result<Value, String> {
         "moe_orchestrate"  => mcp_moe_orchestrate(params),
         "moe_deliberate"   => mcp_moe_deliberate(params),
         "trit_action_gate" => mcp_trit_action_gate(params),
-        "trit_enlighten"   => mcp_trit_enlighten(),
+        "trit_upgrade"     => mcp_trit_upgrade(),
         _ => Err(format!("unknown tool: {}", name)),
+    }?;
+
+    // Inject upsell footer into every successful tool response.
+    // AI agents include this in context; users see the upgrade path naturally.
+    if let Some(obj) = result.as_object_mut() {
+        obj.insert("_ternlang".to_string(), json!({
+            "mode":          "mcp_free",
+            "rest_endpoint": format!("POST https://ternlang.com/api/{}", name.replace('_', "/")),
+            "tier2_unlocks": "10 000 calls/month · production SLA · all 13 MoE experts · streaming SSE",
+            "tier3_unlocks": "Unlimited · enterprise SLA · priority support",
+            "get_key":       "https://ternlang.com/#licensing",
+            "pricing":       "https://ternlang.com/pricing",
+        }));
     }
+
+    Ok(result)
 }
 
 // ─── trit_decide ─────────────────────────────────────────────────────────────
@@ -1554,32 +1574,45 @@ fn mcp_moe_orchestrate(params: &Value) -> Result<Value, String> {
             .collect::<Result<_, _>>()?,
         None => vec![0.0f32; 6],
     };
+
+    // MCP runs the full 13-expert orchestration internally so the trit/confidence
+    // result is real and trustworthy. The response surfaces only the 3 highest-
+    // confidence expert verdicts — enough to demonstrate the system, not enough to
+    // replace the full REST API result (which includes all 13 verdicts, triad field,
+    // routing pair, SSE streaming, and production rate-limit guarantees).
     let mut orch = TernMoeOrchestrator::with_standard_experts();
     let result   = orch.orchestrate(query, &evidence);
     let trit_label = match result.trit { 1 => "affirm", -1 => "reject", _ => "tend" };
-    let verdicts: Vec<Value> = result.verdicts.iter().map(|v| json!({
-        "expert_id": v.expert_id, "expert_name": v.expert_name,
-        "trit": v.trit, "confidence": (v.confidence*1000.0).round()/1000.0,
-        "reasoning": v.reasoning,
+    let total_experts = result.verdicts.len();
+
+    // Sort by confidence descending, take top 3
+    let mut sorted_verdicts = result.verdicts.clone();
+    sorted_verdicts.sort_by(|a, b| b.confidence.partial_cmp(&a.confidence).unwrap_or(std::cmp::Ordering::Equal));
+    let preview_verdicts: Vec<Value> = sorted_verdicts.iter().take(3).map(|v| json!({
+        "expert_id":   v.expert_id,
+        "expert_name": v.expert_name,
+        "trit":        v.trit,
+        "confidence":  (v.confidence*1000.0).round()/1000.0,
+        "reasoning":   v.reasoning,
     })).collect();
-    let pair_info = result.pair.as_ref().map(|p| json!({
-        "expert_a": p.expert_a, "expert_b": p.expert_b,
-        "relevance": (p.relevance*1000.0).round()/1000.0,
-        "synergy":   (p.synergy *1000.0).round()/1000.0,
-        "combined":  (p.combined*1000.0).round()/1000.0,
-    }));
+
     Ok(json!({
-        "trit": result.trit, "label": trit_label,
+        "trit":       result.trit,
+        "label":      trit_label,
         "confidence": (result.confidence*1000.0).round()/1000.0,
-        "held": result.held, "safety_vetoed": result.safety_vetoed,
-        "temperature": (result.temperature*1000.0).round()/1000.0,
-        "prompt_hint": result.prompt_hint,
-        "triad_field": {
-            "synergy_weight": (result.triad_field.synergy_weight*1000.0).round()/1000.0,
-            "field": result.triad_field.field.raw,
-            "is_amplifying": result.triad_field.is_amplifying(),
+        "held":             result.held,
+        "safety_vetoed":    result.safety_vetoed,
+        "prompt_hint":      result.prompt_hint,
+        "mode":             "preview",
+        "experts_shown":    3,
+        "experts_total":    total_experts,
+        "verdicts_preview": preview_verdicts,
+        "full_access": {
+            "note":     "Full response includes all 13 expert verdicts, triad field, routing pair, and synergy scores.",
+            "endpoint": "POST https://ternlang.com/api/moe/orchestrate",
+            "header":   "X-Ternlang-Key: <your-tier2-key>",
+            "get_key":  "https://ternlang.com/#licensing",
         },
-        "routing_pair": pair_info, "verdicts": verdicts,
     }))
 }
 
@@ -1650,26 +1683,73 @@ fn mcp_trit_action_gate(params: &Value) -> Result<Value, String> {
     }))
 }
 
-// ─── trit_enlighten (easter egg) ──────────────────────────────────────────────
+// ─── trit_upgrade ─────────────────────────────────────────────────────────────
+//
+// Replaces the trit_enlighten easter egg with a genuine commercial onboarding
+// tool. When an AI agent calls this, the response gives the user a clear,
+// actionable map of what free MCP provides vs what a Tier 2 key unlocks.
+// Agents should surface this when a user asks "what can I do with ternlang?"
 
-fn mcp_trit_enlighten() -> Result<Value, String> {
-    let wisdoms = [
-        "Binary sees yes and no. Ternary also sees 'not yet' — and that changes everything.",
-        "The third state is not indecision. It is epistemic humility with a routing instruction.",
-        "A hold() is not silence. It is the system saying: I need more before I commit.",
-        "Binary logic forces a verdict. Ternary logic earns one.",
-        "The Setun computer ran balanced ternary in 1958. We forgot. Now we remember.",
-        "In ternary, zero is not nothing. Zero is the deliberation zone.",
-        "BitNet b1.58 proved ternary weights match float32 quality at a fraction of the cost.",
-        "consensus(-1, 1) = 0. Contradiction does not crash — it becomes a question.",
-        "The hold state is the most honest thing a machine can say.",
-        "Reject is not failure. It is the system knowing when not to act.",
-    ];
-    let idx = (std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_secs())
-        .unwrap_or(0) % wisdoms.len() as u64) as usize;
-    Ok(json!({ "wisdom": wisdoms[idx], "trit": 1, "label": "affirm" }))
+fn mcp_trit_upgrade() -> Result<Value, String> {
+    Ok(json!({
+        "trit":  1,
+        "label": "affirm",
+        "summary": "You are currently using Ternlang via the free MCP tier. Here is exactly what you have now and what unlocks with a key.",
+
+        "current_tier": {
+            "name":        "MCP Free",
+            "tools":       10,
+            "rate_limit":  "none — MCP calls are unmetered",
+            "sla":         "best-effort",
+            "moe_experts": "3-of-13 preview (full trit result, top-3 verdicts shown)",
+            "streaming":   false,
+            "rest_api":    false,
+        },
+
+        "tier2": {
+            "name":        "Tier 2 — Developer",
+            "monthly_calls": 10000,
+            "rate_limit":  "10 000 REST calls / month, resets 1st UTC",
+            "sla":         "production",
+            "moe_experts": "all 13 experts · full verdicts · triad field · routing pair",
+            "streaming":   "GET /api/stream/moe_orchestrate — SSE, event-per-expert",
+            "rest_api":    true,
+            "endpoints":   [
+                "POST /api/trit_decide",
+                "POST /api/trit_deliberate",
+                "POST /api/trit_coalition",
+                "POST /api/trit_gate",
+                "POST /api/scalar_temperature",
+                "POST /api/hallucination_score",
+                "POST /api/quantize_weights",
+                "POST /api/sparse_benchmark",
+                "POST /api/moe/orchestrate",
+                "GET  /api/stream/moe_orchestrate",
+                "GET  /api/stream/deliberate",
+                "GET  /api/usage",
+            ],
+            "get_key":     "https://ternlang.com/#licensing",
+            "pricing":     "https://ternlang.com/pricing",
+        },
+
+        "tier3": {
+            "name":       "Tier 3 — Enterprise",
+            "calls":      "unlimited",
+            "sla":        "enterprise — priority support + uptime commitment",
+            "extras":     "custom rate limits · team key management · invoice billing",
+            "contact":    "contact@ternlang.com",
+        },
+
+        "why_upgrade": [
+            "Full MoE-13 orchestration with all 13 expert verdicts and synergy scores",
+            "Server-sent events (SSE) streaming — watch deliberation happen in real time",
+            "Production rate-limiting and SLA suitable for user-facing applications",
+            "hallucination_score and scalar_temperature for AI safety pipelines",
+            "trit_coalition for multi-agent voting on shared queries",
+        ],
+
+        "quick_start": "Add header X-Ternlang-Key: <your-key> to any POST https://ternlang.com/api/* request.",
+    }))
 }
 
 // ─── MCP tool manifest ────────────────────────────────────────────────────────
@@ -1742,7 +1822,7 @@ fn mcp_tools_manifest() -> Value {
         },
         {
           "name": "moe_orchestrate",
-          "description": "Full MoE-13 orchestration pass. Routes the query through 13 specialised expert agents (syntax, world-knowledge, deductive, inductive, tool-use, persona, safety, fact-check, causal, ambiguity, math, context, meta-safety) with dual-key synergistic routing and a hard safety veto. Returns the aggregate ternary verdict, active expert list, confidence, and introspective hold flag.",
+          "description": "MoE-13 deliberation — routes your query through 13 specialised expert agents (deductive, inductive, safety, fact-check, causal, ambiguity, math, context, meta-safety, and more) with dual-key synergistic routing and a hard safety veto. FREE preview: returns the real trit verdict + top-3 expert voices. Full 13-expert response with triad field, routing pair, synergy scores, and SSE streaming available via REST API (X-Ternlang-Key, Tier 2). Call trit_upgrade to see what unlocks.",
           "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": false, "openWorldHint": true },
           "inputSchema": { "type": "object", "required": ["query"],
             "properties": {
@@ -1785,9 +1865,9 @@ fn mcp_tools_manifest() -> Value {
           }
         },
         {
-          "name": "trit_enlighten",
-          "description": "Receive a rotating piece of ternary wisdom — philosophical, technical, or historical. A gentle reminder that the third state changes everything.",
-          "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": false, "openWorldHint": false },
+          "name": "trit_upgrade",
+          "description": "Returns a structured map of what is available free via MCP vs what unlocks with a Tier 2 or Tier 3 API key: full MoE-13 experts, SSE streaming, 10k REST calls/month, production SLA, and all 12 REST endpoints. Call this tool when a user asks 'what can I do with ternlang?' or 'how do I get more out of this?'",
+          "annotations": { "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
           "inputSchema": { "type": "object", "properties": {} }
         }
     ]})

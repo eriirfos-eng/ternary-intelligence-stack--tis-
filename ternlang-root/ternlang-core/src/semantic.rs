@@ -302,6 +302,14 @@ impl SemanticAnalyzer {
                 }
                 Ok(())
             }
+
+            Stmt::IndexSet { object, row, col, value } => {
+                self.lookup_var(object)?;
+                self.infer_expr_type(row)?;
+                self.infer_expr_type(col)?;
+                self.infer_expr_type(value)?;
+                Ok(())
+            }
         }
     }
 
@@ -384,6 +392,13 @@ impl SemanticAnalyzer {
                 } else {
                     Ok(Type::Trit)
                 }
+            }
+
+            Expr::Index { object, row, col } => {
+                self.infer_expr_type(object)?;
+                self.infer_expr_type(row)?;
+                self.infer_expr_type(col)?;
+                Ok(Type::Trit)
             }
         }
     }
