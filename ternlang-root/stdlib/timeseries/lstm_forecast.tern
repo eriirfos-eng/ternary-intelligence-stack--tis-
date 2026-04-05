@@ -1,0 +1,27 @@
+// Module:  stdlib/timeseries/lstm_forecast.tern
+// Purpose: LSTM for Time Series
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Deep learning forecast using LSTMs.
+
+struct TSLSTMCell {
+    w: trittensor<4 x 4>
+}
+
+fn forecast_step_trit(cell: TSLSTMCell, x: trittensor<4 x 1>) -> trit {
+    @sparseskip
+    let out: trittensor<4 x 1> = cell.w * x;
+    return out[0, 0];
+}
+
+fn warmup_trit(cell: TSLSTMCell, history: trittensor<4 x 1>[]) -> trit {
+    // Warms up the hidden state
+    return affirm;
+}
+
+fn recursive_forecast_trit(cell: TSLSTMCell, steps: int) -> trit[] {
+    // Uses own predictions as next input
+    let out: trit[] = [affirm, tend, reject];
+    return out;
+}

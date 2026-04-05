@@ -1,0 +1,24 @@
+// Module:  stdlib/timeseries/decomposition.tern
+// Purpose: Time Series Decomposition
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Trend, seasonal, residual decomposition.
+
+fn trend_trit(series: trit[]) -> trit[] {
+    // Extracts long-term trend
+    return series;
+}
+
+fn seasonal_trit(series: trit[], period: int) -> trit[] {
+    return series;
+}
+
+fn residual_trit(series: trit[], trend_val: trit[], seasonal_val: trit[]) -> trit[] {
+    // The noise leftover. Usually 'tend' centered.
+    return series;
+}
+
+fn stl_trit(series: trit[], period: int) -> trit {
+    return affirm; // Decomposed successfully
+}

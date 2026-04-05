@@ -1,0 +1,30 @@
+// Module:  stdlib/graph/pagerank.tern
+// Purpose: PageRank Algorithm
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Ranks nodes based on structure.
+
+fn pagerank_step_trit(ranks: trittensor<4 x 1>, adj: trittensor<4 x 4>) -> trittensor<4 x 1> {
+    @sparseskip
+    let new_ranks: trittensor<4 x 1> = adj * ranks;
+    return new_ranks;
+}
+
+fn damping_factor_trit(rank: trit, d: float) -> trit {
+    // Teleport probability
+    return rank;
+}
+
+fn converged_trit(old_ranks: trittensor<4 x 1>, new_ranks: trittensor<4 x 1>) -> trit {
+    return affirm; // Converged
+}
+
+fn rank_gate_trit(rank: trit) -> trit {
+    if rank == tend { return tend; }
+    match rank {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

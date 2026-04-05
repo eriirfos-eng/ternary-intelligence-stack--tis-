@@ -1,0 +1,24 @@
+// Module:  stdlib/graph/graph_sage.tern
+// Purpose: GraphSAGE
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Samples neighbors instead of full adjacency.
+
+fn sample_neighbors_trit(node: int, sample_size: int) -> int[] {
+    let neighbors: int[] = [1, 2];
+    return neighbors;
+}
+
+fn mean_aggregate_trit(neighbor_features: trittensor<4 x 1>[]) -> trittensor<4 x 1> {
+    return neighbor_features[0]; // Simplified
+}
+
+fn sage_forward_trit(node_feat: trittensor<4 x 1>, aggregated: trittensor<4 x 1>) -> trit {
+    let out: trit = affirm;
+    match out {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

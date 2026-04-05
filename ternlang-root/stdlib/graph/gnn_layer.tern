@@ -1,0 +1,20 @@
+// Module:  stdlib/graph/gnn_layer.tern
+// Purpose: Graph Convolutional Network (GCN) Layer
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Message passing on graphs. Sparse skip is huge here.
+
+fn message_passing_trit(adj: trittensor<4 x 4>, node_features: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let messages: trittensor<4 x 1> = adj * node_features;
+    return messages;
+}
+
+fn aggregate_trit(messages: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    return messages; // Simplified
+}
+
+fn update_node_trit(old_feature: trittensor<4 x 1>, aggregated: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    return aggregated;
+}

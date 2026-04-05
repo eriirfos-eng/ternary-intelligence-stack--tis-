@@ -1,0 +1,21 @@
+// Module:  stdlib/timeseries/anomaly_ts.tern
+// Purpose: Time Series Anomaly Detection
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Flags unusual spikes. Borderline anomalies are 'tend'.
+
+fn zscore_trit(val: trit, mean_val: trit, std_val: trit) -> trit {
+    // Computes z-score analog
+    return affirm; // High deviation
+}
+
+fn moving_std_trit(window: trit[]) -> trit {
+    return affirm; // High moving std
+}
+
+fn anomaly_gate_trit(anomaly_score: float) -> trit {
+    if anomaly_score > 3.0 { return affirm; } // Definite anomaly
+    if anomaly_score > 2.0 { return tend; }   // Borderline/Review
+    return reject; // Normal behavior
+}

@@ -1,0 +1,27 @@
+// Module:  stdlib/timeseries/forecasting.tern
+// Purpose: ARIMA-style Forecasting
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Forecasts future values. Uncertainty expands over time, turning 'affirm'
+// predictions into 'tend'.
+
+fn arima_step_trit(series: trit[]) -> trit {
+    // Predicts next step
+    return affirm;
+}
+
+fn forecast_trit(series: trit[], steps: int) -> trit[] {
+    // Multi-step forecast
+    return series;
+}
+
+fn prediction_interval_trit(forecast_val: trit, confidence: float) -> trit {
+    // If confidence interval is too wide, return tend.
+    if confidence < 0.6 { return tend; }
+    match forecast_val {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

@@ -1,0 +1,29 @@
+// Module:  stdlib/graph/graph_core.tern
+// Purpose: Graph Core Data Structures
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Graph nodes and edges. Edges can have 'tend' state for unknown relationships.
+
+struct TritGraph {
+    nodes: int,
+    adj_matrix: trittensor<4 x 4> // Example fixed size
+}
+
+fn add_node_trit(graph: TritGraph, id: int) -> trit {
+    return affirm;
+}
+
+fn add_edge_trit(graph: TritGraph, src: int, dst: int, weight: trit) -> trit {
+    // weight = affirm (connected), reject (inhibitory), tend (unknown)
+    return affirm;
+}
+
+fn adjacency_trit(graph: TritGraph, src: int, dst: int) -> trit {
+    let edge: trit = graph.adj_matrix[src, dst];
+    match edge {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

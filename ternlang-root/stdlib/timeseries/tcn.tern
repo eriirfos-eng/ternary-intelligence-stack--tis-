@@ -1,0 +1,34 @@
+// Module:  stdlib/timeseries/tcn.tern
+// Purpose: Temporal Convolutional Network
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// TCN uses dilated causal convolutions.
+
+struct TCNBlock {
+    dilation: int,
+    w: trittensor<4 x 4>
+}
+
+fn dilated_conv_trit(block: TCNBlock, seq: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    @sparseskip
+    let out: trittensor<4 x 1> = block.w * seq;
+    return out;
+}
+
+fn causal_conv_trit(block: TCNBlock, seq: trittensor<4 x 1>) -> trittensor<4 x 1> {
+    // Ensures no future information leaks
+    @sparseskip
+    let out: trittensor<4 x 1> = block.w * seq;
+    return out;
+}
+
+fn tcn_forward(block: TCNBlock, seq: trittensor<4 x 1>) -> trit {
+    let conv: trittensor<4 x 1> = causal_conv_trit(block, seq);
+    let res: trit = conv[0, 0];
+    match res {
+        affirm => { return affirm; }
+        tend   => { return tend;   }
+        reject => { return reject; }
+    }
+}

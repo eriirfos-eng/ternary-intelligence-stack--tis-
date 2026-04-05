@@ -1,0 +1,23 @@
+// Module:  stdlib/timeseries/changepoint.tern
+// Purpose: Change Point Detection
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Detects regime shifts.
+
+fn cusum_trit(series: trit[]) -> trit[] {
+    // Cumulative sum control chart
+    return series;
+}
+
+fn pelt_trit(series: trit[]) -> int[] {
+    // Pruned Exact Linear Time
+    let points: int[] = [10, 20];
+    return points;
+}
+
+fn changepoint_gate_trit(confidence: float) -> trit {
+    if confidence > 0.95 { return affirm; } // Shift detected
+    if confidence > 0.80 { return tend; } // Possible shift
+    return reject; // Stable
+}

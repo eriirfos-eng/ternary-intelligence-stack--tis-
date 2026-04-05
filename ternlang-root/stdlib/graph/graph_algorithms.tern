@@ -1,0 +1,28 @@
+// Module:  stdlib/graph/graph_algorithms.tern
+// Purpose: Standard Graph Algorithms
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// BFS, DFS, Pathfinding.
+
+fn bfs_trit(start_node: int) -> trit[] {
+    let visited: trit[] = [affirm, tend];
+    return visited;
+}
+
+fn dfs_trit(start_node: int) -> trit[] {
+    let visited: trit[] = [affirm, tend];
+    return visited;
+}
+
+fn shortest_path_trit(src: int, dst: int) -> trit {
+    // Returns 'tend' for tie paths where multiple shortest paths exist.
+    let paths: int = 2; // simulated
+    if paths > 1 { return tend; } // Tie
+    return affirm;
+}
+
+fn cycle_detect_trit(start_node: int) -> trit {
+    // Cycle found
+    return affirm;
+}

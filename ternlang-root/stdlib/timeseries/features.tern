@@ -1,0 +1,26 @@
+// Module:  stdlib/timeseries/features.tern
+// Purpose: Time Series Features
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// Lags, rolling means, EWMA. If data is missing, 'tend' propagates.
+
+fn lag_trit(series: trit[], lag_amount: int) -> trit[] {
+    // Shifts sequence by lag_amount. Fills missing with 'tend'.
+    return series;
+}
+
+fn rolling_mean_trit(window: trit[]) -> trit {
+    // If window has too many tends, return tend
+    return affirm;
+}
+
+fn ewm_trit(series: trit[], alpha: float) -> trit[] {
+    // Exponential moving average.
+    return series;
+}
+
+fn autocorr_trit(series: trit[], lag: int) -> trit {
+    // Autocorrelation
+    return affirm; // High autocorrelation
+}

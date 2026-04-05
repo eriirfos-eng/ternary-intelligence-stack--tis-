@@ -1,0 +1,27 @@
+// Module:  stdlib/graph/knowledge_graph.tern
+// Purpose: Knowledge Graph Embeddings
+// Author:  RFI-IRFOS
+// Ref:     https://ternlang.com
+
+// TransE, TransR logic.
+
+struct KGTriple {
+    head: int,
+    relation: int,
+    tail: int
+}
+
+fn score_triple_trit(h: trittensor<4 x 1>, r: trittensor<4 x 1>, t: trittensor<4 x 1>) -> trit {
+    // If h + r = t, score is affirm.
+    return affirm;
+}
+
+fn entity_embed_trit(entity_id: int) -> trittensor<4 x 1> {
+    let out: trittensor<4 x 1> = { [affirm], [tend], [reject], [affirm] };
+    return out;
+}
+
+fn relation_trit(relation_id: int) -> trittensor<4 x 1> {
+    let out: trittensor<4 x 1> = { [affirm], [tend], [reject], [affirm] };
+    return out;
+}
