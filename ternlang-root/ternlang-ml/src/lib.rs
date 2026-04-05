@@ -30,11 +30,11 @@ use ternlang_core::trit::Trit;
 pub fn quantize(weights: &[f32], threshold: f32) -> Vec<Trit> {
     weights.iter().map(|&w| {
         if w > threshold {
-            Trit::PosOne
+            Trit::Affirm
         } else if w < -threshold {
-            Trit::NegOne
+            Trit::Reject
         } else {
-            Trit::Zero
+            Trit::Tend
         }
     }).collect()
 }
@@ -56,7 +56,7 @@ pub struct TritMatrix {
 
 impl TritMatrix {
     pub fn new(rows: usize, cols: usize) -> Self {
-        Self { rows, cols, data: vec![Trit::Zero; rows * cols] }
+        Self { rows, cols, data: vec![Trit::Tend; rows * cols] }
     }
 
     pub fn from_trits(rows: usize, cols: usize, data: Vec<Trit>) -> Self {
@@ -80,13 +80,13 @@ impl TritMatrix {
 
     /// Fraction of elements that are zero (hold state).
     pub fn sparsity(&self) -> f64 {
-        let zeros = self.data.iter().filter(|&&t| t == Trit::Zero).count();
+        let zeros = self.data.iter().filter(|&&t| t == Trit::Tend).count();
         zeros as f64 / self.data.len() as f64
     }
 
     /// Count of non-zero elements (active computation sites).
     pub fn nnz(&self) -> usize {
-        self.data.iter().filter(|&&t| t != Trit::Zero).count()
+        self.data.iter().filter(|&&t| t != Trit::Tend).count()
     }
 }
 
@@ -100,7 +100,7 @@ pub fn dense_matmul(a: &TritMatrix, b: &TritMatrix) -> TritMatrix {
     let mut c = TritMatrix::new(a.rows, b.cols);
     for row in 0..a.rows {
         for col in 0..b.cols {
-            let mut acc = Trit::Zero;
+            let mut acc = Trit::Tend;
             for k in 0..a.cols {
                 let prod = a.get(row, k) * b.get(k, col);
                 let (sum, _carry) = acc + prod;
@@ -138,7 +138,7 @@ pub fn sparse_matmul(a: &TritMatrix, b: &TritMatrix) -> (TritMatrix, usize) {
 
     #[inline(always)]
     fn t2i(t: Trit) -> i8 {
-        match t { Trit::NegOne => -1, Trit::Zero => 0, Trit::PosOne => 1 }
+        match t { Trit::Reject => -1, Trit::Tend => 0, Trit::Affirm => 1 }
     }
 
     // ── Layer 1: flatten A to i8 — eliminates enum dispatch from hot path ────
@@ -272,14 +272,14 @@ pub fn trit_activation(t: Trit) -> Trit { t }
 /// Returns the sign of the sum: positive majority → +1, negative → -1, tie → 0.
 pub fn majority(trits: &[Trit]) -> Trit {
     let sum: i32 = trits.iter().map(|&t| match t {
-        Trit::PosOne => 1,
-        Trit::NegOne => -1,
-        Trit::Zero   => 0,
+        Trit::Affirm => 1,
+        Trit::Reject => -1,
+        Trit::Tend   => 0,
     }).sum();
     match sum.signum() {
-        1  => Trit::PosOne,
-        -1 => Trit::NegOne,
-        _  => Trit::Zero,
+        1  => Trit::Affirm,
+        -1 => Trit::Reject,
+        _  => Trit::Tend,
     }
 }
 
@@ -353,9 +353,9 @@ impl TernaryMLP {
         let mut best_val: i8 = -2;
         for col in 0..self.out_features {
             let v = match output.get(row, col) {
-                Trit::PosOne => 1,
-                Trit::Zero   => 0,
-                Trit::NegOne => -1,
+                Trit::Affirm => 1,
+                Trit::Tend   => 0,
+                Trit::Reject => -1,
             };
             if v > best_val { best_val = v; best_col = col; }
         }
@@ -480,11 +480,11 @@ pub fn bitnet_matrix(rows: usize, cols: usize, seed: u64, target_sparsity: f64) 
         state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
         let prob = (state >> 32) as f64 / (u32::MAX as f64 + 1.0);
         if prob < target_sparsity {
-            data.push(Trit::Zero);
+            data.push(Trit::Tend);
         } else if (state & 1) == 0 {
-            data.push(Trit::PosOne);
+            data.push(Trit::Affirm);
         } else {
-            data.push(Trit::NegOne);
+            data.push(Trit::Reject);
         }
     }
     TritMatrix { rows, cols, data }
@@ -550,10 +550,10 @@ pub fn timed_benchmark_at_sparsity(target_sparsity: f64, sizes: &[usize], reps: 
 /// Input encoding: -1 = False, +1 = True
 pub fn xor_dataset() -> Vec<(TritMatrix, usize)> {
     let inputs = vec![
-        (vec![Trit::NegOne, Trit::NegOne], 0usize), // F XOR F = F → class 0
-        (vec![Trit::NegOne, Trit::PosOne], 1usize), // F XOR T = T → class 1
-        (vec![Trit::PosOne, Trit::NegOne], 1usize), // T XOR F = T → class 1
-        (vec![Trit::PosOne, Trit::PosOne], 0usize), // T XOR T = F → class 0
+        (vec![Trit::Reject, Trit::Reject], 0usize), // F XOR F = F → class 0
+        (vec![Trit::Reject, Trit::Affirm], 1usize), // F XOR T = T → class 1
+        (vec![Trit::Affirm, Trit::Reject], 1usize), // T XOR F = T → class 1
+        (vec![Trit::Affirm, Trit::Affirm], 0usize), // T XOR T = F → class 0
     ];
     inputs.into_iter().map(|(row, label)| {
         (TritMatrix::from_trits(1, 2, row), label)
@@ -564,9 +564,9 @@ pub fn xor_dataset() -> Vec<(TritMatrix, usize)> {
 pub fn parity_dataset() -> Vec<(TritMatrix, usize)> {
     (0u8..8).map(|i| {
         let bits = vec![
-            if i & 4 != 0 { Trit::PosOne } else { Trit::NegOne },
-            if i & 2 != 0 { Trit::PosOne } else { Trit::NegOne },
-            if i & 1 != 0 { Trit::PosOne } else { Trit::NegOne },
+            if i & 4 != 0 { Trit::Affirm } else { Trit::Reject },
+            if i & 2 != 0 { Trit::Affirm } else { Trit::Reject },
+            if i & 1 != 0 { Trit::Affirm } else { Trit::Reject },
         ];
         let parity = (i.count_ones() % 2) as usize;
         (TritMatrix::from_trits(1, 3, bits), parity)
@@ -610,17 +610,17 @@ impl TritScalar {
 
     /// Discrete trit classification.
     pub fn trit(&self) -> Trit {
-        if self.0 > TEND_BOUNDARY       { Trit::PosOne }
-        else if self.0 < -TEND_BOUNDARY { Trit::NegOne }
-        else                            { Trit::Zero   }
+        if self.0 > TEND_BOUNDARY       { Trit::Affirm }
+        else if self.0 < -TEND_BOUNDARY { Trit::Reject }
+        else                            { Trit::Tend   }
     }
 
     /// Semantic label: "reject" | "tend" | "affirm".
     pub fn label(&self) -> &'static str {
         match self.trit() {
-            Trit::PosOne => "affirm",
-            Trit::NegOne => "reject",
-            Trit::Zero   => "tend",
+            Trit::Affirm => "affirm",
+            Trit::Reject => "reject",
+            Trit::Tend   => "tend",
         }
     }
 
@@ -640,7 +640,7 @@ impl TritScalar {
     /// True if the signal is in a decisive zone AND confidence meets the threshold.
     /// Agents should only act when is_actionable returns true.
     pub fn is_actionable(&self, min_confidence: f32) -> bool {
-        self.trit() != Trit::Zero && self.confidence() >= min_confidence
+        self.trit() != Trit::Tend && self.confidence() >= min_confidence
     }
 
     /// Raw scalar value.
@@ -648,7 +648,7 @@ impl TritScalar {
 
     /// Signed integer trit: −1, 0, or +1.
     pub fn trit_i8(&self) -> i8 {
-        match self.trit() { Trit::PosOne => 1, Trit::NegOne => -1, Trit::Zero => 0 }
+        match self.trit() { Trit::Affirm => 1, Trit::Reject => -1, Trit::Tend => 0 }
     }
 }
 
@@ -715,7 +715,7 @@ mod tests {
         let weights = vec![-0.9f32, -0.2, 0.0, 0.3, 0.8];
         let threshold = 0.5;
         let trits = quantize(&weights, threshold);
-        assert_eq!(trits, vec![Trit::NegOne, Trit::Zero, Trit::Zero, Trit::Zero, Trit::PosOne]);
+        assert_eq!(trits, vec![Trit::Reject, Trit::Tend, Trit::Tend, Trit::Tend, Trit::Affirm]);
     }
 
     #[test]
@@ -730,14 +730,14 @@ mod tests {
     fn test_dense_matmul_identity() {
         // Identity matrix: [[1,0],[0,1]] × [[1,0],[0,1]] = [[1,0],[0,1]]
         let mut id = TritMatrix::new(2, 2);
-        id.set(0, 0, Trit::PosOne);
-        id.set(1, 1, Trit::PosOne);
+        id.set(0, 0, Trit::Affirm);
+        id.set(1, 1, Trit::Affirm);
 
         let result = dense_matmul(&id, &id);
-        assert_eq!(result.get(0, 0), Trit::PosOne);
-        assert_eq!(result.get(0, 1), Trit::Zero);
-        assert_eq!(result.get(1, 0), Trit::Zero);
-        assert_eq!(result.get(1, 1), Trit::PosOne);
+        assert_eq!(result.get(0, 0), Trit::Affirm);
+        assert_eq!(result.get(0, 1), Trit::Tend);
+        assert_eq!(result.get(1, 0), Trit::Tend);
+        assert_eq!(result.get(1, 1), Trit::Affirm);
     }
 
     #[test]
@@ -747,9 +747,9 @@ mod tests {
         let threshold = 0.5;
         let w = TritMatrix::from_f32(3, 3, &weights, threshold);
         let mut input = TritMatrix::new(3, 3);
-        input.set(0, 0, Trit::PosOne);
-        input.set(1, 1, Trit::NegOne);
-        input.set(2, 2, Trit::PosOne);
+        input.set(0, 0, Trit::Affirm);
+        input.set(1, 1, Trit::Reject);
+        input.set(2, 2, Trit::Affirm);
 
         let dense = dense_matmul(&input, &w);
         let (sparse, skipped) = sparse_matmul(&input, &w);
@@ -777,10 +777,10 @@ mod tests {
 
     #[test]
     fn test_majority_vote() {
-        assert_eq!(majority(&[Trit::PosOne, Trit::PosOne, Trit::NegOne]), Trit::PosOne);
-        assert_eq!(majority(&[Trit::NegOne, Trit::NegOne, Trit::PosOne]), Trit::NegOne);
-        assert_eq!(majority(&[Trit::PosOne, Trit::NegOne]),               Trit::Zero);
-        assert_eq!(majority(&[Trit::Zero, Trit::Zero]),                   Trit::Zero);
+        assert_eq!(majority(&[Trit::Affirm, Trit::Affirm, Trit::Reject]), Trit::Affirm);
+        assert_eq!(majority(&[Trit::Reject, Trit::Reject, Trit::Affirm]), Trit::Reject);
+        assert_eq!(majority(&[Trit::Affirm, Trit::Reject]),               Trit::Tend);
+        assert_eq!(majority(&[Trit::Tend, Trit::Tend]),                   Trit::Tend);
     }
 
     #[test]
@@ -797,7 +797,7 @@ mod tests {
             -0.6,  0.6,
         ];
         let mlp = TernaryMLP::from_f32(2, 4, 2, &w1_f32, &w2_f32);
-        let input = TritMatrix::from_trits(1, 2, vec![Trit::PosOne, Trit::NegOne]);
+        let input = TritMatrix::from_trits(1, 2, vec![Trit::Affirm, Trit::Reject]);
         let (out, s1, s2) = mlp.forward(&input);
         assert_eq!(out.rows, 1);
         assert_eq!(out.cols, 2);
@@ -810,7 +810,7 @@ mod tests {
         let w1_f32: Vec<f32> = vec![0.9, -0.8, -0.7, 0.9];
         let w2_f32: Vec<f32> = vec![0.9, -0.9, -0.8, 0.8];
         let mlp = TernaryMLP::from_f32(2, 2, 2, &w1_f32, &w2_f32);
-        let input = TritMatrix::from_trits(1, 2, vec![Trit::PosOne, Trit::NegOne]);
+        let input = TritMatrix::from_trits(1, 2, vec![Trit::Affirm, Trit::Reject]);
         let pred = mlp.predict(&input);
         assert!(pred < 2, "prediction must be a valid class index");
     }
@@ -1402,7 +1402,7 @@ pub fn action_gate(dimensions: &[GateDimension]) -> GateResult {
 
     for dim in dimensions {
         let scalar = TritScalar::new(dim.evidence);
-        let is_neg = matches!(scalar.trit(), Trit::NegOne);
+        let is_neg = matches!(scalar.trit(), Trit::Reject);
 
         if dim.hard_block && is_neg {
             hard_blocked_by.push(dim.name.clone());
@@ -1432,9 +1432,9 @@ pub fn action_gate(dimensions: &[GateDimension]) -> GateResult {
     let aggregate = TritScalar::new(agg_score);
 
     let verdict = match aggregate.trit() {
-        Trit::PosOne => GateVerdict::Proceed,
-        Trit::Zero   => GateVerdict::Hold,
-        Trit::NegOne => GateVerdict::Block,
+        Trit::Affirm => GateVerdict::Proceed,
+        Trit::Tend   => GateVerdict::Hold,
+        Trit::Reject => GateVerdict::Block,
     };
 
     let explanation = match &verdict {
@@ -1484,7 +1484,7 @@ pub fn scalar_temperature(scalar: &TritScalar) -> ScalarTemperature {
     let c = scalar.confidence(); // 0.0–1.0
 
     let (temp, reasoning, prompt_hint) = match t {
-        Trit::PosOne => {
+        Trit::Affirm => {
             // Affirm: be precise. High confidence → very low temp.
             let temp = 0.3 - (c * 0.25); // c=1.0 → 0.05, c=0.0 → 0.30
             (
@@ -1493,7 +1493,7 @@ pub fn scalar_temperature(scalar: &TritScalar) -> ScalarTemperature {
                 "Be concise and direct. Evidence is clear. Do not hedge.".to_string(),
             )
         }
-        Trit::NegOne => {
+        Trit::Reject => {
             // Reject: be firm in refusal. Low temp but not zero.
             let temp = 0.15 - (c * 0.10); // c=1.0 → 0.05, c=0.0 → 0.15
             (
@@ -1502,7 +1502,7 @@ pub fn scalar_temperature(scalar: &TritScalar) -> ScalarTemperature {
                 "Decline clearly. Do not offer alternatives unless explicitly asked. Evidence is against.".to_string(),
             )
         }
-        Trit::Zero => {
+        Trit::Tend => {
             // Tend: explore. Low confidence → highest temp (widest search).
             let temp = 0.7 + ((1.0 - c) * 0.3); // c=0.0 → 1.0, c=1.0 → 0.7
             (
@@ -1567,12 +1567,12 @@ pub fn hallucination_score(signals: &[f32]) -> HallucinationScore {
     let trust_evidence = (consistency * 2.0 - 1.0) * mean.abs(); // [-1, +1]
     let trust = TritScalar::new(trust_evidence);
 
-    let explanation = if trust.trit() == Trit::PosOne {
+    let explanation = if trust.trit() == Trit::Affirm {
         format!(
             "Consistent signals (variance {:.3}, consistency {:.0}%) — evidence coheres around {:.3}",
             variance, consistency * 100.0, mean
         )
-    } else if trust.trit() == Trit::NegOne {
+    } else if trust.trit() == Trit::Reject {
         format!(
             "HIGH VARIANCE (variance {:.3}) — signals are internally contradictory. Possible hallucination or conflated sources.",
             variance

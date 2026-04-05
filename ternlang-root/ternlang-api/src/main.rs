@@ -257,11 +257,11 @@ struct AppState {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 fn trit_to_i8(t: Trit) -> i8 {
-    match t { Trit::NegOne => -1, Trit::Zero => 0, Trit::PosOne => 1 }
+    match t { Trit::Reject => -1, Trit::Tend => 0, Trit::Affirm => 1 }
 }
 
 fn i8_to_trit(v: i64) -> Option<Trit> {
-    match v { -1 => Some(Trit::NegOne), 0 => Some(Trit::Zero), 1 => Some(Trit::PosOne), _ => None }
+    match v { -1 => Some(Trit::Reject), 0 => Some(Trit::Tend), 1 => Some(Trit::Affirm), _ => None }
 }
 
 fn api_error(status: StatusCode, message: &str) -> Response {
@@ -496,17 +496,17 @@ async fn trit_decide(Json(body): Json<Value>) -> Response {
     let actionable = scalar.is_actionable(min_confidence);
 
     let recommendation = match scalar.trit() {
-        Trit::PosOne => format!(
+        Trit::Affirm => format!(
             "Affirm — confidence {:.0}%{}.",
             scalar.confidence() * 100.0,
             if actionable { "" } else { " (below min_confidence — gather more evidence)" }
         ),
-        Trit::NegOne => format!(
+        Trit::Reject => format!(
             "Reject — confidence {:.0}%{}.",
             scalar.confidence() * 100.0,
             if actionable { "" } else { " (below min_confidence — gather more evidence)" }
         ),
-        Trit::Zero => format!(
+        Trit::Tend => format!(
             "Tend — scalar {:.3} is in the deliberation zone [{:.3}, +{:.3}]. Gather more evidence.",
             scalar.raw(), -TEND_BOUNDARY, TEND_BOUNDARY
         ),
@@ -593,9 +593,9 @@ async fn trit_vector(Json(body): Json<Value>) -> Response {
         "tend_boundary":    TEND_BOUNDARY,
         "signal_sparsity":  zeros as f64 / ev.dimensions.len() as f64,
         "recommendation":   match agg.trit() {
-            Trit::PosOne => "Affirm — weighted evidence crosses threshold.".to_string(),
-            Trit::NegOne => "Reject — weighted evidence crosses negative threshold.".to_string(),
-            Trit::Zero   => format!(
+            Trit::Affirm => "Affirm — weighted evidence crosses threshold.".to_string(),
+            Trit::Reject => "Reject — weighted evidence crosses negative threshold.".to_string(),
+            Trit::Tend   => format!(
                 "Tend — aggregate {:.3} within deliberation zone. Resolve conflicting dimensions.",
                 agg.raw()
             ),
@@ -616,8 +616,8 @@ async fn trit_consensus(Json(body): Json<Value>) -> Response {
     };
 
     // consensus: agree → common value (carry=0); disagree → 0 (carry=1)
-    let result = if a == b { a } else { Trit::Zero };
-    let carry  = if a == b { Trit::Zero } else { Trit::PosOne };
+    let result = if a == b { a } else { Trit::Tend };
+    let carry  = if a == b { Trit::Tend } else { Trit::Affirm };
 
     (StatusCode::OK, Json(json!({
         "a":      trit_to_i8(a),
@@ -936,7 +936,7 @@ async fn moe_orchestrate(
     let trit_label = match result.trit {
          1  => "affirm",
         -1  => "reject",
-        _   => "hold",
+        _   => "tend",
     };
 
     let pair_json = result.pair.as_ref().map(|p| json!({
@@ -1419,7 +1419,7 @@ fn mcp_trit_decide(params: &Value) -> Result<Value, String> {
     }).collect();
     let threshold = params["threshold"].as_f64().unwrap_or(TEND_BOUNDARY as f64) as f32;
     let trit_val = if mean > threshold { 1i8 } else if mean < -threshold { -1 } else { 0 };
-    let label = match trit_val { 1 => "affirm", -1 => "reject", _ => "hold" };
+    let label = match trit_val { 1 => "affirm", -1 => "reject", _ => "tend" };
     Ok(json!({
         "scalar":     (scalar.raw()*1000.0).round()/1000.0,
         "trit":       trit_val,
@@ -1437,7 +1437,7 @@ fn mcp_trit_consensus(params: &Value) -> Result<Value, String> {
     if ![-1,0,1].contains(&a) { return Err(format!("a={} is not a valid trit", a)); }
     if ![-1,0,1].contains(&b) { return Err(format!("b={} is not a valid trit", b)); }
     let result = if a == 1 && b == 1 { 1i64 } else if a == -1 && b == -1 { -1 } else { 0 };
-    let label = match result { 1 => "affirm", -1 => "reject", _ => "hold" };
+    let label = match result { 1 => "affirm", -1 => "reject", _ => "tend" };
     Ok(json!({ "result": result, "label": label,
                "expression": format!("consensus({}, {}) = {}", a, b, result) }))
 }
@@ -1626,7 +1626,7 @@ fn mcp_trit_action_gate(params: &Value) -> Result<Value, String> {
     let verdict_label = match result.verdict {
         GateVerdict::Proceed => "proceed",
         GateVerdict::Block   => "blocked",
-        GateVerdict::Hold    => "hold",
+        GateVerdict::Hold    => "tend",
     };
     let dim_details: Vec<Value> = result.dim_results.iter().map(|(name, scalar, is_hard)| json!({
         "name": name, "evidence": (scalar.raw()*1000.0).round()/1000.0,

@@ -87,7 +87,7 @@ pub enum Value {
 
 impl Default for Value {
     fn default() -> Self {
-        Value::Trit(Trit::Zero)
+        Value::Trit(Trit::Tend)
     }
 }
 
@@ -119,7 +119,7 @@ impl BetVm {
     pub fn new(code: Vec<u8>) -> Self {
         Self {
             registers: std::array::from_fn(|_| Value::default()),
-            carry_reg: Trit::Zero,
+            carry_reg: Trit::Tend,
             stack: Vec::new(),
             call_stack: Vec::new(),
             tensors: Vec::new(),
@@ -198,7 +198,7 @@ impl BetVm {
                     let addr = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]) as usize;
                     self.pc += 2;
                     let val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
-                    if let Value::Trit(Trit::PosOne) = val {
+                    if let Value::Trit(Trit::Affirm) = val {
                         self.pc = addr;
                     }
                 }
@@ -207,7 +207,7 @@ impl BetVm {
                     let addr = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]) as usize;
                     self.pc += 2;
                     let val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
-                    if let Value::Trit(Trit::Zero) = val {
+                    if let Value::Trit(Trit::Tend) = val {
                         self.pc = addr;
                     }
                 }
@@ -216,7 +216,7 @@ impl BetVm {
                     let addr = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]) as usize;
                     self.pc += 2;
                     let val = self.stack.pop().ok_or(VmError::StackUnderflow)?;
-                    if let Value::Trit(Trit::NegOne) = val {
+                    if let Value::Trit(Trit::Reject) = val {
                         self.pc = addr;
                     }
                 }
@@ -270,7 +270,7 @@ impl BetVm {
                     let size = u16::from_le_bytes([self.code[self.pc], self.code[self.pc + 1]]) as usize;
                     self.pc += 2;
                     let idx = self.tensors.len();
-                    self.tensors.push(vec![Trit::Zero; size]);
+                    self.tensors.push(vec![Trit::Tend; size]);
                     self.stack.push(Value::TensorRef(idx));
                 }
                 0x20 => { // TMATMUL — (tensor_ref_a, tensor_ref_b) → tensor_ref_result
@@ -287,10 +287,10 @@ impl BetVm {
                                 return Err(VmError::TypeMismatch);
                             }
                             let n = a_dim;
-                            let mut result = vec![Trit::Zero; n * n];
+                            let mut result = vec![Trit::Tend; n * n];
                             for row in 0..n {
                                 for col in 0..n {
-                                    let mut acc = Trit::Zero;
+                                    let mut acc = Trit::Tend;
                                     for k in 0..n {
                                         let (prod, _) = self.tensors[a_idx][row * n + k]
                                             + (self.tensors[a_idx][row * n + k]
@@ -315,15 +315,15 @@ impl BetVm {
                         (Value::TensorRef(a_idx), Value::TensorRef(b_idx)) => {
                             let a_len = self.tensors[a_idx].len();
                             let n = (a_len as f64).sqrt() as usize;
-                            let mut result = vec![Trit::Zero; n * n];
+                            let mut result = vec![Trit::Tend; n * n];
                             let mut skipped: usize = 0;
                             for row in 0..n {
                                 for col in 0..n {
-                                    let mut acc = Trit::Zero;
+                                    let mut acc = Trit::Tend;
                                     for k in 0..n {
                                         let weight = self.tensors[b_idx][k * n + col];
                                         // SPARSE SKIP: zero weights contribute nothing — skip entirely
-                                        if weight == Trit::Zero {
+                                        if weight == Trit::Tend {
                                             skipped += 1;
                                             continue;
                                         }
@@ -387,7 +387,7 @@ impl BetVm {
                     match ref_val {
                         Value::TensorRef(idx) => {
                             let zeros = self.tensors[idx].iter()
-                                .filter(|&&t| t == Trit::Zero)
+                                .filter(|&&t| t == Trit::Tend)
                                 .count();
                             self.stack.push(Value::Int(zeros as i64));
                         }
@@ -479,8 +479,8 @@ impl BetVm {
                             // Phase 5.1: Remote TSEND via injected RemoteTransport.
                             if let Some(rt) = &self.remote {
                                 let trit_i8 = match message {
-                                    Value::Trit(Trit::PosOne) =>  1i8,
-                                    Value::Trit(Trit::NegOne) => -1i8,
+                                    Value::Trit(Trit::Affirm) =>  1i8,
+                                    Value::Trit(Trit::Reject) => -1i8,
                                     _                         =>  0i8,
                                 };
                                 rt.remote_send(&addr, id, trit_i8)
@@ -496,7 +496,7 @@ impl BetVm {
                     match agent_val {
                         Value::AgentRef(id, None) => {
                             let message = self.agents[id].mailbox.pop_front()
-                                .unwrap_or(Value::Trit(Trit::Zero)); // empty mailbox → hold
+                                .unwrap_or(Value::Trit(Trit::Tend)); // empty mailbox → hold
                             let handler_addr = self.agents[id].handler_addr;
                             // Push message as argument, then TCALL the handler.
                             self.stack.push(message);
@@ -508,13 +508,13 @@ impl BetVm {
                             let result = if let Some(rt) = &self.remote {
                                 rt.remote_await(&addr, id)
                                     .map(|v| match v {
-                                        1  => Trit::PosOne,
-                                        -1 => Trit::NegOne,
-                                        _  => Trit::Zero,
+                                        1  => Trit::Affirm,
+                                        -1 => Trit::Reject,
+                                        _  => Trit::Tend,
                                     })
-                                    .unwrap_or(Trit::Zero)
+                                    .unwrap_or(Trit::Tend)
                             } else {
-                                Trit::Zero // hold: no transport configured
+                                Trit::Tend // hold: no transport configured
                             };
                             self.stack.push(Value::Trit(result));
                         }
@@ -549,7 +549,7 @@ impl BetVm {
 // ─── Run-length compression helpers (used by TCOMPRESS / TUNPACK) ────────────
 
 /// Run-length encode a trit slice.
-/// Output format: pairs of (run_length: u8 encoded as Trit::Zero count trick,
+/// Output format: pairs of (run_length: u8 encoded as Trit::Tend count trick,
 /// but since Trit has 3 values we encode runs as sequences of a sentinel + count.
 ///
 /// Actual encoding stored in the tensor heap as a flat Vec<Trit>:
@@ -567,7 +567,7 @@ pub fn rle_compress(src: &[Trit]) -> Vec<Trit> {
     if src.is_empty() { return vec![]; }
     let mut out = Vec::new();
     // Header: NegOne sentinel marks this as a compressed tensor
-    out.push(Trit::NegOne);
+    out.push(Trit::Reject);
 
     let mut i = 0;
     while i < src.len() {
@@ -599,7 +599,7 @@ pub fn rle_compress(src: &[Trit]) -> Vec<Trit> {
 pub fn rle_decompress(src: &[Trit]) -> Vec<Trit> {
     if src.is_empty() { return vec![]; }
     // Check header sentinel
-    if src[0] != Trit::NegOne { return src.to_vec(); } // not compressed
+    if src[0] != Trit::Reject { return src.to_vec(); } // not compressed
     let mut out = Vec::new();
     let mut i = 1;
     while i + 2 < src.len() {
@@ -615,17 +615,17 @@ pub fn rle_decompress(src: &[Trit]) -> Vec<Trit> {
 
 fn int_to_trit(v: i8) -> Trit {
     match v {
-        0 => Trit::Zero,
-        1 => Trit::PosOne,
-        _ => Trit::NegOne,
+        0 => Trit::Tend,
+        1 => Trit::Affirm,
+        _ => Trit::Reject,
     }
 }
 
 fn trit_to_int(t: Trit) -> i8 {
     match t {
-        Trit::Zero   => 0,
-        Trit::PosOne => 1,
-        Trit::NegOne => 2, // used as digit '2' in base-3 run-length
+        Trit::Tend   => 0,
+        Trit::Affirm => 1,
+        Trit::Reject => 2, // used as digit '2' in base-3 run-length
     }
 }
 
@@ -705,7 +705,7 @@ mod tensor_tests {
             Value::TensorRef(i) => i,
             _ => panic!("expected TensorRef"),
         };
-        assert_eq!(vm.get_tensor(result_ref).unwrap()[0], Trit::Zero);
+        assert_eq!(vm.get_tensor(result_ref).unwrap()[0], Trit::Tend);
     }
 }
 
@@ -756,7 +756,7 @@ mod actor_tests {
 
         // TLOAD reg0 → AgentRef, TPUSH PosOne → message, TSEND
         code.push(0x09); code.push(0x00); // TLOAD reg0
-        code.push(0x01); code.extend(pack_trits(&[Trit::PosOne])); // TPUSH +1
+        code.push(0x01); code.extend(pack_trits(&[Trit::Affirm])); // TPUSH +1
         code.push(0x31); // TSEND
 
         // TLOAD reg0 → AgentRef, TAWAIT
@@ -770,7 +770,7 @@ mod actor_tests {
         vm.run().unwrap();
 
         // The agent echoed +1 back → reg1 = PosOne
-        assert_eq!(vm.get_register(1), Value::Trit(Trit::PosOne));
+        assert_eq!(vm.get_register(1), Value::Trit(Trit::Affirm));
     }
 }
 
@@ -783,9 +783,9 @@ mod tests {
     fn test_vm_addition() {
         // Tpush 1, Tpush 1, Tadd, Tstore 0, TloadCarry, Tstore 1, Thalt
         let mut code = vec![0x01];
-        code.extend(pack_trits(&[Trit::PosOne]));
+        code.extend(pack_trits(&[Trit::Affirm]));
         code.push(0x01);
-        code.extend(pack_trits(&[Trit::PosOne]));
+        code.extend(pack_trits(&[Trit::Affirm]));
         code.push(0x02); // Tadd
         code.push(0x08); // Tstore 0
         code.push(0x00);
@@ -796,8 +796,8 @@ mod tests {
         
         let mut vm = BetVm::new(code);
         vm.run().unwrap();
-        assert_eq!(vm.get_register(0), Value::Trit(Trit::NegOne)); // Sum
-        assert_eq!(vm.get_register(1), Value::Trit(Trit::PosOne)); // Carry
+        assert_eq!(vm.get_register(0), Value::Trit(Trit::Reject)); // Sum
+        assert_eq!(vm.get_register(1), Value::Trit(Trit::Affirm)); // Carry
     }
 }
 
@@ -808,16 +808,16 @@ mod compress_tests {
 
     #[test]
     fn test_rle_compress_all_zeros() {
-        let src = vec![Trit::Zero; 9];
+        let src = vec![Trit::Tend; 9];
         let c = rle_compress(&src);
         // Must start with sentinel and be shorter than raw
-        assert_eq!(c[0], Trit::NegOne);
+        assert_eq!(c[0], Trit::Reject);
         assert!(c.len() < src.len(), "compressed should be shorter than 9 zeros");
     }
 
     #[test]
     fn test_rle_roundtrip_uniform() {
-        let src = vec![Trit::PosOne; 6];
+        let src = vec![Trit::Affirm; 6];
         let compressed = rle_compress(&src);
         let restored   = rle_decompress(&compressed);
         assert_eq!(restored, src, "roundtrip must be lossless");
@@ -826,10 +826,10 @@ mod compress_tests {
     #[test]
     fn test_rle_roundtrip_mixed() {
         let src = vec![
-            Trit::PosOne, Trit::PosOne, Trit::PosOne,
-            Trit::Zero,   Trit::Zero,
-            Trit::NegOne,
-            Trit::Zero,   Trit::Zero,   Trit::Zero,
+            Trit::Affirm, Trit::Affirm, Trit::Affirm,
+            Trit::Tend,   Trit::Tend,
+            Trit::Reject,
+            Trit::Tend,   Trit::Tend,   Trit::Tend,
         ];
         let compressed = rle_compress(&src);
         let restored   = rle_decompress(&compressed);
@@ -838,7 +838,7 @@ mod compress_tests {
 
     #[test]
     fn test_rle_compress_single_element() {
-        let src = vec![Trit::NegOne];
+        let src = vec![Trit::Reject];
         let c = rle_compress(&src);
         let r = rle_decompress(&c);
         assert_eq!(r, src);

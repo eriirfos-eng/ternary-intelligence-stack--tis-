@@ -127,9 +127,9 @@ pub fn run_tern_test(case: &TernTestCase) -> TernTestResult {
         Ok(()) => {
             // Result is the top of the stack after execution.
             let trit_val: i8 = match vm.peek_stack() {
-                Some(Value::Trit(Trit::PosOne))  =>  1,
-                Some(Value::Trit(Trit::Zero))    =>  0,
-                Some(Value::Trit(Trit::NegOne))  => -1,
+                Some(Value::Trit(Trit::Affirm))  =>  1,
+                Some(Value::Trit(Trit::Tend))    =>  0,
+                Some(Value::Trit(Trit::Reject))  => -1,
                 Some(other) => {
                     return TernTestResult::fail(
                         case.name,

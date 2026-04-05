@@ -60,15 +60,15 @@ impl RpcResponse {
 // ─── Trit helpers ────────────────────────────────────────────────────────────
 
 fn trit_to_i8(t: Trit) -> i8 {
-    match t { Trit::NegOne => -1, Trit::Zero => 0, Trit::PosOne => 1 }
+    match t { Trit::Reject => -1, Trit::Tend => 0, Trit::Affirm => 1 }
 }
 
 fn trit_label(t: Trit) -> &'static str {
-    match t { Trit::NegOne => "reject", Trit::Zero => "tend", Trit::PosOne => "affirm" }
+    match t { Trit::Reject => "reject", Trit::Tend => "tend", Trit::Affirm => "affirm" }
 }
 
 fn i8_to_trit(v: i64) -> Option<Trit> {
-    match v { -1 => Some(Trit::NegOne), 0 => Some(Trit::Zero), 1 => Some(Trit::PosOne), _ => None }
+    match v { -1 => Some(Trit::Reject), 0 => Some(Trit::Tend), 1 => Some(Trit::Affirm), _ => None }
 }
 
 // ─── Tool: trit_decide ───────────────────────────────────────────────────────
@@ -115,17 +115,17 @@ fn tool_trit_decide(params: &Value) -> Result<Value, String> {
     let actionable = scalar.is_actionable(min_confidence);
 
     let recommendation = match scalar.trit() {
-        Trit::PosOne => format!(
+        Trit::Affirm => format!(
             "Affirm — confidence {:.0}%{}. Proceed with action.",
             scalar.confidence() * 100.0,
             if actionable { "" } else { " (below min_confidence threshold — gather more evidence)" }
         ),
-        Trit::NegOne => format!(
+        Trit::Reject => format!(
             "Reject — confidence {:.0}%{}. Do not proceed.",
             scalar.confidence() * 100.0,
             if actionable { "" } else { " (below min_confidence threshold — gather more evidence)" }
         ),
-        Trit::Zero => format!(
+        Trit::Tend => format!(
             "Tend — scalar {:.3} is within the deliberation zone [{:.3}, +{:.3}]. \
              Gather more evidence before acting.",
             scalar.raw(), -TEND_BOUNDARY, TEND_BOUNDARY
@@ -206,17 +206,17 @@ fn tool_trit_vector(params: &Value) -> Result<Value, String> {
     let actionable = agg.is_actionable(min_confidence);
 
     let recommendation = match agg.trit() {
-        Trit::PosOne => format!(
+        Trit::Affirm => format!(
             "Affirm — aggregate scalar {:.3}, confidence {:.0}%{}.",
             agg.raw(), agg.confidence() * 100.0,
             if actionable { ". Act." } else { ". Confidence below threshold — continue gathering evidence." }
         ),
-        Trit::NegOne => format!(
+        Trit::Reject => format!(
             "Reject — aggregate scalar {:.3}, confidence {:.0}%{}.",
             agg.raw(), agg.confidence() * 100.0,
             if actionable { ". Do not act." } else { ". Confidence below threshold — continue gathering evidence." }
         ),
-        Trit::Zero => format!(
+        Trit::Tend => format!(
             "Tend — aggregate scalar {:.3} is in the deliberation zone [{:.3}, +{:.3}]. \
              Do not act yet. Strongest signal: {}.",
             agg.raw(), -TEND_BOUNDARY, TEND_BOUNDARY,

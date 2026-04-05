@@ -246,6 +246,10 @@ impl<'a> Parser<'a> {
                     .map_err(|_| ParseError::InvalidTrit(slice.to_string()))?;
                 Ok(Expr::TritLiteral(val))
             }
+            // Semantic trit keywords: affirm=+1, tend=0, reject=-1
+            Token::Affirm => Ok(Expr::TritLiteral(1)),
+            Token::Tend   => Ok(Expr::TritLiteral(0)),
+            Token::Reject => Ok(Expr::TritLiteral(-1)),
             Token::Int(val) => Ok(Expr::IntLiteral(val)),
             Token::StringLit(s) => Ok(Expr::StringLiteral(s)),
             Token::Ident(name) => {

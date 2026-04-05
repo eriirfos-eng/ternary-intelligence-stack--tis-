@@ -11,9 +11,9 @@ pub fn pack_trits(trits: &[Trit]) -> Vec<u8> {
         let mut byte = 0u8;
         for (i, &trit) in chunk.iter().enumerate() {
             let bits = match trit {
-                Trit::NegOne => 0b01,
-                Trit::Zero   => 0b11,
-                Trit::PosOne => 0b10,
+                Trit::Reject => 0b01,
+                Trit::Tend   => 0b11,
+                Trit::Affirm => 0b10,
             };
             byte |= bits << (i * 2);
         }
@@ -31,9 +31,9 @@ pub fn unpack_trits(bytes: &[u8], count: usize) -> Result<Vec<Trit>, BetFault> {
             }
             let bits = (byte >> (bit_idx * 2)) & 0b11;
             let trit = match bits {
-                0b01 => Trit::NegOne,
-                0b11 => Trit::Zero,
-                0b10 => Trit::PosOne,
+                0b01 => Trit::Reject,
+                0b11 => Trit::Tend,
+                0b10 => Trit::Affirm,
                 0b00 => return Err(BetFault::InvalidState(byte_idx as u8)),
                 _ => unreachable!(),
             };
@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_packing_unpacking() {
-        let trits = vec![Trit::NegOne, Trit::Zero, Trit::PosOne, Trit::NegOne, Trit::Zero];
+        let trits = vec![Trit::Reject, Trit::Tend, Trit::Affirm, Trit::Reject, Trit::Tend];
         let packed = pack_trits(&trits);
         assert_eq!(packed.len(), 2);
         

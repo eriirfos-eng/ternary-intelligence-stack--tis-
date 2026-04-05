@@ -125,7 +125,7 @@ impl BytecodeEmitter {
                             self.symbols.insert(format!("{}.{}", name, field), reg);
                             // Zero-initialise each field
                             self.code.push(0x01); // TPUSH hold
-                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Zero]));
+                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Tend]));
                             self.code.push(0x08); // TSTORE
                             self.code.push(reg);
                         }
@@ -133,7 +133,7 @@ impl BytecodeEmitter {
                         if fields.is_empty() {
                             self.next_reg += 1;
                             self.code.push(0x01);
-                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Zero]));
+                            self.code.extend(crate::vm::bet::pack_trits(&[crate::trit::Trit::Tend]));
                             self.code.push(0x08);
                             self.code.push(base_reg);
                         }
@@ -268,14 +268,14 @@ impl BytecodeEmitter {
 
                 // Initialise index to 0 (hold trit — used as int here)
                 self.code.push(0x01);
-                self.code.extend(pack_trits(&[Trit::Zero]));
+                self.code.extend(pack_trits(&[Trit::Tend]));
                 self.code.push(0x08); self.code.push(idx_reg); // TSTORE idx=0
 
                 let loop_top = self.code.len() as u16;
 
                 // Load current element: TIDX(tensor, 0, idx) — simplified 1D walk
                 self.code.push(0x09); self.code.push(iter_reg); // TLOAD tensor
-                self.code.push(0x01); self.code.extend(pack_trits(&[Trit::Zero])); // row 0
+                self.code.push(0x01); self.code.extend(pack_trits(&[Trit::Tend])); // row 0
                 self.code.push(0x09); self.code.push(idx_reg); // TLOAD idx
                 self.code.push(0x22); // TIDX → trit element
                 let var_reg = self.next_reg; self.next_reg += 1;
@@ -469,15 +469,15 @@ impl BytecodeEmitter {
                     }
                     "truth" => {
                         self.code.push(0x01); // TPUSH
-                        self.code.extend(pack_trits(&[Trit::PosOne]));
+                        self.code.extend(pack_trits(&[Trit::Affirm]));
                     }
                     "hold" => {
                         self.code.push(0x01); // TPUSH
-                        self.code.extend(pack_trits(&[Trit::Zero]));
+                        self.code.extend(pack_trits(&[Trit::Tend]));
                     }
                     "conflict" => {
                         self.code.push(0x01); // TPUSH
-                        self.code.extend(pack_trits(&[Trit::NegOne]));
+                        self.code.extend(pack_trits(&[Trit::Reject]));
                     }
                     "matmul" => {
                         if args.len() == 2 {
@@ -503,7 +503,7 @@ impl BytecodeEmitter {
                             // Forward reference: emit TCALL with placeholder, needs second pass
                             // For now emit hold as safe default
                             self.code.push(0x01); // TPUSH hold
-                            self.code.extend(pack_trits(&[Trit::Zero]));
+                            self.code.extend(pack_trits(&[Trit::Tend]));
                         }
                     }
                 }
@@ -521,7 +521,7 @@ impl BytecodeEmitter {
                 }
                 // Fallback: push hold
                 self.code.push(0x01);
-                self.code.extend(pack_trits(&[Trit::Zero]));
+                self.code.extend(pack_trits(&[Trit::Tend]));
             }
             Expr::Propagate { expr } => {
                 // Evaluate inner expression → stack: [val]
@@ -558,7 +558,7 @@ impl BytecodeEmitter {
                         self.code.extend_from_slice(&type_id.to_le_bytes());
                     } else {
                         self.code.push(0x01);
-                        self.code.extend(pack_trits(&[Trit::Zero]));
+                        self.code.extend(pack_trits(&[Trit::Tend]));
                     }
                 } else if let Some(&type_id) = self.agent_type_ids.get(agent_name) {
                     // Local spawn
@@ -567,7 +567,7 @@ impl BytecodeEmitter {
                 } else {
                     // Unknown agent — push hold as fallback
                     self.code.push(0x01);
-                    self.code.extend(pack_trits(&[Trit::Zero]));
+                    self.code.extend(pack_trits(&[Trit::Tend]));
                 }
             }
             Expr::StringLiteral(s) => {
@@ -578,7 +578,7 @@ impl BytecodeEmitter {
                 // Let's assume the VM can handle a raw string in the value stack if pushed via a hook.
                 // For now, emit a placeholder.
                 self.code.push(0x01);
-                self.code.extend(pack_trits(&[Trit::Zero]));
+                self.code.extend(pack_trits(&[Trit::Tend]));
             }
             Expr::NodeId => {
                 self.code.push(0x12); // TNODEID
@@ -640,7 +640,7 @@ mod tests {
         vm.run().unwrap();
         
         // Final 'y' should be in register 1
-        assert_eq!(vm.get_register(1), Value::Trit(Trit::NegOne));
+        assert_eq!(vm.get_register(1), Value::Trit(Trit::Reject));
     }
 
     #[test]
@@ -682,6 +682,6 @@ mod tests {
         vm.run().unwrap();
         
         // 'x' is 1, so 'y' in the first branch should be -1.
-        assert_eq!(vm.get_register(1), Value::Trit(Trit::NegOne));
+        assert_eq!(vm.get_register(1), Value::Trit(Trit::Reject));
     }
 }

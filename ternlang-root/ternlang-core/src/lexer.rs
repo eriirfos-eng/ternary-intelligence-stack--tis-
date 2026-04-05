@@ -10,6 +10,16 @@ pub enum Token {
     #[token("1")]
     TritLiteral,
 
+    // Ternary semantic keywords — first-class trit values
+    #[token("affirm", priority = 4)]
+    Affirm,
+
+    #[token("tend", priority = 4)]
+    Tend,
+
+    #[token("reject", priority = 4)]
+    Reject,
+
     #[token("?")]
     UncertainBranch,
 
